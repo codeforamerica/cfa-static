@@ -179,8 +179,9 @@ The `snippet` block references a reusable block composition by filename without
 the `.md` extension:
 
 ```yaml
-- type: snippet
-  reference: shared-contact-prompt
+blocks:
+  - type: snippet
+    reference: shared-contact-prompt
 ```
 
 Create `src/snippets/shared-contact-prompt.md` before using that reference.

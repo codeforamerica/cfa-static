@@ -317,6 +317,14 @@ const withConfiguredMock = (configureFn) => () => {
 // ============================================
 
 // Export project-specific utilities
+export { analyzeBlockMarkdown } from "#test/test-utils/block-markdown-analysis.js";
+export {
+  assertDocumentationLinks,
+  assertDocumentationTarget,
+  extractDocumentationExamples,
+  getDocumentationFiles,
+} from "#test/test-utils/documentation.js";
+
 export {
   ALL_JS_FILES,
   // Code analysis

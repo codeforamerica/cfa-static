@@ -1,30 +1,9 @@
 import { memoize } from "#utils/fp/memoize.js";
 import { filterObject, mapEntries } from "#utils/fp/object.js";
-import { frozenSet } from "#utils/fp/set.js";
+import { VOID_ELEMENTS } from "#utils/html-elements.js";
 import { loadDOM } from "#utils/lazy-dom.js";
 
 /** @typedef {import("#lib/types").ElementAttributes} ElementAttributes */
-
-/**
- * HTML5 void elements that cannot have children and are self-closing.
- * @type {ReadonlySet<string>}
- */
-const VOID_ELEMENTS = frozenSet([
-  "area",
-  "base",
-  "br",
-  "col",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "link",
-  "meta",
-  "param",
-  "source",
-  "track",
-  "wbr",
-]);
 
 /**
  * Escape a string for use in HTML attribute values

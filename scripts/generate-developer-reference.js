@@ -5,37 +5,25 @@ import { parseSync } from "oxc-parser";
 import scss from "postcss-scss";
 import YAML from "yaml";
 import { ROOT_DIR } from "#lib/paths.js";
+import { COLLECTIONS } from "#scripts/customise-cms/collections.js";
+import { FEATURE_QUESTIONS } from "#scripts/customise-cms/feature-questions.js";
 import { runIfMain } from "#scripts/lib/is-main-module.js";
+import {
+  inlineCode as code,
+  escapeText,
+  fencedCode,
+  markdownTable as table,
+} from "#scripts/lib/markdown.js";
 import { pick } from "#utils/fp/array.js";
 
 /** @typedef {{ path: string, content: string }} SourceFile */
-/** @typedef {SourceFile & { constant: string }} DefinitionSource */
+/** @typedef {{ path: string } & ({ constant: "COLLECTIONS", value: typeof COLLECTIONS } | { constant: "FEATURE_QUESTIONS", value: typeof FEATURE_QUESTIONS })} CmsDefinition */
 /** @typedef {{ engines: { node: string }, scripts: Record<string, string>, imports: Record<string, unknown> }} PackageInfo */
 
-// HTML code cells preserve shell backticks and pipes without breaking tables.
 /** @param {unknown} value */
-const code = (value) =>
-  `<code>${String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replace(/[\\`*_[\]~]/g, (char) => `&#${char.charCodeAt(0)};`)
-    .replaceAll("|", "&#124;")
-    .replaceAll("\n", "<br>")}</code>`;
-
-/** @param {string[]} headers @param {string[][]} rows */
-const table = (headers, rows) =>
-  [
-    `| ${headers.join(" | ")} |`,
-    `| ${headers.map(() => "---").join(" | ")} |`,
-    ...rows.map((row) => `| ${row.join(" | ")} |`),
-  ].join("\n");
-
-/** @param {unknown} value */
-const jsonBlock = (value) =>
-  `\`\`\`json\n${JSON.stringify(value, null, 2)}\n\`\`\``;
+const jsonBlock = (value) => fencedCode(JSON.stringify(value, null, 2), "json");
 /** @param {string} path */
-const sourceLink = (path) => `[${path}](../${path})`;
+const sourceLink = (path) => `[${escapeText(path)}](../${path})`;
 
 /** @param {string} path @param {string} content */
 const parseReferenceJavaScript = (path, content) => {
@@ -102,7 +90,7 @@ const renderFpModule = ({ path, content }) => {
         summary ? code(summary) : "No adjacent JSDoc summary; see source.",
       ];
     });
-  return `### \`#utils/fp/${path.split("/").at(-1)}\`\n\n${sourceLink(path)}\n\n${table(["Export", "JSDoc Summary"], rows)}`;
+  return `### ${code(`#utils/fp/${path.split("/").at(-1)}`)}\n\n${sourceLink(path)}\n\n${table(["Export", "JSDoc Summary"], rows)}`;
 };
 
 /** @param {ReturnType<typeof scss.parse>["nodes"]} nodes @param {string} prefix */
@@ -140,7 +128,7 @@ const renderSass = ({ path, content }) => {
   const helpers = nodes
     .filter((node) => node.type === "atrule")
     .filter((node) => ["function", "mixin"].includes(node.name))
-    .map((node) => `\`\`\`scss\n${node.toString()}\n\`\`\``);
+    .map((node) => fencedCode(node.toString(), "scss"));
   return [
     `### ${sourceLink(path)}`,
     table(["Sass Variable", "Source Expression"], rows),
@@ -148,24 +136,9 @@ const renderSass = ({ path, content }) => {
   ].join("\n\n");
 };
 
-/** Extract one known top-level array declaration without importing its module.
- * @param {DefinitionSource} file
- */
-const renderCmsDefinition = ({ path, content, constant }) => {
-  const { program } = parseReferenceJavaScript(path, content);
-  const declaration = program.body
-    .map((node) =>
-      node.type === "ExportNamedDeclaration" ? node.declaration : node,
-    )
-    .filter((node) => node?.type === "VariableDeclaration")
-    .flatMap((node) => node.declarations)
-    .find(({ id }) => id.type === "Identifier" && id.name === constant);
-  if (declaration?.init?.type !== "ArrayExpression") {
-    throw new Error(`Expected top-level array ${constant} in ${path}`);
-  }
-  const source = content.slice(declaration.init.start, declaration.init.end);
-  return `### ${constant}\n\nSource: ${sourceLink(path)}.\n\n\`\`\`js\nconst ${constant} = ${source};\n\`\`\``;
-};
+/** @param {CmsDefinition} definition */
+const renderCmsDefinition = ({ path, value, constant }) =>
+  `### ${escapeText(constant)}\n\nSource: ${sourceLink(path)}.\n\n${jsonBlock(value)}`;
 
 /** @param {SourceFile} file */
 const renderWorkflow = ({ path, content }) => {
@@ -201,13 +174,13 @@ const renderWorkflow = ({ path, content }) => {
       ]),
     ),
   };
-  return `### ${sourceLink(path)}\n\n\`\`\`yaml\n${YAML.stringify(facts, { lineWidth: 0 })}\`\`\``;
+  return `### ${sourceLink(path)}\n\n${fencedCode(YAML.stringify(facts, { lineWidth: 0 }), "yaml")}`;
 };
 
-/** @param {{ sassSources: SourceFile[], cmsSources: DefinitionSource[], workflowSources: SourceFile[] }} inputs */
+/** @param {{ sassSources: SourceFile[], cmsDefinitions: CmsDefinition[], workflowSources: SourceFile[] }} inputs */
 const renderStructuredSources = ({
   sassSources,
-  cmsSources,
+  cmsDefinitions,
   workflowSources,
 }) =>
   [
@@ -215,8 +188,8 @@ const renderStructuredSources = ({
     "Top-level Sass variable declarations from `src/css/_variables.scss` and `src/css/_breakpoints.scss`, plus their function/mixin definitions. Values are source expressions, not evaluated CSS: `!default` is a Sass configuration flag, references and arithmetic remain unevaluated, and the breakpoint map is not a table of computed media-query thresholds. Nested helper variables are only shown inside their definitions. No equivalence between separately declared breakpoint values is inferred.",
     ...sassSources.map(renderSass),
     "## CMS Definitions",
-    "The `COLLECTIONS` and `FEATURE_QUESTIONS` arrays are extracted from their definition modules without importing or executing them. Collection paths and direct dependencies are declared values, not resolved site paths or transitive dependencies. Optional flags are shown only when present. Feature questions identify available choices, not saved selections or inferred defaults. This is not the generated PagesCMS field schema or an inventory of runtime/custom collections.",
-    ...cmsSources.map(renderCmsDefinition),
+    "The generator imports `COLLECTIONS` from `scripts/customise-cms/collections.js` and `FEATURE_QUESTIONS` from `scripts/customise-cms/feature-questions.js`, the same definitions used by the CMS runtime. These modules have no import-time I/O; interactive prompts and saved site configuration are not loaded. This fixed catalog is serialized as JSON in declaration order, without copying JavaScript comments or evaluating source text. Collection paths and direct dependencies are declared values, not resolved site paths or transitive dependencies. Optional flags are shown only when present. Feature questions identify available choices, not saved selections or inferred defaults. This is not the generated PagesCMS field schema or an inventory of runtime/custom collections.",
+    ...cmsDefinitions.map(renderCmsDefinition),
     "## Deployment Workflow Facts",
     "Parsed configured workflow metadata and job definitions from the linked YAML files. Job facts include declared runners, dependencies, conditions, strategy, environments, defaults, reusable-workflow inputs, and complete ordered steps (including build commands and step env/with mappings). YAML formatting and comments are normalized. Omitted keys stay omitted: no runner, shell, environment, or application defaults are inferred. GitHub expressions are literal source expressions; no environment variables or secret values are read or evaluated.",
     ...workflowSources.map(renderWorkflow),
@@ -261,7 +234,7 @@ const renderBiome = (biome) =>
   ].join("\n\n");
 
 /** Pure renderer: all source inputs are supplied, no files are read or written.
- * @param {{ packageJson: PackageInfo, biome: Record<string, unknown>, fpSources: SourceFile[], themeSources: SourceFile[], sassSources: SourceFile[], cmsSources: DefinitionSource[], workflowSources: SourceFile[] }} inputs
+ * @param {{ packageJson: PackageInfo, biome: Record<string, unknown>, fpSources: SourceFile[], themeSources: SourceFile[], sassSources: SourceFile[], cmsDefinitions: CmsDefinition[], workflowSources: SourceFile[] }} inputs
  * @returns {string}
  */
 export const renderDeveloperReference = ({
@@ -302,7 +275,9 @@ const sources = (directory, pattern) =>
     .filter((name) => pattern.test(name))
     .map((name) => readReferenceSource(`${directory}/${name}`));
 
-/** Read source inputs only. Importing this module does not read or write files. */
+/** Read source files and supply shared CMS data. Importing this module does not read or write files.
+ * @returns {Parameters<typeof renderDeveloperReference>[0]}
+ */
 export const readDeveloperReferenceInputs = () => ({
   packageJson: JSON.parse(readReferenceSource("package.json").content),
   biome: JSON.parse(readReferenceSource("biome.json").content),
@@ -311,10 +286,18 @@ export const readDeveloperReferenceInputs = () => ({
   sassSources: ["src/css/_variables.scss", "src/css/_breakpoints.scss"].map(
     readReferenceSource,
   ),
-  cmsSources: [
-    { path: "scripts/customise-cms/collections.js", constant: "COLLECTIONS" },
-    { path: "scripts/customise-cms/prompts.js", constant: "FEATURE_QUESTIONS" },
-  ].map(({ path, constant }) => ({ ...readReferenceSource(path), constant })),
+  cmsDefinitions: [
+    {
+      path: "scripts/customise-cms/collections.js",
+      constant: "COLLECTIONS",
+      value: COLLECTIONS,
+    },
+    {
+      path: "scripts/customise-cms/feature-questions.js",
+      constant: "FEATURE_QUESTIONS",
+      value: FEATURE_QUESTIONS,
+    },
+  ],
   workflowSources: [
     ".github/workflows/pages.yml",
     ".github/workflows/sharedservices-deploy.yaml",

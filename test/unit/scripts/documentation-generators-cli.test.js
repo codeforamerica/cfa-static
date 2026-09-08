@@ -1,64 +1,78 @@
-import { writeFileSync } from "node:fs";
-import { basename, join } from "node:path";
-import { afterEach, describe, expect, test, vi } from "vitest";
-import {
-  readDeveloperReferenceInputs,
-  renderDeveloperReference,
-} from "#scripts/generate-developer-reference.js";
-import { runIfMain } from "#scripts/lib/is-main-module.js";
-import { renderBlocksReference } from "#scripts/lib/render-blocks-reference.js";
-import "#scripts/generate-blocks-reference.js";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { captureConsole, rootDir } from "#test/test-utils.js";
 
 vi.mock("node:fs", async (importOriginal) => {
   const original = await importOriginal();
-  const writeFileSync = vi.fn();
+  const mocked = {
+    readFileSync: vi.fn(original.readFileSync),
+    readdirSync: vi.fn(original.readdirSync),
+    writeFileSync: vi.fn(),
+  };
   return {
     ...original,
-    writeFileSync,
-    default: { ...original.default, writeFileSync },
+    ...mocked,
+    default: { ...original.default, ...mocked },
   };
 });
-vi.mock("#scripts/lib/is-main-module.js", () => ({ runIfMain: vi.fn() }));
-
-const entryPoints = Object.fromEntries(
-  vi
-    .mocked(runIfMain)
-    .mock.calls.map(([url, main]) => [basename(new URL(url).pathname), main]),
-);
 
 const generators = [
   {
     script: "generate-blocks-reference.js",
     target: "skills/cfa-static-site-builder/references/blocks.md",
-    render: renderBlocksReference,
+    load: () => import("#scripts/generate-blocks-reference.js"),
+    render: async () => {
+      const { renderBlocksReference } = await import(
+        "#scripts/lib/render-blocks-reference.js"
+      );
+      return renderBlocksReference();
+    },
   },
   {
     script: "generate-developer-reference.js",
     target: "docs/developer-reference.md",
-    render: () => renderDeveloperReference(readDeveloperReferenceInputs()),
+    load: () => import("#scripts/generate-developer-reference.js"),
+    render: async () => {
+      const { readDeveloperReferenceInputs, renderDeveloperReference } =
+        await import("#scripts/generate-developer-reference.js");
+      return renderDeveloperReference(readDeveloperReferenceInputs());
+    },
   },
 ];
 
-afterEach(() => {
-  vi.restoreAllMocks();
+beforeEach(() => {
+  vi.resetModules();
   vi.clearAllMocks();
 });
 
-describe.each(generators)("$script CLI", ({ script, target, render }) => {
-  test("generated output ends with exactly one newline", () => {
-    expect(render().match(/\n+$/)?.[0]).toBe("\n");
-  });
+afterEach(() => {
+  vi.doUnmock("#scripts/lib/is-main-module.js");
+  vi.restoreAllMocks();
+});
 
-  test("importing does not write the generated file", () => {
+describe.each(generators)("$script CLI", ({ script, target, load, render }) => {
+  test("fresh import respects filesystem safety with the real entry-point guard", async () => {
+    await load();
     expect(writeFileSync).not.toHaveBeenCalled();
+    if (script === "generate-developer-reference.js") {
+      expect(readFileSync).not.toHaveBeenCalled();
+      expect(readdirSync).not.toHaveBeenCalled();
+    }
   });
 
-  test("the guarded entry point writes the rendered reference", () => {
-    captureConsole(entryPoints[script]);
+  test("the guarded callback writes the newline-terminated rendered reference", async () => {
+    const guard = vi.fn();
+    vi.doMock("#scripts/lib/is-main-module.js", () => ({ runIfMain: guard }));
+    await load();
+    const [[url, main]] = guard.mock.calls;
+    expect(new URL(url).pathname).toBe(join(rootDir, "scripts", script));
+    captureConsole(main);
+    const output = await render();
+    expect(output.match(/\n+$/)?.[0]).toBe("\n");
     expect(writeFileSync).toHaveBeenCalledExactlyOnceWith(
       join(rootDir, target),
-      render(),
+      output,
     );
   });
 });

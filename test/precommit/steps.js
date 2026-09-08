@@ -70,7 +70,9 @@ export const finishTestRun = (output, status) => {
  * Lint / SCSS / knip use the read-only check variants (no `--write` / `--fix`)
  * so a commit hook never mutates the checkout mid-commit. If formatting or
  * dead-code is found the step fails; run `npm run lint:fix` / `npm run
- * knip:fix` and re-stage. The test step uses the dot reporter so the runner
+ * knip:fix` and re-stage. Generated artifacts are checked for freshness, not
+ * regenerated, so a stale index cannot pass via a repaired working tree.
+ * The test step uses the dot reporter so the runner
  * can stream live `(N/total passed)` progress even when stdout is piped.
  */
 export const getSteps = () => {
@@ -80,10 +82,6 @@ export const getSteps = () => {
 
   return [
     { name: "install", cmd: ["npm", "install"] },
-    {
-      name: "generate-types",
-      cmd: ["node", "scripts/generate-pages-cms-types.js"],
-    },
     {
       name: "tests:code-quality",
       cmd: ["npx", "vitest", "run", "test/unit/code-quality"],

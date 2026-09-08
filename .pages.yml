@@ -109,6 +109,7 @@ components:
           - name: icon
             type: string
             label: Icon (Iconify ID or HTML entity)
+          - { name: icon_label, type: string, label: Icon Accessible Label }
           - { name: name, type: string, label: Name, required: true }
           - { name: description, type: rich-text, label: Description }
           - { name: style, type: string, label: Custom Style }

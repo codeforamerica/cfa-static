@@ -111,13 +111,6 @@ const BLOCK_MODULES = [
 const indexByType = (getValue) =>
   Object.fromEntries(BLOCK_MODULES.map((m) => [m.type, getValue(m)]));
 
-/** @type {Record<string, string>} */
-const DOC_TYPE_MAP = {
-  markdown: "string",
-  image: "string",
-  reference: "string",
-};
-
 const BLOCK_SCHEMAS = indexByType((m) => m.fields);
 
 /** @type {Record<string, "full" | "wide" | "narrow">} */
@@ -194,35 +187,15 @@ const BLOCK_CMS_FIELDS = indexByType((m) => ({
 }));
 
 /**
- * @typedef {Object} BlockParamDoc
- * @property {string} type
- * @property {boolean} [required]
- * @property {unknown} [default]
- * @property {string} [description]
- *
  * @typedef {Object} BlockDoc
  * @property {string} summary
  * @property {string} [scss]
  * @property {string} [htmlRoot]
  * @property {string} [notes]
- * @property {Record<string, BlockParamDoc>} params
  */
 
 /** @type {Record<string, BlockDoc>} */
-const BLOCK_DOCS = indexByType((m) => ({
-  ...m.docs,
-  params: Object.fromEntries(
-    Object.entries(m.fields).map(([key, field]) => [
-      key,
-      {
-        type: field.list ? "array" : DOC_TYPE_MAP[field.type] || field.type,
-        ...(field.required && { required: true }),
-        ...(field.default !== undefined && { default: field.default }),
-        description: field.description,
-      },
-    ]),
-  ),
-}));
+const BLOCK_DOCS = indexByType((m) => m.docs);
 
 /** @param {readonly string[]} arr */
 const quoteJoin = (arr) => arr.map((k) => `"${k}"`).join(", ");
