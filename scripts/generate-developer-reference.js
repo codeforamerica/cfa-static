@@ -23,7 +23,7 @@ import { pick } from "#utils/fp/array.js";
 /** @param {unknown} value */
 const jsonBlock = (value) => fencedCode(JSON.stringify(value, null, 2), "json");
 /** @param {string} path */
-const sourceLink = (path) => `[${escapeText(path)}](../${path})`;
+const sourceLink = (path) => `[${code(path)}](../${path})`;
 
 /** @param {string} path @param {string} content */
 const parseReferenceJavaScript = (path, content) => {
@@ -87,21 +87,26 @@ const renderFpModule = ({ path, content }) => {
       const line = content.slice(0, local.start).split("\n").length;
       return [
         `[${code(entry.exportName.name)}](../${path}#L${line})`,
-        summary ? code(summary) : "No adjacent JSDoc summary; see source.",
+        summary
+          ? escapeText(summary)
+          : "No adjacent JSDoc summary; see source.",
       ];
     });
   return `### ${code(`#utils/fp/${path.split("/").at(-1)}`)}\n\n${sourceLink(path)}\n\n${table(["Export", "JSDoc Summary"], rows)}`;
 };
 
 /** @param {ReturnType<typeof scss.parse>["nodes"]} nodes @param {string} prefix */
-const declarationRows = (nodes, prefix) =>
-  nodes
+const renderDeclarations = (nodes, prefix) => {
+  const declarations = nodes
     .filter((node) => node.type === "decl")
     .filter((node) => node.prop.startsWith(prefix))
-    .map((node) => [
-      code(node.prop),
-      code(`${node.value}${node.important ? " !important" : ""}`),
-    ]);
+    .map(
+      (node) =>
+        `${node.prop}: ${node.value}${node.important ? " !important" : ""};`,
+    )
+    .join("\n");
+  return declarations ? [fencedCode(declarations, "scss")] : [];
+};
 
 /** Literal top-level :root declarations only; no Sass evaluation or cascade inference.
  * @param {SourceFile} file
@@ -112,26 +117,27 @@ const renderTheme = ({ path, content }) => {
     .nodes.filter((node) => node.type === "rule")
     .filter((node) => node.selector === ":root");
   if (!roots.length) return [];
-  const rows = declarationRows(
-    roots.flatMap((root) => root.nodes),
-    "--",
-  );
   return [
-    `### ${sourceLink(path)}\n\n${table(["Token", "Source Value"], rows)}`,
+    [
+      `### ${sourceLink(path)}`,
+      ...renderDeclarations(
+        roots.flatMap((root) => root.nodes),
+        "--",
+      ),
+    ].join("\n\n"),
   ];
 };
 
 /** @param {SourceFile} file */
 const renderSass = ({ path, content }) => {
   const { nodes } = scss.parse(content, { from: path });
-  const rows = declarationRows(nodes, "$");
   const helpers = nodes
     .filter((node) => node.type === "atrule")
     .filter((node) => ["function", "mixin"].includes(node.name))
     .map((node) => fencedCode(node.toString(), "scss"));
   return [
     `### ${sourceLink(path)}`,
-    table(["Sass Variable", "Source Expression"], rows),
+    ...renderDeclarations(nodes, "$"),
     ...helpers,
   ].join("\n\n");
 };
@@ -257,7 +263,7 @@ export const renderDeveloperReference = ({
     "Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from parsed local named exports, not a handwritten inventory. Summaries are only the immediately preceding JSDoc prose before tags or a paragraph break; missing prose is explicitly marked. Follow source links for signatures, currying, examples, and caveats. No utility behavior is inferred, and source modules are not executed.",
     ...fpSources.toSorted(byPath).map(renderFpModule),
     "## Theme Source Tokens",
-    "Source-file catalog: `src/css/theme.scss` and `src/css/theme-*.scss` files that contain a top-level `:root` rule. Files without that rule (such as editor styles) are omitted. Tables preserve literal custom-property declarations in source order. This is not the compiled theme-switcher registry, a complete design-system token inventory, computed CSS, or a claim about scoped overrides and Sass defaults. Follow the source links for the rest of each theme.",
+    "Source-file catalog: `src/css/theme.scss` and `src/css/theme-*.scss` files that contain a top-level `:root` rule. Files without that rule (such as editor styles) are omitted. Code blocks preserve literal custom-property declarations in source order. This is not the compiled theme-switcher registry, a complete design-system token inventory, computed CSS, or a claim about scoped overrides and Sass defaults. Follow the source links for the rest of each theme.",
     ...themeSources.toSorted(byPath).flatMap(renderTheme),
     renderStructuredSources(structuredSources),
   ].join("\n\n")}\n`;

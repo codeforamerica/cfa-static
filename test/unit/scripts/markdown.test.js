@@ -11,6 +11,21 @@ const markdown = new MarkdownIt({ html: true });
 
 describe("literal reference Markdown", () => {
   test.each([
+    ">=22",
+    "#utils/*",
+    "src/_lib/utils/fp/array.js",
+    "--color-link",
+    "node scripts/build.js --ignore '**/*.js' && npm run check:links",
+  ])("keeps ordinary code readable in Markdown source: %s", (text) => {
+    expect(inlineCode(text)).toBe(`\`${text}\``);
+  });
+
+  test("leaves ordinary prose punctuation readable", () => {
+    const text = "Full-width at 1.5rem (the default).";
+    expect(escapeText(text)).toBe(text);
+  });
+
+  test.each([
     { rows: [] },
     {
       rows: [
@@ -75,6 +90,10 @@ describe("literal reference Markdown", () => {
     " ``value`` ",
     "  ",
     "\\|",
+    "",
+    "value|label",
+    " value",
+    "value ",
   ])("preserves inline code whitespace and delimiters: %j", (text) => {
     const document = new DOMParser().parseFromString(
       markdown.render(inlineCode(text)),

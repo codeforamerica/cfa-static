@@ -153,7 +153,7 @@ image paths, alt text, aspect ratios, and caption fields.
 
 Spacing, typography, radii, widths, and breakpoint declarations are generated in
 the checkout's [developer reference](../../../docs/developer-reference.md#sass-source-declarations).
-The [theme source tables](../../../docs/developer-reference.md#theme-source-tokens)
+The [theme source declarations](../../../docs/developer-reference.md#theme-source-tokens)
 show literal custom-property overrides. Source expressions and Sass defaults
 are not computed browser values; inspect rendered output when changing themes.
 
