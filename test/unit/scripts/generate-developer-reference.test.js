@@ -112,14 +112,14 @@ describe("developer reference rendering", () => {
 
   test("renders the supplied Node requirement", () => {
     expect(renderDeveloperReference(inputs())).toContain(
-      "Node requirement: <code>&gt;&#61;99</code>",
+      "Node requirement: `>=99`",
     );
   });
 
   test("lists every script with its exact command", () => {
     expect(renderDeveloperReference(inputs())).toContain(
-      "| <code>npm run inspect</code> | <code>node inspect&#46;js &#45;&#45;strict</code> |\n" +
-        "| <code>npm run test</code> | <code>vitest run</code> |",
+      "| `npm run inspect` | `node inspect.js --strict` |\n" +
+        "| `npm run test` | `vitest run` |",
     );
   });
 
@@ -167,12 +167,8 @@ describe("developer reference rendering", () => {
         },
       },
     });
-    expect(output).toContain(
-      "| <code>&#35;fixture/&#42;</code> | <code>&#46;/fixtures/&#42;</code> |",
-    );
-    expect(output).toContain(
-      '<code>{"node":"&#46;/node&#46;js","default":"&#46;/web&#46;js"}</code>',
-    );
+    expect(output).toContain("| `#fixture/*` | `./fixtures/*` |");
+    expect(output).toContain('`{"node":"./node.js","default":"./web.js"}`');
   });
 
   test.each([
@@ -204,11 +200,11 @@ describe("developer reference rendering", () => {
       export function callable() { return 3; }
     `),
     );
-    expect(output).toContain("<code>publicName</code>");
-    expect(output).toContain("<code>direct</code>");
-    expect(output).toContain("<code>callable</code>");
-    expect(output).not.toContain("<code>privateHelper</code>");
-    expect(output).not.toContain("<code>local</code>");
+    expect(output).toContain("`publicName`");
+    expect(output).toContain("`direct`");
+    expect(output).toContain("`callable`");
+    expect(output).not.toContain("`privateHelper`");
+    expect(output).not.toContain("`local`");
   });
 
   test("links JSDoc summaries to their declaration line", () => {
@@ -218,7 +214,7 @@ describe("developer reference rendering", () => {
       ),
     );
     expect(output).toContain(
-      "[<code>named</code>](../src/_lib/utils/fp/example.js#L5) | <code>First line continues here&#46;</code>",
+      "[`named`](../src/_lib/utils/fp/example.js#L5) | First line continues here.",
     );
     expect(output).not.toContain("@param");
   });
@@ -229,7 +225,7 @@ describe("developer reference rendering", () => {
         "/** Summary.\n *\n * Details deliberately omitted.\n */\nexport const named = 1;",
       ),
     );
-    expect(output).toContain("<code>Summary&#46;</code>");
+    expect(output).toContain("| Summary. |");
     expect(output).not.toContain("Details deliberately omitted");
   });
 
@@ -281,16 +277,12 @@ describe("developer reference rendering", () => {
       }),
     );
     expect(output).toContain(
-      "[src/css/theme&#45;sample&#46;scss](../src/css/theme-sample.scss)",
+      "[`src/css/theme-sample.scss`](../src/css/theme-sample.scss)",
     );
-    expect(output).toContain(
-      "| <code>&#45;&#45;color</code> | <code>rgb(1 2 3 / 5%&#41;</code> |",
-    );
-    expect(output).toContain(
-      '| <code>&#45;&#45;font</code> | <code>"A; B"</code> |',
-    );
+    expect(output).toContain("--color: rgb(1 2 3 / 5%);");
+    expect(output).toContain('--font: "A; B";');
     expect(output).not.toMatch(
-      /&#45;&#45;(?:commented|scoped|nested)|theme-editor\.scss/,
+      /--(?:commented|scoped|nested)|theme-editor\.scss/,
     );
   });
 
@@ -306,6 +298,19 @@ describe("developer reference rendering", () => {
     ).toThrow("Unclosed block");
   });
 
+  test("keeps multiline theme values in readable SCSS fences rather than HTML table cells", () => {
+    const declaration = "--background: linear-gradient(\n  red,\n  blue\n);";
+    const output = renderDeveloperReference(
+      inputs({
+        themeSources: [
+          { path: "theme.scss", content: `:root { ${declaration} }` },
+        ],
+      }),
+    );
+    expect(codeBlocks(output, "scss")).toEqual([`${declaration}\n`]);
+    expect(output).not.toMatch(/<code>|<br>|&#\d+;/);
+  });
+
   test("preserves important flags on source token declarations", () => {
     const output = renderDeveloperReference(
       inputs({
@@ -317,9 +322,7 @@ describe("developer reference rendering", () => {
         ],
       }),
     );
-    expect(output).toContain(
-      "| <code>&#45;&#45;color</code> | <code>red &#33;important</code> |",
-    );
+    expect(output).toContain("--color: red !important;");
   });
 
   test("sorts source catalogs without mutating caller input", () => {
@@ -358,15 +361,9 @@ describe("developer reference rendering", () => {
         ],
       }),
     );
-    expect(output).toContain(
-      "| <code>$unit</code> | <code>9px &#33;default</code> |",
-    );
-    expect(output).toContain(
-      "| <code>$width</code> | <code>$unit &#42; 7 &#33;default</code> |",
-    );
-    expect(output).toContain(
-      '<code>("small": 701px, "large": 999px&#41;</code>',
-    );
+    expect(output).toContain("$unit: 9px !default;");
+    expect(output).toContain("$width: $unit * 7 !default;");
+    expect(output).toContain('$breakpoints: ("small": 701px, "large": 999px);');
     expect(output).toContain(
       '@function alias($name) { @return unquote("var(--#{$name})"); }',
     );
