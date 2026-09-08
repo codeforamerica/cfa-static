@@ -18,7 +18,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { rootDir } from "#test/test-utils.js";
-import { BLOCK_CMS_FIELDS, BLOCK_DOCS } from "#utils/block-schema.js";
+import {
+  BLOCK_CMS_FIELDS,
+  BLOCK_SCHEMAS,
+  getBlockTemplate,
+} from "#utils/block-schema.js";
 import { frozenSet } from "#utils/fp/set.js";
 
 /**
@@ -85,10 +89,9 @@ const isRawHtmlAllowlisted = (blockType, fieldName) =>
  * within `.map(...)` so all its locals (and the nested helpers that only this
  * mapping uses) remain scoped to a single call site.
  */
-const blocksWithTemplates = Object.entries(BLOCK_CMS_FIELDS)
-  .filter(([type]) => BLOCK_DOCS[type]?.template)
-  .map(([type, fields]) => {
-    const template = BLOCK_DOCS[type].template;
+const blocksWithTemplates = Object.entries(BLOCK_CMS_FIELDS).map(
+  ([type, fields]) => {
+    const template = `src/_includes/${getBlockTemplate(type)}`;
 
     const collectFieldEntries = (obj) =>
       Object.entries(obj).flatMap(([name, schema]) => [
@@ -139,7 +142,8 @@ const blocksWithTemplates = Object.entries(BLOCK_CMS_FIELDS)
     });
 
     return { type, template, typeMap, outputs };
-  });
+  },
+);
 
 /**
  * Run `check(context, output)` for every (block, output) pair and collect the
@@ -157,6 +161,18 @@ const collectViolations = (check) =>
   );
 
 describe("block-markdown-rendering", () => {
+  test("checks resolved templates for every registered block", () => {
+    expect(blocksWithTemplates.length).toBeGreaterThan(0);
+    expect(blocksWithTemplates.map(({ type }) => type)).toEqual(
+      Object.keys(BLOCK_SCHEMAS),
+    );
+    expect(
+      blocksWithTemplates
+        .flatMap(({ outputs }) => outputs)
+        .filter(({ isMarkdownRender }) => isMarkdownRender).length,
+    ).toBeGreaterThan(0);
+  });
+
   test(`every | renderContent: "md" is inside a .prose-classed element`, () => {
     const violations = collectViolations(({ type, output }) => {
       if (!output.isMarkdownRender) return null;

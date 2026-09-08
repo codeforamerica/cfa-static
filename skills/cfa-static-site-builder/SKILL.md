@@ -11,10 +11,10 @@ description: >-
   Static site without crossing the template's static boundary. Do not use it
   for unrelated Eleventy projects.
 license: MIT
-compatibility: Requires git, Node.js 22+, npm, a POSIX-compatible shell, and a CfA Static fork or checkout. Network access may be needed to clone, install dependencies, fetch an uncached icon or remote asset, or deploy.
+compatibility: Requires git, npm, the Node.js version declared by the checkout's package.json, a POSIX-compatible shell, and a CfA Static fork or checkout. Network access may be needed to clone, install dependencies, fetch an uncached icon or remote asset, or deploy.
 metadata:
   author: chobbledotcom
-  version: "1.0.0"
+  version: "1.1.0"
   repository: https://github.com/codeforamerica/cfa-static
 ---
 
@@ -36,13 +36,17 @@ link to an external service. Do not quietly add a server-side subsystem.
 - Treat the site as a fork of CfA Static, never as an npm dependency.
 - Use supplied facts and assets. Never invent contact details, people,
   addresses, testimonials, statistics, legal claims, or organization history.
-- Prefer the existing block vocabulary. Read `BLOCKS_LAYOUT.md` before
-  authoring a block instead of guessing its fields.
+- Prefer the existing block vocabulary. Read the generated
+  [block reference](references/blocks.md) before authoring a block instead of
+  guessing its fields. Read [layouts](references/layouts.md) for columns,
+  sidebars, and rendering context.
 - Pages, news, guide categories, and guide pages are block-only. Do not add
   Markdown body content below their frontmatter. Snippet body content is the
   intentional exception.
-- Do not hand-edit `.pages.yml`, `BLOCKS_LAYOUT.md`, or
-  `src/_lib/types/pages-cms-generated.d.ts`; regenerate them from source.
+- Do not hand-edit `.pages.yml`, `references/blocks.md`, the checkout's
+  `docs/developer-reference.md`, or `src/_lib/types/pages-cms-generated.d.ts`;
+  regenerate them from source. `BLOCKS_LAYOUT.md` is an authored navigation
+  page, not generated output.
 - Preserve existing user changes and the site's visual language unless the
   user asks for a redesign.
 - Follow the checked-out repository's `CLAUDE.md` and local instructions when

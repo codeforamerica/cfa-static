@@ -47,6 +47,8 @@
 		"generate-pages-yml": "node scripts/customise-cms/generate-full.js",
 		"generate-cms-types": "node scripts/generate-pages-cms-types.js",
 		"generate-blocks-reference": "node scripts/generate-blocks-reference.js",
+		"generate-developer-reference": "node scripts/generate-developer-reference.js",
+		"generate-references": "npm run generate-blocks-reference && npm run generate-pages-yml && npm run generate-cms-types && npm run generate-developer-reference",
 		"screenshot": "node scripts/screenshot.js",
 		"lighthouse": "node scripts/lighthouse.js",
 		"check:links": "node scripts/check-internal-links.js _site",

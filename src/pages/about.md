@@ -5,7 +5,7 @@ meta_description: What CfA Static is, where it comes from, and the principles it
 blocks:
   - type: section-header
     intro: |-
-      ## About this template
+      # About this template
 
       A small, opinionated base for informational sites
   - type: markdown
@@ -24,10 +24,10 @@ blocks:
     items:
       - icon: "hugeicons:shield-01"
         name: Fail loudly at build time
-        description: Configuration mistakes, unknown blocks, and broken internal links stop the build with a named error - never a silently wrong page.
+        description: Required site identity, block types, and internal links are checked at build time. Review the rendered page too; automated checks cannot catch every content mistake.
       - icon: "hugeicons:document-validation"
         name: One source of truth
-        description: Block schemas generate the validation, the editor config, the reference docs, and the live gallery - none of them can drift.
+        description: Block schemas drive validation, the editor config, and the generated reference. Tests check that generated artifacts stay current and gallery examples validate.
       - icon: "hugeicons:globe-02"
         name: Static means simple
         description: The deployable artifact is a directory of files. Host it anywhere, cache it everywhere, patch nothing.
@@ -38,7 +38,9 @@ blocks:
     content: |
       ## Explore the building blocks
 
-      Every block type is rendered live, next to the YAML that produces it.
+      Browse schema-backed YAML examples, with live previews for blocks that
+      work on their own. Collection-restricted blocks include guidance for
+      using them in context instead.
     button:
       text: See the blocks
       href: /blocks/

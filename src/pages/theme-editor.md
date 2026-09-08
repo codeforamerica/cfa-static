@@ -1,6 +1,9 @@
 ---
 name: Theme Editor
 blocks:
+  - type: markdown
+    content: |
+      # Theme Editor
   - type: html
     content: |
       {% capture field %}form/field.html{% endcapture %}

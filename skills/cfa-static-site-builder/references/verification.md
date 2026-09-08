@@ -39,17 +39,27 @@ npm test
 
 ## Generated Artifacts
 
-After changing a block schema, regenerate all schema-derived files:
+After changing schemas or other generated-reference inputs, regenerate all
+references and CMS artifacts:
 
 ```bash
-npm run generate-blocks-reference
-npm run generate-pages-yml
-npm run generate-cms-types
+npm run generate-references
 ```
 
-The CMS customizer and normal configured generator regenerate `.pages.yml` and
-the generated types together. The explicit type command remains useful for a
-focused freshness check.
+This runs the block reference, PagesCMS config, CMS types, and developer
+reference generators in order, stopping on failure. CMS artifacts use the saved
+`cms_config`; the command does not change the selected collections or features.
+Individual generator commands remain available for focused work.
+
+The block generator owns `references/blocks.md` inside this skill, not
+`BLOCKS_LAYOUT.md` or the authored `layouts.md` companion. The developer
+reference derives from package commands, Biome configuration, FP exports, Sass,
+CMS definitions, and deployment workflows.
+
+Freshness checks
+compare generated content without rewriting either reference. Skill packaging
+checks validate metadata, links, and evaluation definitions; they do not run
+an agent against the evaluation scenarios or prove task success.
 
 Never repair generated output by hand. Change its source schema or saved
 `cms_config`, regenerate, and inspect the diff.
@@ -102,7 +112,7 @@ schema URLs for exactly one `/project/` prefix.
 
 - **Placeholder site data:** replace or remove the reported publishable value;
   do not weaken `scripts/site-data.js`.
-- **Unknown block/key:** compare the content with `BLOCKS_LAYOUT.md` and the
+- **Unknown block/key:** compare the content with [the block reference](blocks.md) and the
   schema module named by the block.
 - **Missing required field:** add factual content or choose a block that does
   not require that field.

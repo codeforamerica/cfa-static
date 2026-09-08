@@ -13,7 +13,7 @@ blocks:
 
       Build small, fast, accessible marketing and informational sites from composable content blocks - written in YAML, rendered by Eleventy, deployed as a static artifact.
     buttons:
-      - text: See every block live
+      - text: Explore the blocks
         href: /blocks/
         variant: primary
         size: lg

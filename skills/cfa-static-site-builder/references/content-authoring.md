@@ -5,12 +5,13 @@ CfA Static content.
 
 ## Use The Live Schema
 
-`BLOCKS_LAYOUT.md` is the readable block reference and `/blocks/` is the live
-gallery. The schema modules under `src/_lib/utils/block-schema/` define accepted
+[The block reference](blocks.md) is generated from full schemas and canonical
+examples; `/blocks/` is the live gallery. The schema modules under
+`src/_lib/utils/block-schema/` define accepted
 fields. The template path recorded in the reference, usually under
 `src/_includes/design-system/`, defines rendering. Before using a block:
 
-1. find its entry in `BLOCKS_LAYOUT.md`
+1. find its entry and canonical YAML example in [the block reference](blocks.md)
 2. confirm consequential fields in its schema and template
 3. include every required field
 4. build immediately after introducing a new block pattern
@@ -170,8 +171,9 @@ unless there is a clear reason.
 
 Snippet files live in `src/snippets/` and may use either Markdown body content
 or a `blocks` array. `footer-content.md` and `right-content.md` are named global
-regions. Read `src/snippets/README.md` before changing them because sidebars
-allow only column-safe block types.
+regions. Read `src/snippets/README.md` and [layouts](layouts.md) before changing
+them; the [generated compatibility table](blocks.md#column-and-sidebar-compatibility)
+lists column-safe block types for sidebars.
 
 The `snippet` block references a reusable block composition by filename without
 the `.md` extension:

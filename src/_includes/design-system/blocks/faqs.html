@@ -16,7 +16,7 @@ If block.items is not provided, falls back to the page-level `faqs` array.
 <dl class="faqs">
   {%- for faq in _faqs -%}
   <dt>{{ faq.question }}</dt>
-  <dd>{{ faq.answer | renderContent: "md" }}</dd>
+  <dd class="prose">{{ faq.answer | renderContent: "md" }}</dd>
   {%- endfor -%}
 </dl>
 {%- endif -%}
