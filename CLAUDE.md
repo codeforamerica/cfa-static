@@ -103,7 +103,7 @@ Edit sources, never generated output by hand. After block schema changes:
 
 1. Update `src/_lib/utils/block-schema/<type>.js` and register new modules in `src/_lib/utils/block-schema.js`.
 2. Add/update `src/_includes/design-system/blocks/<type>.html` and the matching SCSS partial under `src/css/design-system/`; forward new partials from its index.
-3. Run `npm run generate-references`. It runs the block reference, PagesCMS config, CMS types, and developer reference generators in order, stopping on failure. Review `skills/cfa-static-site-builder/references/blocks.md`, `.pages.yml`, `src/_lib/types/pages-cms-generated.d.ts`, and `docs/developer-reference.md`.
+3. Run `npm run generate-references`. Its three steps generate the block reference, PagesCMS config plus CMS types, and developer reference in order, stopping on failure. Review all four artifacts: `skills/cfa-static-site-builder/references/blocks.md`, `.pages.yml`, `src/_lib/types/pages-cms-generated.d.ts`, and `docs/developer-reference.md`. Precommit checks freshness without regenerating; regenerate and re-stage stale artifacts before retrying.
 
 The block reference is wholly generated. `BLOCKS_LAYOUT.md` is a handwritten
 navigation page; the skill's `SKILL.md`, layout guidance, and other workflow

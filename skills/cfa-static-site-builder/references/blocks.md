@@ -19,78 +19,78 @@ The **Documented default** column reproduces display-text metadata, not executab
 `type` is a required string selecting a registered block. The common wrapper fields below come from `CONTAINER_FIELDS`. `dark` selects a dark section palette; `compact` reduces section padding. They affect full-width section wrappers, not direct column/sidebar rendering; transparent `snippet` blocks do not acquire their own wrapper.
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `dark` | `boolean` | optional | Not documented | Dark |  |
-| `compact` | `boolean` | optional | Not documented | Compact |  |
+| --- | --- | --- | --- | --- | --- |
+| <code>dark</code> | <code>boolean</code> | optional | Not documented | Dark |  |
+| <code>compact</code> | <code>boolean</code> | optional | Not documented | Compact |  |
 
 ## Column and sidebar compatibility
 
 This table covers registered types only. `No` types are rejected inside columns and the right-content sidebar, but may appear in full-width `before` slots. `Yes` means the type passes the placement check, not that it is context-free. Snippets are reusable compositions: keep their contents appropriate for their destination too.
 
 | Block | Container width | Columns / sidebar |
-|---|---|---|
-| [`section-header`](#section-header) | `wide` | Yes |
-| [`features`](#features) | `wide` | Yes |
-| [`image-cards`](#image-cards) | `wide` | Yes |
-| [`stats`](#stats) | `wide` | Yes |
-| [`code-block`](#code-block) | `wide` | Yes |
-| [`hero`](#hero) | `full` | No |
-| [`split-image`](#split-image) | `wide` | No |
-| [`split-code`](#split-code) | `wide` | No |
-| [`split-icon-links`](#split-icon-links) | `wide` | No |
-| [`split-html`](#split-html) | `wide` | No |
-| [`split-callout`](#split-callout) | `wide` | No |
-| [`split-full`](#split-full) | `full` | No |
-| [`cta`](#cta) | `wide` | Yes |
-| [`callout`](#callout) | `narrow` | Yes |
-| [`image-background`](#image-background) | `full` | No |
-| [`items`](#items) | `wide` | Yes |
-| [`items-array`](#items-array) | `wide` | Yes |
-| [`items-text-list`](#items-text-list) | `wide` | Yes |
-| [`link-columns`](#link-columns) | `wide` | Yes |
-| [`markdown`](#markdown) | `wide` | Yes |
-| [`table-of-contents`](#table-of-contents) | `narrow` | Yes |
-| [`html`](#html) | `wide` | Yes |
-| [`iframe-embed`](#iframe-embed) | `wide` | Yes |
-| [`include`](#include) | `wide` | Yes |
-| [`news-meta`](#news-meta) | `wide` | Yes |
-| [`faqs`](#faqs) | `wide` | Yes |
-| [`guide-categories`](#guide-categories) | `wide` | Yes |
-| [`guide-header`](#guide-header) | `full` | Yes |
-| [`guide-navigation`](#guide-navigation) | `full` | Yes |
-| [`guide-pages-list`](#guide-pages-list) | `full` | Yes |
-| [`link-button`](#link-button) | `wide` | Yes |
-| [`gallery`](#gallery) | `wide` | Yes |
-| [`marquee-images`](#marquee-images) | `full` | No |
-| [`icon-links`](#icon-links) | `narrow` | Yes |
-| [`downloads`](#downloads) | `narrow` | Yes |
-| [`snippet`](#snippet) | `wide` | Yes |
+| --- | --- | --- |
+| [<code>section&#45;header</code>](#section-header) | <code>wide</code> | Yes |
+| [<code>features</code>](#features) | <code>wide</code> | Yes |
+| [<code>image&#45;cards</code>](#image-cards) | <code>wide</code> | Yes |
+| [<code>stats</code>](#stats) | <code>wide</code> | Yes |
+| [<code>code&#45;block</code>](#code-block) | <code>wide</code> | Yes |
+| [<code>hero</code>](#hero) | <code>full</code> | No |
+| [<code>split&#45;image</code>](#split-image) | <code>wide</code> | No |
+| [<code>split&#45;code</code>](#split-code) | <code>wide</code> | No |
+| [<code>split&#45;icon&#45;links</code>](#split-icon-links) | <code>wide</code> | No |
+| [<code>split&#45;html</code>](#split-html) | <code>wide</code> | No |
+| [<code>split&#45;callout</code>](#split-callout) | <code>wide</code> | No |
+| [<code>split&#45;full</code>](#split-full) | <code>full</code> | No |
+| [<code>cta</code>](#cta) | <code>wide</code> | Yes |
+| [<code>callout</code>](#callout) | <code>narrow</code> | Yes |
+| [<code>image&#45;background</code>](#image-background) | <code>full</code> | No |
+| [<code>items</code>](#items) | <code>wide</code> | Yes |
+| [<code>items&#45;array</code>](#items-array) | <code>wide</code> | Yes |
+| [<code>items&#45;text&#45;list</code>](#items-text-list) | <code>wide</code> | Yes |
+| [<code>link&#45;columns</code>](#link-columns) | <code>wide</code> | Yes |
+| [<code>markdown</code>](#markdown) | <code>wide</code> | Yes |
+| [<code>table&#45;of&#45;contents</code>](#table-of-contents) | <code>narrow</code> | Yes |
+| [<code>html</code>](#html) | <code>wide</code> | Yes |
+| [<code>iframe&#45;embed</code>](#iframe-embed) | <code>wide</code> | Yes |
+| [<code>include</code>](#include) | <code>wide</code> | Yes |
+| [<code>news&#45;meta</code>](#news-meta) | <code>wide</code> | Yes |
+| [<code>faqs</code>](#faqs) | <code>wide</code> | Yes |
+| [<code>guide&#45;categories</code>](#guide-categories) | <code>wide</code> | Yes |
+| [<code>guide&#45;header</code>](#guide-header) | <code>full</code> | Yes |
+| [<code>guide&#45;navigation</code>](#guide-navigation) | <code>full</code> | Yes |
+| [<code>guide&#45;pages&#45;list</code>](#guide-pages-list) | <code>full</code> | Yes |
+| [<code>link&#45;button</code>](#link-button) | <code>wide</code> | Yes |
+| [<code>gallery</code>](#gallery) | <code>wide</code> | Yes |
+| [<code>marquee&#45;images</code>](#marquee-images) | <code>full</code> | No |
+| [<code>icon&#45;links</code>](#icon-links) | <code>narrow</code> | Yes |
+| [<code>downloads</code>](#downloads) | <code>narrow</code> | Yes |
+| [<code>snippet</code>](#snippet) | <code>wide</code> | Yes |
 
-## `section-header`
+## <code>section&#45;header</code>
 
-Standalone section header with rich text intro.
+Standalone section header with rich text intro&#46;
 
-**Schema:** `src/_lib/utils/block-schema/section-header.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/section&#45;header&#46;js</code>
 
-**Component:** `block_section_header`
+**Component:** <code>block&#95;section&#95;header</code>
 
-**Template:** `src/_includes/design-system/blocks/section-header.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/section&#45;header&#46;html</code>
 
-**SCSS:** `src/css/design-system/_base.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;base&#46;scss</code>
 
-**HTML root:** `<div class="section-header prose">`
+**HTML root:** <code>&lt;div class&#61;"section&#45;header prose"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `intro` | `markdown` | **required** | Not documented | Section Header Intro | Rich text content rendered as markdown. Use headings and body text together. |
-| `align` | `string` | optional | `"center"` | Not exposed | Text alignment. &#96;"center"&#96; adds &#96;.text-center&#96;. |
-| `class` | `string` | optional | Not documented | Not exposed | Extra CSS classes. |
+| --- | --- | --- | --- | --- | --- |
+| <code>intro</code> | <code>markdown</code> | **required** | Not documented | Section Header Intro | Rich text content rendered as markdown&#46; Use headings and body text together&#46; |
+| <code>align</code> | <code>string</code> | optional | <code>"center"</code> | Not exposed | Text alignment&#46; &#96;"center"&#96; adds &#96;&#46;text&#45;center&#96;&#46; |
+| <code>class</code> | <code>string</code> | optional | Not documented | Not exposed | Extra CSS classes&#46; |
 
 ### Canonical example
 
@@ -105,36 +105,37 @@ blocks:
       context.
 ```
 
-## `features`
+## <code>features</code>
 
-Grid of feature cards with optional icons, names, and descriptions.
+Grid of feature cards with optional icons, names, and descriptions&#46;
 
-**Schema:** `src/_lib/utils/block-schema/features.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/features&#46;js</code>
 
-**Component:** `block_features`
+**Component:** <code>block&#95;features</code>
 
-**Template:** `src/_includes/design-system/blocks/features.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/features&#46;html</code>
 
-**SCSS:** `src/css/design-system/_feature.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;feature&#46;scss</code>
 
-**HTML root:** `<ul class="features" role="list"> containing <li><article class="feature"> items`
+**HTML root:** <code>&lt;ul class&#61;"features" role&#61;"list"&gt; containing &lt;li&gt;&lt;article class&#61;"feature"&gt; items</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `items` | `array<object>` | **required** | Not documented | Features | Feature objects. Each: &#96;{icon, icon&#95;label, name, description, style}&#96;. Icon can be an Iconify ID (&#96;"prefix:name"&#96;), image path (&#96;"/images/foo.svg"&#96;), or raw HTML/emoji. |
-| `items[].icon` | `string` | optional | Not documented | Icon (Iconify ID or HTML entity) |  |
-| `items[].name` | `string` | **required** | Not documented | Name |  |
-| `items[].description` | `markdown` | optional | Not documented | Description |  |
-| `items[].style` | `string` | optional | Not documented | Custom Style |  |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `reveal` | `boolean` | optional | `true` | Not exposed | Adds &#96;data-reveal&#96; to each item. |
-| `center` | `boolean` | optional | `false` | Centered | If true, centers feature text. |
+| --- | --- | --- | --- | --- | --- |
+| <code>items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Features | Feature objects&#46; Each: &#96;{icon, icon&#95;label, name, description, style}&#96;&#46; Icon can be an Iconify ID (&#96;"prefix:name"&#96;&#41;, image path (&#96;"/images/foo&#46;svg"&#96;&#41;, or raw HTML/emoji&#46; |
+| <code>items&#91;&#93;&#46;icon</code> | <code>string</code> | optional | Not documented | Icon (Iconify ID or HTML entity&#41; |  |
+| <code>items&#91;&#93;&#46;icon&#95;label</code> | <code>string</code> | optional | Not documented | Icon Accessible Label |  |
+| <code>items&#91;&#93;&#46;name</code> | <code>string</code> | **required** | Not documented | Name |  |
+| <code>items&#91;&#93;&#46;description</code> | <code>markdown</code> | optional | Not documented | Description |  |
+| <code>items&#91;&#93;&#46;style</code> | <code>string</code> | optional | Not documented | Custom Style |  |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>reveal</code> | <code>boolean</code> | optional | <code>true</code> | Not exposed | Adds &#96;data&#45;reveal&#96; to each item&#46; |
+| <code>center</code> | <code>boolean</code> | optional | <code>false</code> | Centered | If true, centers feature text&#46; |
 
 ### Canonical example
 
@@ -154,36 +155,36 @@ blocks:
         description: Everything renders to plain HTML at build time.
 ```
 
-## `image-cards`
+## <code>image&#45;cards</code>
 
-Grid of cards featuring images with names and optional descriptions.
+Grid of cards featuring images with names and optional descriptions&#46;
 
-**Schema:** `src/_lib/utils/block-schema/image-cards.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/image&#45;cards&#46;js</code>
 
-**Component:** `block_image_cards`
+**Component:** <code>block&#95;image&#95;cards</code>
 
-**Template:** `src/_includes/design-system/blocks/image-cards.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/image&#45;cards&#46;html</code>
 
-**SCSS:** `src/css/design-system/_items.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;items&#46;scss</code>
 
-**HTML root:** `<ul class="items" role="list">`
+**HTML root:** <code>&lt;ul class&#61;"items" role&#61;"list"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `items` | `array<object>` | **required** | Not documented | Cards | Card objects. Each: &#96;{image, name, description, link}&#96;. Images processed by &#96;{% image %}&#96; shortcode for responsive srcset + LQIP. |
-| `items[].image` | `image` | **required** | Not documented | Image |  |
-| `items[].name` | `string` | **required** | Not documented | Name |  |
-| `items[].description` | `string` | optional | Not documented | Description |  |
-| `items[].link` | `string` | optional | Not documented | Link URL |  |
-| `reveal` | `boolean` | optional | `true` | Not exposed | Adds &#96;data-reveal&#96; to each item. |
-| `image_aspect_ratio` | `string` | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e.g. &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Cards | Card objects&#46; Each: &#96;{image, name, description, link}&#96;&#46; Images processed by &#96;{% image %}&#96; shortcode for responsive srcset &#43; LQIP&#46; |
+| <code>items&#91;&#93;&#46;image</code> | <code>image</code> | **required** | Not documented | Image |  |
+| <code>items&#91;&#93;&#46;name</code> | <code>string</code> | **required** | Not documented | Name |  |
+| <code>items&#91;&#93;&#46;description</code> | <code>string</code> | optional | Not documented | Description |  |
+| <code>items&#91;&#93;&#46;link</code> | <code>string</code> | optional | Not documented | Link URL |  |
+| <code>reveal</code> | <code>boolean</code> | optional | <code>true</code> | Not exposed | Adds &#96;data&#45;reveal&#96; to each item&#46; |
+| <code>image&#95;aspect&#95;ratio</code> | <code>string</code> | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e&#46;g&#46; &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
 
 ### Canonical example
 
@@ -203,33 +204,33 @@ blocks:
         description: An optional link makes the whole card clickable.
 ```
 
-## `stats`
+## <code>stats</code>
 
-Key metrics displayed as large numbers with labels.
+Key metrics displayed as large numbers with labels&#46;
 
-**Schema:** `src/_lib/utils/block-schema/stats.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/stats&#46;js</code>
 
-**Component:** `block_stats`
+**Component:** <code>block&#95;stats</code>
 
-**Template:** `src/_includes/design-system/blocks/stats.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/stats&#46;html</code>
 
-**SCSS:** `src/css/design-system/_stats.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;stats&#46;scss</code>
 
-**HTML root:** `<dl class="stats">`
+**HTML root:** <code>&lt;dl class&#61;"stats"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `items` | `array<object>` | **required** | Not documented | Statistics | Stat objects: &#96;{value, label}&#96; or pipe-delimited strings &#96;"value&#124;label"&#96;. Also accepts "value&#124;label" strings. |
-| `items[].value` | `string` | **required** | Not documented | Value |  |
-| `items[].label` | `string` | **required** | Not documented | Label |  |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `reveal` | `boolean` | optional | `true` | Not exposed | Adds &#96;data-reveal&#96; to each stat. |
+| --- | --- | --- | --- | --- | --- |
+| <code>items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Statistics | Stat objects: &#96;{value, label}&#96; or pipe&#45;delimited strings &#96;"value&#124;label"&#96;&#46; Also accepts "value&#124;label" strings&#46; |
+| <code>items&#91;&#93;&#46;value</code> | <code>string</code> | **required** | Not documented | Value |  |
+| <code>items&#91;&#93;&#46;label</code> | <code>string</code> | **required** | Not documented | Label |  |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>reveal</code> | <code>boolean</code> | optional | <code>true</code> | Not exposed | Adds &#96;data&#45;reveal&#96; to each stat&#46; |
 
 ### Canonical example
 
@@ -245,32 +246,32 @@ blocks:
         label: Servers to run
 ```
 
-## `code-block`
+## <code>code&#45;block</code>
 
-Terminal-style code display with macOS-like toolbar header.
+Terminal&#45;style code display with macOS&#45;like toolbar header&#46;
 
-**Schema:** `src/_lib/utils/block-schema/code-block.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/code&#45;block&#46;js</code>
 
-**Component:** `block_code_block`
+**Component:** <code>block&#95;code&#95;block</code>
 
-**Template:** `src/_includes/design-system/blocks/code-block.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/code&#45;block&#46;html</code>
 
-**SCSS:** `src/css/design-system/_code-block.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;code&#45;block&#46;scss</code>
 
-**HTML root:** `<div class="code-block">`
+**HTML root:** <code>&lt;div class&#61;"code&#45;block"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `filename` | `string` | **required** | Not documented | Filename | Displayed in the toolbar header. |
-| `code` | `string` | **required** | Not documented | Code | Code content. Rendered in &#96;&#60;pre&#62;&#60;code&#62;&#96;. |
-| `language` | `string` | optional | Not documented | Language | Sets &#96;data-language&#96; attribute (for future syntax highlighting). |
-| `reveal` | `boolean` | optional | `true` | Not exposed | &#96;data-reveal&#96; value. |
+| --- | --- | --- | --- | --- | --- |
+| <code>filename</code> | <code>string</code> | **required** | Not documented | Filename | Displayed in the toolbar header&#46; |
+| <code>code</code> | <code>string</code> | **required** | Not documented | Code | Code content&#46; Rendered in &#96;&lt;pre&gt;&lt;code&gt;&#96;&#46; |
+| <code>language</code> | <code>string</code> | optional | Not documented | Language | Sets &#96;data&#45;language&#96; attribute (for future syntax highlighting&#41;&#46; |
+| <code>reveal</code> | <code>boolean</code> | optional | <code>true</code> | Not exposed | &#96;data&#45;reveal&#96; value&#46; |
 
 ### Canonical example
 
@@ -284,37 +285,37 @@ blocks:
       npm run serve
 ```
 
-## `hero`
+## <code>hero</code>
 
-Full-width hero banner with optional badge, markdown content, and action buttons.
+Full&#45;width hero banner with optional badge, markdown content, and action buttons&#46;
 
-**Schema:** `src/_lib/utils/block-schema/hero.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/hero&#46;js</code>
 
-**Component:** `block_hero`
+**Component:** <code>block&#95;hero</code>
 
-**Template:** `src/_includes/design-system/blocks/hero.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/hero&#46;html</code>
 
-**SCSS:** `src/css/design-system/_hero.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;hero&#46;scss</code>
 
-**HTML root:** `<header class="hero">`
+**HTML root:** <code>&lt;header class&#61;"hero"&gt;</code>
 
-**Container width:** `full`
+**Container width:** <code>full</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `badge` | `string` | optional | Not documented | Badge Text | Small pill label above the content. Renders as &#96;&#60;span class="badge"&#62;&#96;. |
-| `content` | `markdown` | **required** | Not documented | Content | Markdown content rendered in &#96;.prose&#96;. Start with a &#96;# Heading&#96;; paragraphs get &#96;body-lg&#96; size, muted color, max-width &#96;$width-narrow&#96; (680px). |
-| `buttons` | `array<object>` | optional | Not documented | Buttons | Action buttons below the content. Each: &#96;{text, href, variant, size}&#96;. Variants: &#96;"primary"&#96; (filled), &#96;"secondary"&#96; (outlined), &#96;"ghost"&#96; (transparent). Sizes: &#96;"sm"&#96;, &#96;"lg"&#96;, or omit for default. |
-| `buttons[].text` | `string` | **required** | Not documented | Button Text |  |
-| `buttons[].href` | `string` | **required** | Not documented | URL |  |
-| `buttons[].variant` | `string` | optional | Not documented | Variant |  |
-| `buttons[].size` | `string` | optional | Not documented | Size |  |
-| `reveal` | `string` | optional | Not documented | Not exposed | &#96;data-reveal&#96; value. |
-| `class` | `string` | optional | Not documented | CSS Class | Extra CSS classes on the &#96;&#60;header&#62;&#96;. Use &#96;"gradient"&#96; for gradient bg. |
+| --- | --- | --- | --- | --- | --- |
+| <code>badge</code> | <code>string</code> | optional | Not documented | Badge Text | Small pill label above the content&#46; Renders as &#96;&lt;span class&#61;"badge"&gt;&#96;&#46; |
+| <code>content</code> | <code>markdown</code> | **required** | Not documented | Content | Markdown content rendered in &#96;&#46;prose&#96;&#46; Start with a &#96;&#35; Heading&#96;; paragraphs get &#96;body&#45;lg&#96; size, muted color, max&#45;width &#96;$width&#45;narrow&#96; (680px&#41;&#46; |
+| <code>buttons</code> | <code>array&lt;object&gt;</code> | optional | Not documented | Buttons | Action buttons below the content&#46; Each: &#96;{text, href, variant, size}&#96;&#46; Variants: &#96;"primary"&#96; (filled&#41;, &#96;"secondary"&#96; (outlined&#41;, &#96;"ghost"&#96; (transparent&#41;&#46; Sizes: &#96;"sm"&#96;, &#96;"lg"&#96;, or omit for default&#46; |
+| <code>buttons&#91;&#93;&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>buttons&#91;&#93;&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>buttons&#91;&#93;&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>buttons&#91;&#93;&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>reveal</code> | <code>string</code> | optional | Not documented | Not exposed | &#96;data&#45;reveal&#96; value&#46; |
+| <code>class</code> | <code>string</code> | optional | Not documented | CSS Class | Extra CSS classes on the &#96;&lt;header&gt;&#96;&#46; Use &#96;"gradient"&#96; for gradient bg&#46; |
 
 ### Canonical example
 
@@ -339,41 +340,41 @@ blocks:
         size: lg
 ```
 
-## `split-image`
+## <code>split&#45;image</code>
 
-Two-column layout with text content and a responsive image.
+Two&#45;column layout with text content and a responsive image&#46;
 
-**Schema:** `src/_lib/utils/block-schema/split-image.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/split&#45;image&#46;js</code>
 
-**Component:** `block_split_image`
+**Component:** <code>block&#95;split&#95;image</code>
 
-**Template:** `src/_includes/design-system/split.html`
+**Template:** <code>src/&#95;includes/design&#45;system/split&#46;html</code>
 
-**SCSS:** `src/css/design-system/_split.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;split&#46;scss</code>
 
-**HTML root:** `<div class="split">`
+**HTML root:** <code>&lt;div class&#61;"split"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with &#96;.text-muted&#96; styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. &#96;## Heading&#96;). Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;.prose&#96;. |
-| `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | &#96;data-reveal&#96; for the text side. Auto-set to &#96;"right"&#96; when &#96;reverse&#96; is true. |
-| `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | &#96;data-reveal&#96; for the figure side. |
-| `button` | `object` | optional | Not documented | Button | &#96;{text, href, variant}&#96;. Rendered below content. Default variant: &#96;"secondary"&#96;. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_src` | `image` | **required** | Not documented | Figure Image | Image path. |
-| `figure_alt` | `string` | optional | Not documented | Figure Alt Text | Alt text for the image. |
-| `figure_caption` | `string` | optional | Not documented | Figure Caption | Visible caption below the image. |
+| --- | --- | --- | --- | --- | --- |
+| <code>subtitle</code> | <code>string</code> | optional | Not documented | Subtitle | Subtitle with &#96;&#46;text&#45;muted&#96; styling&#46; |
+| <code>content</code> | <code>markdown</code> | optional | Not documented | Content | Main content with markdown headings (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;&#46;prose&#96;&#46; |
+| <code>reverse</code> | <code>boolean</code> | optional | <code>false</code> | Reverse Layout | Reverses column order (content right, figure left&#41; on desktop&#46; |
+| <code>reveal&#95;content</code> | <code>string</code> | optional | <code>"left"</code> | Reveal Content Animation | &#96;data&#45;reveal&#96; for the text side&#46; Auto&#45;set to &#96;"right"&#96; when &#96;reverse&#96; is true&#46; |
+| <code>reveal&#95;figure</code> | <code>string</code> | optional | <code>"scale"</code> | Reveal Figure Animation | &#96;data&#45;reveal&#96; for the figure side&#46; |
+| <code>button</code> | <code>object</code> | optional | Not documented | Button | &#96;{text, href, variant}&#96;&#46; Rendered below content&#46; Default variant: &#96;"secondary"&#96;&#46; |
+| <code>button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>button&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>figure&#95;src</code> | <code>image</code> | **required** | Not documented | Figure Image | Image path&#46; |
+| <code>figure&#95;alt</code> | <code>string</code> | optional | Not documented | Figure Alt Text | Alt text for the image&#46; |
+| <code>figure&#95;caption</code> | <code>string</code> | optional | Not documented | Figure Caption | Visible caption below the image&#46; |
 
 ### Canonical example
 
@@ -392,41 +393,41 @@ blocks:
     figure_caption: Captions are optional.
 ```
 
-## `split-code`
+## <code>split&#45;code</code>
 
-Two-column layout with text content and a code block.
+Two&#45;column layout with text content and a code block&#46;
 
-**Schema:** `src/_lib/utils/block-schema/split-code.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/split&#45;code&#46;js</code>
 
-**Component:** `block_split_code`
+**Component:** <code>block&#95;split&#95;code</code>
 
-**Template:** `src/_includes/design-system/split.html`
+**Template:** <code>src/&#95;includes/design&#45;system/split&#46;html</code>
 
-**SCSS:** `src/css/design-system/_split.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;split&#46;scss</code>
 
-**HTML root:** `<div class="split">`
+**HTML root:** <code>&lt;div class&#61;"split"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with &#96;.text-muted&#96; styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. &#96;## Heading&#96;). Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;.prose&#96;. |
-| `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | &#96;data-reveal&#96; for the text side. Auto-set to &#96;"right"&#96; when &#96;reverse&#96; is true. |
-| `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | &#96;data-reveal&#96; for the figure side. |
-| `button` | `object` | optional | Not documented | Button | &#96;{text, href, variant}&#96;. Rendered below content. Default variant: &#96;"secondary"&#96;. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_filename` | `string` | optional | Not documented | Code Filename | Displayed filename in the code block header. |
-| `figure_code` | `string` | **required** | Not documented | Code Content | Code content. |
-| `figure_language` | `string` | optional | Not documented | Code Language | Syntax highlighting language. |
+| --- | --- | --- | --- | --- | --- |
+| <code>subtitle</code> | <code>string</code> | optional | Not documented | Subtitle | Subtitle with &#96;&#46;text&#45;muted&#96; styling&#46; |
+| <code>content</code> | <code>markdown</code> | optional | Not documented | Content | Main content with markdown headings (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;&#46;prose&#96;&#46; |
+| <code>reverse</code> | <code>boolean</code> | optional | <code>false</code> | Reverse Layout | Reverses column order (content right, figure left&#41; on desktop&#46; |
+| <code>reveal&#95;content</code> | <code>string</code> | optional | <code>"left"</code> | Reveal Content Animation | &#96;data&#45;reveal&#96; for the text side&#46; Auto&#45;set to &#96;"right"&#96; when &#96;reverse&#96; is true&#46; |
+| <code>reveal&#95;figure</code> | <code>string</code> | optional | <code>"scale"</code> | Reveal Figure Animation | &#96;data&#45;reveal&#96; for the figure side&#46; |
+| <code>button</code> | <code>object</code> | optional | Not documented | Button | &#96;{text, href, variant}&#96;&#46; Rendered below content&#46; Default variant: &#96;"secondary"&#96;&#46; |
+| <code>button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>button&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>figure&#95;filename</code> | <code>string</code> | optional | Not documented | Code Filename | Displayed filename in the code block header&#46; |
+| <code>figure&#95;code</code> | <code>string</code> | **required** | Not documented | Code Content | Code content&#46; |
+| <code>figure&#95;language</code> | <code>string</code> | optional | Not documented | Code Language | Syntax highlighting language&#46; |
 
 ### Canonical example
 
@@ -449,42 +450,42 @@ blocks:
       }
 ```
 
-## `split-icon-links`
+## <code>split&#45;icon&#45;links</code>
 
-Two-column layout with text content and an icon-links list.
+Two&#45;column layout with text content and an icon&#45;links list&#46;
 
-**Schema:** `src/_lib/utils/block-schema/split-icon-links.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/split&#45;icon&#45;links&#46;js</code>
 
-**Component:** `block_split_icon_links`
+**Component:** <code>block&#95;split&#95;icon&#95;links</code>
 
-**Template:** `src/_includes/design-system/split.html`
+**Template:** <code>src/&#95;includes/design&#45;system/split&#46;html</code>
 
-**SCSS:** `src/css/design-system/_split.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;split&#46;scss</code>
 
-**HTML root:** `<div class="split">`
+**HTML root:** <code>&lt;div class&#61;"split"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with &#96;.text-muted&#96; styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. &#96;## Heading&#96;). Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;.prose&#96;. |
-| `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | &#96;data-reveal&#96; for the text side. Auto-set to &#96;"right"&#96; when &#96;reverse&#96; is true. |
-| `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | &#96;data-reveal&#96; for the figure side. |
-| `button` | `object` | optional | Not documented | Button | &#96;{text, href, variant}&#96;. Rendered below content. Default variant: &#96;"secondary"&#96;. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_items` | `array<object>` | **required** | Not documented | Links | Icon-link objects. Each: &#96;{icon, text, url}&#96;. &#96;url&#96; is optional. Icon can be an Iconify ID (&#96;"prefix:name"&#96;), image path, or raw HTML/emoji. |
-| `figure_items[].icon` | `string` | **required** | Not documented | Icon (Iconify ID or HTML entity) |  |
-| `figure_items[].text` | `string` | **required** | Not documented | Link Text |  |
-| `figure_items[].url` | `string` | optional | Not documented | URL |  |
+| --- | --- | --- | --- | --- | --- |
+| <code>subtitle</code> | <code>string</code> | optional | Not documented | Subtitle | Subtitle with &#96;&#46;text&#45;muted&#96; styling&#46; |
+| <code>content</code> | <code>markdown</code> | optional | Not documented | Content | Main content with markdown headings (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;&#46;prose&#96;&#46; |
+| <code>reverse</code> | <code>boolean</code> | optional | <code>false</code> | Reverse Layout | Reverses column order (content right, figure left&#41; on desktop&#46; |
+| <code>reveal&#95;content</code> | <code>string</code> | optional | <code>"left"</code> | Reveal Content Animation | &#96;data&#45;reveal&#96; for the text side&#46; Auto&#45;set to &#96;"right"&#96; when &#96;reverse&#96; is true&#46; |
+| <code>reveal&#95;figure</code> | <code>string</code> | optional | <code>"scale"</code> | Reveal Figure Animation | &#96;data&#45;reveal&#96; for the figure side&#46; |
+| <code>button</code> | <code>object</code> | optional | Not documented | Button | &#96;{text, href, variant}&#96;&#46; Rendered below content&#46; Default variant: &#96;"secondary"&#96;&#46; |
+| <code>button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>button&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>figure&#95;items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Links | Icon&#45;link objects&#46; Each: &#96;{icon, text, url}&#96;&#46; &#96;url&#96; is optional&#46; Icon can be an Iconify ID (&#96;"prefix:name"&#96;&#41;, image path, or raw HTML/emoji&#46; |
+| <code>figure&#95;items&#91;&#93;&#46;icon</code> | <code>string</code> | **required** | Not documented | Icon (Iconify ID or HTML entity&#41; |  |
+| <code>figure&#95;items&#91;&#93;&#46;text</code> | <code>string</code> | **required** | Not documented | Link Text |  |
+| <code>figure&#95;items&#91;&#93;&#46;url</code> | <code>string</code> | optional | Not documented | URL |  |
 
 ### Canonical example
 
@@ -508,39 +509,39 @@ blocks:
         url: /search/
 ```
 
-## `split-html`
+## <code>split&#45;html</code>
 
-Two-column layout with text content and custom HTML.
+Two&#45;column layout with text content and custom HTML&#46;
 
-**Schema:** `src/_lib/utils/block-schema/split-html.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/split&#45;html&#46;js</code>
 
-**Component:** `block_split_html`
+**Component:** <code>block&#95;split&#95;html</code>
 
-**Template:** `src/_includes/design-system/split.html`
+**Template:** <code>src/&#95;includes/design&#45;system/split&#46;html</code>
 
-**SCSS:** `src/css/design-system/_split.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;split&#46;scss</code>
 
-**HTML root:** `<div class="split">`
+**HTML root:** <code>&lt;div class&#61;"split"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with &#96;.text-muted&#96; styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. &#96;## Heading&#96;). Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;.prose&#96;. |
-| `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | &#96;data-reveal&#96; for the text side. Auto-set to &#96;"right"&#96; when &#96;reverse&#96; is true. |
-| `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | &#96;data-reveal&#96; for the figure side. |
-| `button` | `object` | optional | Not documented | Button | &#96;{text, href, variant}&#96;. Rendered below content. Default variant: &#96;"secondary"&#96;. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_html` | `markdown` | **required** | Not documented | Figure HTML Content | Raw HTML content for the figure side. |
+| --- | --- | --- | --- | --- | --- |
+| <code>subtitle</code> | <code>string</code> | optional | Not documented | Subtitle | Subtitle with &#96;&#46;text&#45;muted&#96; styling&#46; |
+| <code>content</code> | <code>markdown</code> | optional | Not documented | Content | Main content with markdown headings (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;&#46;prose&#96;&#46; |
+| <code>reverse</code> | <code>boolean</code> | optional | <code>false</code> | Reverse Layout | Reverses column order (content right, figure left&#41; on desktop&#46; |
+| <code>reveal&#95;content</code> | <code>string</code> | optional | <code>"left"</code> | Reveal Content Animation | &#96;data&#45;reveal&#96; for the text side&#46; Auto&#45;set to &#96;"right"&#96; when &#96;reverse&#96; is true&#46; |
+| <code>reveal&#95;figure</code> | <code>string</code> | optional | <code>"scale"</code> | Reveal Figure Animation | &#96;data&#45;reveal&#96; for the figure side&#46; |
+| <code>button</code> | <code>object</code> | optional | Not documented | Button | &#96;{text, href, variant}&#96;&#46; Rendered below content&#46; Default variant: &#96;"secondary"&#96;&#46; |
+| <code>button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>button&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>figure&#95;html</code> | <code>markdown</code> | **required** | Not documented | Figure HTML Content | Raw HTML content for the figure side&#46; |
 
 ### Canonical example
 
@@ -555,42 +556,42 @@ blocks:
     figure_html: <p style="font-size:3rem;text-align:center">&#127881;</p>
 ```
 
-## `split-callout`
+## <code>split&#45;callout</code>
 
-Two-column layout with text content and a styled callout box with icon, name, and subtitle.
+Two&#45;column layout with text content and a styled callout box with icon, name, and subtitle&#46;
 
-**Schema:** `src/_lib/utils/block-schema/split-callout.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/split&#45;callout&#46;js</code>
 
-**Component:** `block_split_callout`
+**Component:** <code>block&#95;split&#95;callout</code>
 
-**Template:** `src/_includes/design-system/blocks/split-callout.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/split&#45;callout&#46;html</code>
 
-**SCSS:** `src/css/design-system/_split-callout.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;split&#45;callout&#46;scss</code>
 
-**HTML root:** `<div class="split-callout">`
+**HTML root:** <code>&lt;div class&#61;"split&#45;callout"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `subtitle` | `string` | optional | Not documented | Subtitle | Subtitle with &#96;.text-muted&#96; styling. |
-| `content` | `markdown` | optional | Not documented | Content | Main content with markdown headings (e.g. &#96;## Heading&#96;). Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;.prose&#96;. |
-| `reverse` | `boolean` | optional | `false` | Reverse Layout | Reverses column order (content right, figure left) on desktop. |
-| `reveal_content` | `string` | optional | `"left"` | Reveal Content Animation | &#96;data-reveal&#96; for the text side. Auto-set to &#96;"right"&#96; when &#96;reverse&#96; is true. |
-| `reveal_figure` | `string` | optional | `"scale"` | Reveal Figure Animation | &#96;data-reveal&#96; for the figure side. |
-| `button` | `object` | optional | Not documented | Button | &#96;{text, href, variant}&#96;. Rendered below content. Default variant: &#96;"secondary"&#96;. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `figure_icon` | `string` | optional | Not documented | Icon (Iconify ID, emoji, or path) | Icon content: Iconify ID (&#96;prefix:name&#96;), emoji, or image path. |
-| `figure_name` | `string` | **required** | Not documented | Callout Name | Bold heading text in the callout box. |
-| `figure_subtitle` | `string` | optional | Not documented | Callout Subtitle | Supporting text below the name. |
-| `figure_variant` | `string` | optional | `"primary"` | Callout Color Variant | Color scheme: &#96;"primary"&#96;, &#96;"secondary"&#96;, &#96;"gradient"&#96;, or a custom CSS gradient string. |
+| --- | --- | --- | --- | --- | --- |
+| <code>subtitle</code> | <code>string</code> | optional | Not documented | Subtitle | Subtitle with &#96;&#46;text&#45;muted&#96; styling&#46; |
+| <code>content</code> | <code>markdown</code> | optional | Not documented | Content | Main content with markdown headings (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; Rendered through &#96;renderContent: "md"&#96; filter, wrapped in &#96;&#46;prose&#96;&#46; |
+| <code>reverse</code> | <code>boolean</code> | optional | <code>false</code> | Reverse Layout | Reverses column order (content right, figure left&#41; on desktop&#46; |
+| <code>reveal&#95;content</code> | <code>string</code> | optional | <code>"left"</code> | Reveal Content Animation | &#96;data&#45;reveal&#96; for the text side&#46; Auto&#45;set to &#96;"right"&#96; when &#96;reverse&#96; is true&#46; |
+| <code>reveal&#95;figure</code> | <code>string</code> | optional | <code>"scale"</code> | Reveal Figure Animation | &#96;data&#45;reveal&#96; for the figure side&#46; |
+| <code>button</code> | <code>object</code> | optional | Not documented | Button | &#96;{text, href, variant}&#96;&#46; Rendered below content&#46; Default variant: &#96;"secondary"&#96;&#46; |
+| <code>button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>button&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>figure&#95;icon</code> | <code>string</code> | optional | Not documented | Icon (Iconify ID, emoji, or path&#41; | Icon content: Iconify ID (&#96;prefix:name&#96;&#41;, emoji, or image path&#46; |
+| <code>figure&#95;name</code> | <code>string</code> | **required** | Not documented | Callout Name | Bold heading text in the callout box&#46; |
+| <code>figure&#95;subtitle</code> | <code>string</code> | optional | Not documented | Callout Subtitle | Supporting text below the name&#46; |
+| <code>figure&#95;variant</code> | <code>string</code> | optional | <code>"primary"</code> | Callout Color Variant | Color scheme: &#96;"primary"&#96;, &#96;"secondary"&#96;, &#96;"gradient"&#96;, or a custom CSS gradient string&#46; |
 
 ### Canonical example
 
@@ -607,43 +608,43 @@ blocks:
     figure_subtitle: Phone lines open 9-5, Monday to Friday.
 ```
 
-## `split-full`
+## <code>split&#45;full</code>
 
-Full-width two-panel layout with distinct background colors per side.
+Full&#45;width two&#45;panel layout with distinct background colors per side&#46;
 
-**Schema:** `src/_lib/utils/block-schema/split-full.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/split&#45;full&#46;js</code>
 
-**Component:** `block_split_full`
+**Component:** <code>block&#95;split&#95;full</code>
 
-**Template:** `src/_includes/design-system/blocks/split-full.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/split&#45;full&#46;html</code>
 
-**SCSS:** `src/css/design-system/_split.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;split&#46;scss</code>
 
-**HTML root:** `<div class="split-full">`
+**HTML root:** <code>&lt;div class&#61;"split&#45;full"&gt;</code>
 
-**Container width:** `full`
+**Container width:** <code>full</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `variant` | `string` | optional | Not documented | Variant | Color scheme: &#96;"dark-left"&#96;, &#96;"dark-right"&#96;, &#96;"primary-left"&#96;, &#96;"primary-right"&#96;. |
-| `left_content` | `markdown` | optional | Not documented | Left Content | Left panel content with markdown headings (e.g. &#96;## Heading&#96;). Rendered as markdown via &#96;.prose&#96;. |
-| `left_button` | `object` | optional | Not documented | Left Button | &#96;{text, href, variant}&#96;. |
-| `left_button.text` | `string` | **required** | Not documented | Button Text |  |
-| `left_button.href` | `string` | **required** | Not documented | URL |  |
-| `left_button.variant` | `string` | optional | Not documented | Variant |  |
-| `right_content` | `markdown` | optional | Not documented | Right Content | Right panel content with markdown headings (e.g. &#96;## Heading&#96;). Rendered as markdown via &#96;.prose&#96;. |
-| `right_button` | `object` | optional | Not documented | Right Button | &#96;{text, href, variant}&#96;. |
-| `right_button.text` | `string` | **required** | Not documented | Button Text |  |
-| `right_button.href` | `string` | **required** | Not documented | URL |  |
-| `right_button.variant` | `string` | optional | Not documented | Variant |  |
-| `reveal_left` | `string` | optional | Not documented | Reveal Left Animation | &#96;data-reveal&#96; for left panel. |
-| `reveal_right` | `string` | optional | Not documented | Reveal Right Animation | &#96;data-reveal&#96; for right panel. |
+| --- | --- | --- | --- | --- | --- |
+| <code>variant</code> | <code>string</code> | optional | Not documented | Variant | Color scheme: &#96;"dark&#45;left"&#96;, &#96;"dark&#45;right"&#96;, &#96;"primary&#45;left"&#96;, &#96;"primary&#45;right"&#96;&#46; |
+| <code>left&#95;content</code> | <code>markdown</code> | optional | Not documented | Left Content | Left panel content with markdown headings (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; Rendered as markdown via &#96;&#46;prose&#96;&#46; |
+| <code>left&#95;button</code> | <code>object</code> | optional | Not documented | Left Button | &#96;{text, href, variant}&#96;&#46; |
+| <code>left&#95;button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>left&#95;button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>left&#95;button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>right&#95;content</code> | <code>markdown</code> | optional | Not documented | Right Content | Right panel content with markdown headings (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; Rendered as markdown via &#96;&#46;prose&#96;&#46; |
+| <code>right&#95;button</code> | <code>object</code> | optional | Not documented | Right Button | &#96;{text, href, variant}&#96;&#46; |
+| <code>right&#95;button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>right&#95;button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>right&#95;button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>reveal&#95;left</code> | <code>string</code> | optional | Not documented | Reveal Left Animation | &#96;data&#45;reveal&#96; for left panel&#46; |
+| <code>reveal&#95;right</code> | <code>string</code> | optional | Not documented | Reveal Right Animation | &#96;data&#45;reveal&#96; for right panel&#46; |
 
-**Usage notes:** Variants: &#96;"dark-left"&#96; / &#96;"dark-right"&#96; (dark bg + light text), &#96;"primary-left"&#96; / &#96;"primary-right"&#96; (&#96;--color-link&#96; bg + contrast text). Button colors automatically invert in dark/primary panels. The parent &#96;&#60;section&#62;&#96; has zero padding — panels handle their own padding.
+**Usage notes:** Variants: &#96;"dark&#45;left"&#96; / &#96;"dark&#45;right"&#96; (dark bg &#43; light text&#41;, &#96;"primary&#45;left"&#96; / &#96;"primary&#45;right"&#96; (&#96;&#45;&#45;color&#45;link&#96; bg &#43; contrast text&#41;&#46; Button colors automatically invert in dark/primary panels&#46; The parent &#96;&lt;section&gt;&#96; has zero padding — panels handle their own padding&#46;
 
 ### Canonical example
 
@@ -668,35 +669,35 @@ blocks:
       href: /news/
 ```
 
-## `cta`
+## <code>cta</code>
 
-Call-to-action banner with gradient background.
+Call&#45;to&#45;action banner with gradient background&#46;
 
-**Schema:** `src/_lib/utils/block-schema/cta.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/cta&#46;js</code>
 
-**Component:** `block_cta`
+**Component:** <code>block&#95;cta</code>
 
-**Template:** `src/_includes/design-system/blocks/cta.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/cta&#46;html</code>
 
-**SCSS:** `src/css/design-system/_cta.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;cta&#46;scss</code>
 
-**HTML root:** `<aside class="cta">`
+**HTML root:** <code>&lt;aside class&#61;"cta"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `content` | `markdown` | **required** | Not documented | Content | Markdown content with optional heading (e.g. &#96;## Heading&#96;). &#96;body-lg&#96;, 0.9 opacity, max-width &#96;$width-narrow&#96;. |
-| `button` | `object` | optional | Not documented | Button | &#96;{text, href, variant, size}&#96;. Default variant: &#96;"secondary"&#96;, default size: &#96;"lg"&#96;. |
-| `button.text` | `string` | **required** | Not documented | Button Text |  |
-| `button.href` | `string` | **required** | Not documented | URL |  |
-| `button.variant` | `string` | optional | Not documented | Variant |  |
-| `button.size` | `string` | optional | Not documented | Size |  |
-| `reveal` | `string` | optional | Not documented | Not exposed | &#96;data-reveal&#96; value. |
+| --- | --- | --- | --- | --- | --- |
+| <code>content</code> | <code>markdown</code> | **required** | Not documented | Content | Markdown content with optional heading (e&#46;g&#46; &#96;&#35;&#35; Heading&#96;&#41;&#46; &#96;body&#45;lg&#96;, 0&#46;9 opacity, max&#45;width &#96;$width&#45;narrow&#96;&#46; |
+| <code>button</code> | <code>object</code> | optional | Not documented | Button | &#96;{text, href, variant, size}&#96;&#46; Default variant: &#96;"secondary"&#96;, default size: &#96;"lg"&#96;&#46; |
+| <code>button&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>button&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>button&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>button&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>reveal</code> | <code>string</code> | optional | Not documented | Not exposed | &#96;data&#45;reveal&#96; value&#46; |
 
 ### Canonical example
 
@@ -713,32 +714,32 @@ blocks:
       size: lg
 ```
 
-## `callout`
+## <code>callout</code>
 
-One-column callout/note with icon, name, and short content — for content warnings, advisories, tips, etc.
+One&#45;column callout/note with icon, name, and short content — for content warnings, advisories, tips, etc&#46;
 
-**Schema:** `src/_lib/utils/block-schema/callout.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/callout&#46;js</code>
 
-**Component:** `block_callout`
+**Component:** <code>block&#95;callout</code>
 
-**Template:** `src/_includes/design-system/blocks/callout.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/callout&#46;html</code>
 
-**SCSS:** `src/css/design-system/_callout.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;callout&#46;scss</code>
 
-**HTML root:** `<aside class="callout">`
+**HTML root:** <code>&lt;aside class&#61;"callout"&gt;</code>
 
-**Container width:** `narrow`
+**Container width:** <code>narrow</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `variant` | `string` | optional | `"info"` | Variant (info &#124; warning &#124; success &#124; danger) | Color scheme: &#96;"info"&#96;, &#96;"warning"&#96;, &#96;"success"&#96;, or &#96;"danger"&#96;. |
-| `icon` | `string` | optional | Not documented | Icon (Iconify ID, emoji, or path) | Icon content: Iconify ID (&#96;prefix:name&#96;), emoji, or image path. |
-| `name` | `string` | optional | Not documented | Name | Bold heading text. |
-| `content` | `markdown` | **required** | Not documented | Content | Markdown content rendered via &#96;renderContent: "md"&#96; inside &#96;.prose&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>variant</code> | <code>string</code> | optional | <code>"info"</code> | Variant (info &#124; warning &#124; success &#124; danger&#41; | Color scheme: &#96;"info"&#96;, &#96;"warning"&#96;, &#96;"success"&#96;, or &#96;"danger"&#96;&#46; |
+| <code>icon</code> | <code>string</code> | optional | Not documented | Icon (Iconify ID, emoji, or path&#41; | Icon content: Iconify ID (&#96;prefix:name&#96;&#41;, emoji, or image path&#46; |
+| <code>name</code> | <code>string</code> | optional | Not documented | Name | Bold heading text&#46; |
+| <code>content</code> | <code>markdown</code> | **required** | Not documented | Content | Markdown content rendered via &#96;renderContent: "md"&#96; inside &#96;&#46;prose&#96;&#46; |
 
 ### Canonical example
 
@@ -752,43 +753,43 @@ blocks:
       are available.
 ```
 
-## `image-background`
+## <code>image&#45;background</code>
 
-Full-width image background with hero-style overlay content (badge, markdown content, buttons) and optional parallax.
+Full&#45;width image background with hero&#45;style overlay content (badge, markdown content, buttons&#41; and optional parallax&#46;
 
-**Schema:** `src/_lib/utils/block-schema/image-background.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/image&#45;background&#46;js</code>
 
-**Component:** `block_image_background`
+**Component:** <code>block&#95;image&#95;background</code>
 
-**Template:** `src/_includes/design-system/blocks/image-background.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/image&#45;background&#46;html</code>
 
-**SCSS:** `src/css/design-system/_image-background.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;image&#45;background&#46;scss</code>
 
-**HTML root:** `<div class="image-background">`
+**HTML root:** <code>&lt;div class&#61;"image&#45;background"&gt;</code>
 
-**Container width:** `full`
+**Container width:** <code>full</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `image` | `image` | **required** | Not documented | Background Image | Image path. |
-| `image_alt` | `string` | optional | `"Background image"` | Image Alt Text | Alt text. |
-| `class` | `string` | optional | Not documented | CSS Class | Extra CSS classes. |
-| `badge` | `string` | optional | Not documented | Badge Text | Small pill label above the content. Renders as &#96;&#60;span class="badge"&#62;&#96;. |
-| `content` | `markdown` | optional | Not documented | Content | Markdown overlay content rendered in &#96;.prose&#96; inside the &#96;&#60;figcaption&#62;&#96;. |
-| `buttons` | `array<object>` | optional | Not documented | Buttons | Action buttons below the content. Each: &#96;{text, href, variant, size}&#96;. Variants: &#96;"primary"&#96; (filled), &#96;"secondary"&#96; (outlined), &#96;"ghost"&#96; (transparent). Sizes: &#96;"sm"&#96;, &#96;"lg"&#96;, or omit for default. |
-| `buttons[].text` | `string` | **required** | Not documented | Button Text |  |
-| `buttons[].href` | `string` | **required** | Not documented | URL |  |
-| `buttons[].variant` | `string` | optional | Not documented | Variant |  |
-| `buttons[].size` | `string` | optional | Not documented | Size |  |
-| `reveal` | `string` | optional | Not documented | Not exposed | &#96;data-reveal&#96; value. |
-| `parallax` | `boolean` | optional | `false` | Parallax | Enables CSS &#96;animation-timeline: scroll()&#96; parallax effect. |
-| `tint` | `boolean` | optional | `false` | Tint | Applies a dark gradient overlay for text legibility over the background image. |
+| --- | --- | --- | --- | --- | --- |
+| <code>image</code> | <code>image</code> | **required** | Not documented | Background Image | Image path&#46; |
+| <code>image&#95;alt</code> | <code>string</code> | optional | <code>"Background image"</code> | Image Alt Text | Alt text&#46; |
+| <code>class</code> | <code>string</code> | optional | Not documented | CSS Class | Extra CSS classes&#46; |
+| <code>badge</code> | <code>string</code> | optional | Not documented | Badge Text | Small pill label above the content&#46; Renders as &#96;&lt;span class&#61;"badge"&gt;&#96;&#46; |
+| <code>content</code> | <code>markdown</code> | optional | Not documented | Content | Markdown overlay content rendered in &#96;&#46;prose&#96; inside the &#96;&lt;figcaption&gt;&#96;&#46; |
+| <code>buttons</code> | <code>array&lt;object&gt;</code> | optional | Not documented | Buttons | Action buttons below the content&#46; Each: &#96;{text, href, variant, size}&#96;&#46; Variants: &#96;"primary"&#96; (filled&#41;, &#96;"secondary"&#96; (outlined&#41;, &#96;"ghost"&#96; (transparent&#41;&#46; Sizes: &#96;"sm"&#96;, &#96;"lg"&#96;, or omit for default&#46; |
+| <code>buttons&#91;&#93;&#46;text</code> | <code>string</code> | **required** | Not documented | Button Text |  |
+| <code>buttons&#91;&#93;&#46;href</code> | <code>string</code> | **required** | Not documented | URL |  |
+| <code>buttons&#91;&#93;&#46;variant</code> | <code>string</code> | optional | Not documented | Variant |  |
+| <code>buttons&#91;&#93;&#46;size</code> | <code>string</code> | optional | Not documented | Size |  |
+| <code>reveal</code> | <code>string</code> | optional | Not documented | Not exposed | &#96;data&#45;reveal&#96; value&#46; |
+| <code>parallax</code> | <code>boolean</code> | optional | <code>false</code> | Parallax | Enables CSS &#96;animation&#45;timeline: scroll(&#41;&#96; parallax effect&#46; |
+| <code>tint</code> | <code>boolean</code> | optional | <code>false</code> | Tint | Applies a dark gradient overlay for text legibility over the background image&#46; |
 
-**Usage notes:** Image processed via &#96;{% image %}&#96; at widths 2560/1920/1280/960/640, cropped to 16/9. Parallax uses &#96;animation-timeline: scroll()&#96; for native CSS scroll-driven translation.
+**Usage notes:** Image processed via &#96;{% image %}&#96; at widths 2560/1920/1280/960/640, cropped to 16/9&#46; Parallax uses &#96;animation&#45;timeline: scroll(&#41;&#96; for native CSS scroll&#45;driven translation&#46;
 
 ### Canonical example
 
@@ -805,35 +806,35 @@ blocks:
       A tint keeps the text readable.
 ```
 
-## `items`
+## <code>items</code>
 
-Displays an Eleventy collection as a card grid or horizontal slider.
+Displays an Eleventy collection as a card grid or horizontal slider&#46;
 
-**Schema:** `src/_lib/utils/block-schema/items.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/items&#46;js</code>
 
-**Component:** `block_items`
+**Component:** <code>block&#95;items</code>
 
-**Template:** `src/_includes/design-system/blocks/items.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/items&#46;html</code>
 
-**SCSS:** `src/css/design-system/_items.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;items&#46;scss</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `collection` | `string` | **required** | Not documented | Collection Name | Name of an Eleventy collection (e.g. &#96;"news"&#96;, &#96;"guideCategories"&#96;). |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `horizontal` | `boolean` | optional | `false` | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid. |
-| `masonry` | `boolean` | optional | `false` | Masonry Grid | If true, renders as a masonry grid using uWrap for zero-reflow height prediction. |
-| `filter` | `object` | optional | Not documented | Filter | Filter object: &#96;{property, includes, equals}&#96;. &#96;property&#96; is a dot-notation path (e.g. &#96;"url"&#96;, &#96;"data.name"&#96;). When the resolved value is an array, the operator runs against each element (per-element exact match for &#96;equals&#96;, per-element substring for &#96;includes&#96;). &#96;includes&#96; matches substring; &#96;equals&#96; matches exact value. |
-| `filter.property` | `string` | optional | Not documented | Property (e.g. url, data.name) |  |
-| `filter.includes` | `string` | optional | Not documented | Contains |  |
-| `filter.equals` | `string` | optional | Not documented | Equals |  |
-| `image_aspect_ratio` | `string` | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e.g. &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>collection</code> | <code>string</code> | **required** | Not documented | Collection Name | Name of an Eleventy collection (e&#46;g&#46; &#96;"news"&#96;, &#96;"guideCategories"&#96;&#41;&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>horizontal</code> | <code>boolean</code> | optional | <code>false</code> | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid&#46; |
+| <code>masonry</code> | <code>boolean</code> | optional | <code>false</code> | Masonry Grid | If true, renders as a masonry grid using uWrap for zero&#45;reflow height prediction&#46; |
+| <code>filter</code> | <code>object</code> | optional | Not documented | Filter | Filter object: &#96;{property, includes, equals}&#96;&#46; &#96;property&#96; is a dot&#45;notation path (e&#46;g&#46; &#96;"url"&#96;, &#96;"data&#46;name"&#96;&#41;&#46; When the resolved value is an array, the operator runs against each element (per&#45;element exact match for &#96;equals&#96;, per&#45;element substring for &#96;includes&#96;&#41;&#46; &#96;includes&#96; matches substring; &#96;equals&#96; matches exact value&#46; |
+| <code>filter&#46;property</code> | <code>string</code> | optional | Not documented | Property (e&#46;g&#46; url, data&#46;name&#41; |  |
+| <code>filter&#46;includes</code> | <code>string</code> | optional | Not documented | Contains |  |
+| <code>filter&#46;equals</code> | <code>string</code> | optional | Not documented | Equals |  |
+| <code>image&#95;aspect&#95;ratio</code> | <code>string</code> | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e&#46;g&#46; &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;&#46; |
 
 ### Canonical example
 
@@ -847,35 +848,35 @@ blocks:
       This example renders the `news` collection.
 ```
 
-## `items-array`
+## <code>items&#45;array</code>
 
-Renders items from an explicit list of paths. The collection is inferred dynamically from each item's path. Directory paths (ending in &#96;/&#96; or with no &#96;.md&#96; extension) expand to every item in that directory.
+Renders items from an explicit list of paths&#46; The collection is inferred dynamically from each item's path&#46; Directory paths (ending in &#96;/&#96; or with no &#96;&#46;md&#96; extension&#41; expand to every item in that directory&#46;
 
-**Schema:** `src/_lib/utils/block-schema/items-array.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/items&#45;array&#46;js</code>
 
-**Component:** `block_items_array`
+**Component:** <code>block&#95;items&#95;array</code>
 
-**Template:** `src/_includes/design-system/blocks/items-array.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/items&#45;array&#46;html</code>
 
-**SCSS:** `src/css/design-system/_items.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;items&#46;scss</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `items` | `array<string>` | optional | Not documented | Items | Array of path strings. Each entry may be a file path (e.g. &#96;src/news/example.md&#96;) or a directory path (e.g. &#96;src/news&#96; or &#96;src/news/&#96;), in which case every item in that directory is included in place. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `horizontal` | `boolean` | optional | `false` | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid. |
-| `masonry` | `boolean` | optional | `false` | Masonry Grid | If true, renders as a masonry grid using uWrap for zero-reflow height prediction. |
-| `filter` | `object` | optional | Not documented | Filter | Filter object: &#96;{property, includes, equals}&#96;. &#96;property&#96; is a dot-notation path (e.g. &#96;"url"&#96;, &#96;"data.name"&#96;). When the resolved value is an array, the operator runs against each element (per-element exact match for &#96;equals&#96;, per-element substring for &#96;includes&#96;). &#96;includes&#96; matches substring; &#96;equals&#96; matches exact value. |
-| `filter.property` | `string` | optional | Not documented | Property (e.g. url, data.name) |  |
-| `filter.includes` | `string` | optional | Not documented | Contains |  |
-| `filter.equals` | `string` | optional | Not documented | Equals |  |
-| `image_aspect_ratio` | `string` | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e.g. &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>items</code> | <code>array&lt;string&gt;</code> | optional | Not documented | Items | Array of path strings&#46; Each entry may be a file path (e&#46;g&#46; &#96;src/news/example&#46;md&#96;&#41; or a directory path (e&#46;g&#46; &#96;src/news&#96; or &#96;src/news/&#96;&#41;, in which case every item in that directory is included in place&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>horizontal</code> | <code>boolean</code> | optional | <code>false</code> | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid&#46; |
+| <code>masonry</code> | <code>boolean</code> | optional | <code>false</code> | Masonry Grid | If true, renders as a masonry grid using uWrap for zero&#45;reflow height prediction&#46; |
+| <code>filter</code> | <code>object</code> | optional | Not documented | Filter | Filter object: &#96;{property, includes, equals}&#96;&#46; &#96;property&#96; is a dot&#45;notation path (e&#46;g&#46; &#96;"url"&#96;, &#96;"data&#46;name"&#96;&#41;&#46; When the resolved value is an array, the operator runs against each element (per&#45;element exact match for &#96;equals&#96;, per&#45;element substring for &#96;includes&#96;&#41;&#46; &#96;includes&#96; matches substring; &#96;equals&#96; matches exact value&#46; |
+| <code>filter&#46;property</code> | <code>string</code> | optional | Not documented | Property (e&#46;g&#46; url, data&#46;name&#41; |  |
+| <code>filter&#46;includes</code> | <code>string</code> | optional | Not documented | Contains |  |
+| <code>filter&#46;equals</code> | <code>string</code> | optional | Not documented | Equals |  |
+| <code>image&#95;aspect&#95;ratio</code> | <code>string</code> | optional | Not documented | Image Aspect Ratio | Aspect ratio for images, e&#46;g&#46; &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;&#46; |
 
 ### Canonical example
 
@@ -890,26 +891,26 @@ blocks:
       List file paths, or a directory to include everything in it.
 ```
 
-## `items-text-list`
+## <code>items&#45;text&#45;list</code>
 
-Renders a collection as a comma-separated inline list of links, with optional introductory markdown text prepended. Excludes the current page from the list.
+Renders a collection as a comma&#45;separated inline list of links, with optional introductory markdown text prepended&#46; Excludes the current page from the list&#46;
 
-**Schema:** `src/_lib/utils/block-schema/items-text-list.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/items&#45;text&#45;list&#46;js</code>
 
-**Component:** `block_items_text_list`
+**Component:** <code>block&#95;items&#95;text&#95;list</code>
 
-**Template:** `src/_includes/design-system/blocks/items-text-list.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/items&#45;text&#45;list&#46;html</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `collection` | `string` | **required** | Not documented | Collection Name | Name of an Eleventy collection (e.g. &#96;"services"&#96;, &#96;"events"&#96;). |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>collection</code> | <code>string</code> | **required** | Not documented | Collection Name | Name of an Eleventy collection (e&#46;g&#46; &#96;"services"&#96;, &#96;"events"&#96;&#41;&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
 
 ### Canonical example
 
@@ -920,33 +921,33 @@ blocks:
     intro_content: "Read our latest news posts:"
 ```
 
-## `link-columns`
+## <code>link&#45;columns</code>
 
-Renders a collection as a plain-text unordered list of links arranged in responsive CSS columns. Optionally strips matching text via a regex so repetitive prefixes/suffixes can be removed.
+Renders a collection as a plain&#45;text unordered list of links arranged in responsive CSS columns&#46; Optionally strips matching text via a regex so repetitive prefixes/suffixes can be removed&#46;
 
-**Schema:** `src/_lib/utils/block-schema/link-columns.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/link&#45;columns&#46;js</code>
 
-**Component:** `block_link_columns`
+**Component:** <code>block&#95;link&#95;columns</code>
 
-**Template:** `src/_includes/design-system/blocks/link-columns.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/link&#45;columns&#46;html</code>
 
-**SCSS:** `src/css/design-system/_link-columns.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;link&#45;columns&#46;scss</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `collection` | `string` | **required** | Not documented | Collection Name | Name of an Eleventy collection (e.g. &#96;"locations"&#96;, &#96;"services"&#96;). |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `filter` | `object` | optional | Not documented | Filter | Filter object: &#96;{property, includes, equals}&#96;. &#96;property&#96; is a dot-notation path (e.g. &#96;"url"&#96;, &#96;"data.name"&#96;). When the resolved value is an array, the operator runs against each element (per-element exact match for &#96;equals&#96;, per-element substring for &#96;includes&#96;). &#96;includes&#96; matches substring; &#96;equals&#96; matches exact value. |
-| `filter.property` | `string` | optional | Not documented | Property (e.g. url, data.name) |  |
-| `filter.includes` | `string` | optional | Not documented | Contains |  |
-| `filter.equals` | `string` | optional | Not documented | Equals |  |
-| `remove_text` | `string` | optional | Not documented | Remove Text (Regex) | Regex pattern (JavaScript syntax, global flag implied). Each match is removed from every link's display text and the result is trimmed. Useful for stripping repetitive prefixes like &#96;"Service in "&#96; so links render tidier. |
+| --- | --- | --- | --- | --- | --- |
+| <code>collection</code> | <code>string</code> | **required** | Not documented | Collection Name | Name of an Eleventy collection (e&#46;g&#46; &#96;"locations"&#96;, &#96;"services"&#96;&#41;&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>filter</code> | <code>object</code> | optional | Not documented | Filter | Filter object: &#96;{property, includes, equals}&#96;&#46; &#96;property&#96; is a dot&#45;notation path (e&#46;g&#46; &#96;"url"&#96;, &#96;"data&#46;name"&#96;&#41;&#46; When the resolved value is an array, the operator runs against each element (per&#45;element exact match for &#96;equals&#96;, per&#45;element substring for &#96;includes&#96;&#41;&#46; &#96;includes&#96; matches substring; &#96;equals&#96; matches exact value&#46; |
+| <code>filter&#46;property</code> | <code>string</code> | optional | Not documented | Property (e&#46;g&#46; url, data&#46;name&#41; |  |
+| <code>filter&#46;includes</code> | <code>string</code> | optional | Not documented | Contains |  |
+| <code>filter&#46;equals</code> | <code>string</code> | optional | Not documented | Equals |  |
+| <code>remove&#95;text</code> | <code>string</code> | optional | Not documented | Remove Text (Regex&#41; | Regex pattern (JavaScript syntax, global flag implied&#41;&#46; Each match is removed from every link's display text and the result is trimmed&#46; Useful for stripping repetitive prefixes like &#96;"Service in "&#96; so links render tidier&#46; |
 
 ### Canonical example
 
@@ -957,29 +958,29 @@ blocks:
     intro_content: "## A collection as link columns"
 ```
 
-## `markdown`
+## <code>markdown</code>
 
-Renders markdown content as rich text.
+Renders markdown content as rich text&#46;
 
-**Schema:** `src/_lib/utils/block-schema/markdown.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/markdown&#46;js</code>
 
-**Component:** `block_markdown`
+**Component:** <code>block&#95;markdown</code>
 
-**Template:** `src/_includes/design-system/blocks/markdown.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/markdown&#46;html</code>
 
-**SCSS:** `src/css/design-system/_prose.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;prose&#46;scss</code>
 
-**HTML root:** `<div class="prose">`
+**HTML root:** <code>&lt;div class&#61;"prose"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `content` | `markdown` | **required** | Not documented | Markdown | Markdown content. Passed through &#96;renderContent: "md"&#96; filter. |
+| --- | --- | --- | --- | --- | --- |
+| <code>content</code> | <code>markdown</code> | **required** | Not documented | Markdown | Markdown content&#46; Passed through &#96;renderContent: "md"&#96; filter&#46; |
 
 ### Canonical example
 
@@ -1001,32 +1002,32 @@ blocks:
       - Three
 ```
 
-## `table-of-contents`
+## <code>table&#45;of&#45;contents</code>
 
-In-page contents built from the headings the page actually renders.
+In&#45;page contents built from the headings the page actually renders&#46;
 
-**Schema:** `src/_lib/utils/block-schema/table-of-contents.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/table&#45;of&#45;contents&#46;js</code>
 
-**Component:** `block_table_of_contents`
+**Component:** <code>block&#95;table&#95;of&#95;contents</code>
 
-**Template:** `src/_includes/design-system/blocks/table-of-contents.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/table&#45;of&#45;contents&#46;html</code>
 
-**SCSS:** `src/css/design-system/_table-of-contents.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;table&#45;of&#45;contents&#46;scss</code>
 
-**HTML root:** `<nav class="table-of-contents">`
+**HTML root:** <code>&lt;nav class&#61;"table&#45;of&#45;contents"&gt;</code>
 
-**Container width:** `narrow`
+**Container width:** <code>narrow</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `title` | `string` | optional | `"On this page"` | Title | Heading above the list, and the accessible name of the navigation landmark. |
-| `levels` | `string` | optional | `"2,3"` | Heading Levels | Comma-separated heading levels to list, from &#96;2&#96; to &#96;6&#96;. Every other level is left out of the list, so &#96;"2"&#96; gives a top-level-only contents. An unlistable level fails the build. |
+| --- | --- | --- | --- | --- | --- |
+| <code>title</code> | <code>string</code> | optional | <code>"On this page"</code> | Title | Heading above the list, and the accessible name of the navigation landmark&#46; |
+| <code>levels</code> | <code>string</code> | optional | <code>"2,3"</code> | Heading Levels | Comma&#45;separated heading levels to list, from &#96;2&#96; to &#96;6&#96;&#46; Every other level is left out of the list, so &#96;"2"&#96; gives a top&#45;level&#45;only contents&#46; An unlistable level fails the build&#46; |
 
-**Usage notes:** The list is filled in after the page renders, from the headings in the page's main content at the levels this block names — no matter which blocks wrote them. Each listed heading gets an &#96;id&#96; (its own, when it already has one) so the links are stable, and the entries nest the way the headings do. A page whose headings none of the named levels match fails the build rather than publishing an empty contents.
+**Usage notes:** The list is filled in after the page renders, from the headings in the page's main content at the levels this block names — no matter which blocks wrote them&#46; Each listed heading gets an &#96;id&#96; (its own, when it already has one&#41; so the links are stable, and the entries nest the way the headings do&#46; A page whose headings none of the named levels match fails the build rather than publishing an empty contents&#46;
 
 ### Canonical example
 
@@ -1037,27 +1038,27 @@ blocks:
     levels: 2,3
 ```
 
-## `html`
+## <code>html</code>
 
-Outputs raw HTML without processing.
+Outputs raw HTML without processing&#46;
 
-**Schema:** `src/_lib/utils/block-schema/html.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/html&#46;js</code>
 
-**Component:** `block_html`
+**Component:** <code>block&#95;html</code>
 
-**Template:** `src/_includes/design-system/blocks/html.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/html&#46;html</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `content` | `string` | **required** | Not documented | Raw HTML | Raw HTML. Output directly with &#96;{{ block.content }}&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>content</code> | <code>string</code> | **required** | Not documented | Raw HTML | Raw HTML&#46; Output directly with &#96;{{ block&#46;content }}&#96;&#46; |
 
-**Usage notes:** No wrapping element. Useful for custom embeds, iframes, or one-off HTML.
+**Usage notes:** No wrapping element&#46; Useful for custom embeds, iframes, or one&#45;off HTML&#46;
 
 ### Canonical example
 
@@ -1068,40 +1069,40 @@ blocks:
       for one-off markup.</p>
 ```
 
-## `iframe-embed`
+## <code>iframe&#45;embed</code>
 
-Third-party iframe embed (itch.io widgets, Buttondown, Bandcamp, Stripe buttons, etc).
+Third&#45;party iframe embed (itch&#46;io widgets, Buttondown, Bandcamp, Stripe buttons, etc&#41;&#46;
 
-**Schema:** `src/_lib/utils/block-schema/iframe-embed.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/iframe&#45;embed&#46;js</code>
 
-**Component:** `block_iframe_embed`
+**Component:** <code>block&#95;iframe&#95;embed</code>
 
-**Template:** `src/_includes/design-system/blocks/iframe-embed.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/iframe&#45;embed&#46;html</code>
 
-**SCSS:** `src/css/design-system/_iframe-embed.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;iframe&#45;embed&#46;scss</code>
 
-**HTML root:** `<div class="iframe-embed">`
+**HTML root:** <code>&lt;div class&#61;"iframe&#45;embed"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `src` | `string` | **required** | Not documented | Iframe URL | Full URL of the iframe to embed. |
-| `name` | `string` | **required** | Not documented | Accessible Name | Accessible name (rendered as the iframe's &#96;title&#96; attribute). |
-| `width` | `number` | optional | Not documented | Width (px) | Fixed pixel width. Omit to fill the container. |
-| `height` | `number` | optional | Not documented | Height (px) | Fixed pixel height. Required for non-responsive embeds unless &#96;aspect&#95;ratio&#96; is set. |
-| `aspect_ratio` | `string` | optional | Not documented | Aspect Ratio (e.g. 16/9) | CSS &#96;aspect-ratio&#96; for responsive height, e.g. &#96;"16/9"&#96;. Alternative to &#96;height&#96;. |
-| `max_width` | `string` | optional | Not documented | Max Width (CSS, e.g. 560px) | CSS max-width on the wrapper, e.g. &#96;"560px"&#96;. |
-| `sandbox` | `string` | optional | Not documented | Sandbox | Space-separated sandbox tokens, e.g. &#96;"allow-scripts allow-same-origin allow-forms"&#96;. |
-| `allow` | `string` | optional | Not documented | Allow (permissions policy) | &#96;allow&#96; attribute for iframe permissions policy. |
-| `scrolling` | `string` | optional | Not documented | Scrolling | Legacy &#96;scrolling&#96; attribute, e.g. &#96;"no"&#96;. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>src</code> | <code>string</code> | **required** | Not documented | Iframe URL | Full URL of the iframe to embed&#46; |
+| <code>name</code> | <code>string</code> | **required** | Not documented | Accessible Name | Accessible name (rendered as the iframe's &#96;title&#96; attribute&#41;&#46; |
+| <code>width</code> | <code>number</code> | optional | Not documented | Width (px&#41; | Fixed pixel width&#46; Omit to fill the container&#46; |
+| <code>height</code> | <code>number</code> | optional | Not documented | Height (px&#41; | Fixed pixel height&#46; Required for non&#45;responsive embeds unless &#96;aspect&#95;ratio&#96; is set&#46; |
+| <code>aspect&#95;ratio</code> | <code>string</code> | optional | Not documented | Aspect Ratio (e&#46;g&#46; 16/9&#41; | CSS &#96;aspect&#45;ratio&#96; for responsive height, e&#46;g&#46; &#96;"16/9"&#96;&#46; Alternative to &#96;height&#96;&#46; |
+| <code>max&#95;width</code> | <code>string</code> | optional | Not documented | Max Width (CSS, e&#46;g&#46; 560px&#41; | CSS max&#45;width on the wrapper, e&#46;g&#46; &#96;"560px"&#96;&#46; |
+| <code>sandbox</code> | <code>string</code> | optional | Not documented | Sandbox | Space&#45;separated sandbox tokens, e&#46;g&#46; &#96;"allow&#45;scripts allow&#45;same&#45;origin allow&#45;forms"&#96;&#46; |
+| <code>allow</code> | <code>string</code> | optional | Not documented | Allow (permissions policy&#41; | &#96;allow&#96; attribute for iframe permissions policy&#46; |
+| <code>scrolling</code> | <code>string</code> | optional | Not documented | Scrolling | Legacy &#96;scrolling&#96; attribute, e&#46;g&#46; &#96;"no"&#96;&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
 
-**Usage notes:** Provide either &#96;height&#96; for a fixed-height embed or &#96;aspect&#95;ratio&#96; (e.g. &#96;16/9&#96;) for a responsive one. Use &#96;max&#95;width&#96; to cap the embed width within the container.
+**Usage notes:** Provide either &#96;height&#96; for a fixed&#45;height embed or &#96;aspect&#95;ratio&#96; (e&#46;g&#46; &#96;16/9&#96;&#41; for a responsive one&#46; Use &#96;max&#95;width&#96; to cap the embed width within the container&#46;
 
 ### Canonical example
 
@@ -1114,27 +1115,27 @@ blocks:
     max_width: 560px
 ```
 
-## `include`
+## <code>include</code>
 
-Includes an arbitrary template file.
+Includes an arbitrary template file&#46;
 
-**Schema:** `src/_lib/utils/block-schema/include.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/include&#46;js</code>
 
-**Component:** `block_include`
+**Component:** <code>block&#95;include</code>
 
-**Template:** `src/_includes/design-system/blocks/include.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/include&#46;html</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `file` | `string` | **required** | Not documented | Template File Path | Path to the template file to include. |
+| --- | --- | --- | --- | --- | --- |
+| <code>file</code> | <code>string</code> | **required** | Not documented | Template File Path | Path to the template file to include&#46; |
 
-**Usage notes:** Escape hatch for custom content that doesn't fit the block system. The &#96;file&#96; value is passed straight to &#96;{% include %}&#96;.
+**Usage notes:** Escape hatch for custom content that doesn't fit the block system&#46; The &#96;file&#96; value is passed straight to &#96;{% include %}&#96;&#46;
 
 ### Canonical example
 
@@ -1144,25 +1145,25 @@ blocks:
     file: demo-include.html
 ```
 
-## `news-meta`
+## <code>news&#45;meta</code>
 
-Renders a news post's metadata: author name plus the post date.
+Renders a news post's metadata: author name plus the post date&#46;
 
-**Schema:** `src/_lib/utils/block-schema/news-meta.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/news&#45;meta&#46;js</code>
 
-**Component:** `block_news_meta`
+**Component:** <code>block&#95;news&#95;meta</code>
 
-**Template:** `src/_includes/design-system/blocks/news-meta.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/news&#45;meta&#46;html</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
-**CMS collection availability:** `news`
+**CMS collection availability:** <code>news</code>
 
 **Columns / sidebar:** Yes
 
 No block-specific fields. Common fields still apply.
 
-**Usage notes:** News-only block. No parameters. Reads &#96;author&#96; from the page data and renders it as plain text, falling back to a date-only block when there is no author.
+**Usage notes:** News&#45;only block&#46; No parameters&#46; Reads &#96;author&#96; from the page data and renders it as plain text, falling back to a date&#45;only block when there is no author&#46;
 
 ### Canonical example
 
@@ -1171,30 +1172,30 @@ blocks:
   - type: news-meta
 ```
 
-## `faqs`
+## <code>faqs</code>
 
-Renders question/answer pairs as a definition list. Available on all page types.
+Renders question/answer pairs as a definition list&#46; Available on all page types&#46;
 
-**Schema:** `src/_lib/utils/block-schema/faqs.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/faqs&#46;js</code>
 
-**Component:** `block_faqs`
+**Component:** <code>block&#95;faqs</code>
 
-**Template:** `src/_includes/design-system/blocks/faqs.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/faqs&#46;html</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `items` | `array<object>` | optional | Not documented | FAQs | FAQ question/answer pairs. Answers support markdown formatting. Falls back to page-level &#96;faqs&#96; array if omitted. |
-| `items[].question` | `string` | **required** | Not documented | Question |  |
-| `items[].answer` | `markdown` | optional | Not documented | Answer (Markdown) |  |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>items</code> | <code>array&lt;object&gt;</code> | optional | Not documented | FAQs | FAQ question/answer pairs&#46; Answers support markdown formatting&#46; Falls back to page&#45;level &#96;faqs&#96; array if omitted&#46; |
+| <code>items&#91;&#93;&#46;question</code> | <code>string</code> | **required** | Not documented | Question |  |
+| <code>items&#91;&#93;&#46;answer</code> | <code>markdown</code> | optional | Not documented | Answer (Markdown&#41; |  |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
 
-**Usage notes:** Define FAQs inline via &#96;items&#96;, or omit to fall back to the page-level &#96;faqs&#96; array (useful for pages and guide pages that declare FAQs in frontmatter). Answers are rendered as markdown.
+**Usage notes:** Define FAQs inline via &#96;items&#96;, or omit to fall back to the page&#45;level &#96;faqs&#96; array (useful for pages and guide pages that declare FAQs in frontmatter&#41;&#46; Answers are rendered as markdown&#46;
 
 ### Canonical example
 
@@ -1209,17 +1210,17 @@ blocks:
         answer: Omit `items` and the block falls back to the page-level `faqs` array.
 ```
 
-## `guide-categories`
+## <code>guide&#45;categories</code>
 
-Displays the site-wide guide categories.
+Displays the site&#45;wide guide categories&#46;
 
-**Schema:** `src/_lib/utils/block-schema/guide-categories.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/guide&#45;categories&#46;js</code>
 
-**Component:** `block_guide_categories`
+**Component:** <code>block&#95;guide&#95;categories</code>
 
-**Template:** `src/_includes/design-system/blocks/guide-categories.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/guide&#45;categories&#46;html</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
@@ -1227,7 +1228,7 @@ Displays the site-wide guide categories.
 
 No block-specific fields. Common fields still apply.
 
-**Usage notes:** No block-level parameters. Uses the global &#96;collections.guide-categories&#96;, minus any category with a &#96;property&#96; — those belong to a single property's guide and are listed by the &#96;property-guides&#96; block on the property page instead.
+**Usage notes:** No block&#45;level parameters&#46; Uses the global &#96;collections&#46;guide&#45;categories&#96;, minus any category with a &#96;property&#96; — those belong to a single property's guide and are listed by the &#96;property&#45;guides&#96; block on the property page instead&#46;
 
 ### Canonical example
 
@@ -1236,25 +1237,25 @@ blocks:
   - type: guide-categories
 ```
 
-## `guide-header`
+## <code>guide&#45;header</code>
 
-Renders a guide page's heading: title and optional subtitle.
+Renders a guide page's heading: title and optional subtitle&#46;
 
-**Schema:** `src/_lib/utils/block-schema/guide-header.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/guide&#45;header&#46;js</code>
 
-**Component:** `block_guide_header`
+**Component:** <code>block&#95;guide&#95;header</code>
 
-**Template:** `src/_includes/design-system/blocks/guide-header.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/guide&#45;header&#46;html</code>
 
-**Container width:** `full`
+**Container width:** <code>full</code>
 
-**CMS collection availability:** `guide-pages`, `guide-categories`
+**CMS collection availability:** <code>guide&#45;pages</code>, <code>guide&#45;categories</code>
 
 **Columns / sidebar:** Yes
 
 No block-specific fields. Common fields still apply.
 
-**Usage notes:** Guide-only block. No parameters. Reads &#96;title&#96; and &#96;subtitle&#96; from the page data.
+**Usage notes:** Guide&#45;only block&#46; No parameters&#46; Reads &#96;title&#96; and &#96;subtitle&#96; from the page data&#46;
 
 ### Canonical example
 
@@ -1263,25 +1264,25 @@ blocks:
   - type: guide-header
 ```
 
-## `guide-navigation`
+## <code>guide&#45;navigation</code>
 
-Renders a 'Back to &#60;category&#62;' breadcrumb link for a guide page.
+Renders a 'Back to &lt;category&gt;' breadcrumb link for a guide page&#46;
 
-**Schema:** `src/_lib/utils/block-schema/guide-navigation.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/guide&#45;navigation&#46;js</code>
 
-**Component:** `block_guide_navigation`
+**Component:** <code>block&#95;guide&#95;navigation</code>
 
-**Template:** `src/_includes/design-system/blocks/guide-navigation.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/guide&#45;navigation&#46;html</code>
 
-**Container width:** `full`
+**Container width:** <code>full</code>
 
-**CMS collection availability:** `guide-pages`
+**CMS collection availability:** <code>guide&#45;pages</code>
 
 **Columns / sidebar:** Yes
 
 No block-specific fields. Common fields still apply.
 
-**Usage notes:** Guide-page-only block. No parameters. Renders nothing when the page has no &#96;guide-category&#96; field.
+**Usage notes:** Guide&#45;page&#45;only block&#46; No parameters&#46; Renders nothing when the page has no &#96;guide&#45;category&#96; field&#46;
 
 ### Canonical example
 
@@ -1290,25 +1291,25 @@ blocks:
   - type: guide-navigation
 ```
 
-## `guide-pages-list`
+## <code>guide&#45;pages&#45;list</code>
 
-Lists the guide pages that belong to the current guide category (filtered via &#96;guidesByCategory&#96;).
+Lists the guide pages that belong to the current guide category (filtered via &#96;guidesByCategory&#96;&#41;&#46;
 
-**Schema:** `src/_lib/utils/block-schema/guide-pages-list.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/guide&#45;pages&#45;list&#46;js</code>
 
-**Component:** `block_guide_pages_list`
+**Component:** <code>block&#95;guide&#95;pages&#95;list</code>
 
-**Template:** `src/_includes/design-system/blocks/guide-pages-list.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/guide&#45;pages&#45;list&#46;html</code>
 
-**Container width:** `full`
+**Container width:** <code>full</code>
 
-**CMS collection availability:** `guide-categories`
+**CMS collection availability:** <code>guide&#45;categories</code>
 
 **Columns / sidebar:** Yes
 
 No block-specific fields. Common fields still apply.
 
-**Usage notes:** Guide-category-only block. No parameters. A guide page with a &#96;property&#96; is only listed when the category carries the same &#96;property&#96;. Renders nothing when there are no pages left to show.
+**Usage notes:** Guide&#45;category&#45;only block&#46; No parameters&#46; A guide page with a &#96;property&#96; is only listed when the category carries the same &#96;property&#96;&#46; Renders nothing when there are no pages left to show&#46;
 
 ### Canonical example
 
@@ -1317,33 +1318,33 @@ blocks:
   - type: guide-pages-list
 ```
 
-## `link-button`
+## <code>link&#45;button</code>
 
-Standalone centered button linking to an anchor or URL.
+Standalone centered button linking to an anchor or URL&#46;
 
-**Schema:** `src/_lib/utils/block-schema/link-button.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/link&#45;button&#46;js</code>
 
-**Component:** `block_link_button`
+**Component:** <code>block&#95;link&#95;button</code>
 
-**Template:** `src/_includes/design-system/blocks/link-button.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/link&#45;button&#46;html</code>
 
-**SCSS:** `src/css/design-system/_link-button.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;link&#45;button&#46;scss</code>
 
-**HTML root:** `<div class="link-button">`
+**HTML root:** <code>&lt;div class&#61;"link&#45;button"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `text` | `string` | **required** | Not documented | Button Text | Button label. |
-| `href` | `string` | **required** | Not documented | URL | Link URL or anchor (e.g. &#96;"#contact"&#96;, &#96;"/about"&#96;). |
-| `variant` | `string` | optional | `"primary"` | Variant | &#96;"primary"&#96;, &#96;"secondary"&#96;, or &#96;"ghost"&#96;. |
-| `size` | `string` | optional | Not documented | Size | &#96;"sm"&#96;, &#96;"lg"&#96;, or omit for default. |
-| `reveal` | `string` | optional | Not documented | Reveal Animation | &#96;data-reveal&#96; value. |
+| --- | --- | --- | --- | --- | --- |
+| <code>text</code> | <code>string</code> | **required** | Not documented | Button Text | Button label&#46; |
+| <code>href</code> | <code>string</code> | **required** | Not documented | URL | Link URL or anchor (e&#46;g&#46; &#96;"&#35;contact"&#96;, &#96;"/about"&#96;&#41;&#46; |
+| <code>variant</code> | <code>string</code> | optional | <code>"primary"</code> | Variant | &#96;"primary"&#96;, &#96;"secondary"&#96;, or &#96;"ghost"&#96;&#46; |
+| <code>size</code> | <code>string</code> | optional | Not documented | Size | &#96;"sm"&#96;, &#96;"lg"&#96;, or omit for default&#46; |
+| <code>reveal</code> | <code>string</code> | optional | Not documented | Reveal Animation | &#96;data&#45;reveal&#96; value&#46; |
 
 ### Canonical example
 
@@ -1355,35 +1356,35 @@ blocks:
     variant: primary
 ```
 
-## `gallery`
+## <code>gallery</code>
 
-Image grid with optional aspect ratio cropping and captions.
+Image grid with optional aspect ratio cropping and captions&#46;
 
-**Schema:** `src/_lib/utils/block-schema/gallery.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/gallery&#46;js</code>
 
-**Component:** `block_gallery`
+**Component:** <code>block&#95;gallery</code>
 
-**Template:** `src/_includes/design-system/blocks/gallery.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/gallery&#46;html</code>
 
-**SCSS:** `src/css/design-system/_items.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;items&#46;scss</code>
 
-**HTML root:** `<ul class="items" role="list">`
+**HTML root:** <code>&lt;ul class&#61;"items" role&#61;"list"&gt;</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `items` | `array<object>` | **required** | Not documented | Gallery Images | Image objects. Each: &#96;{image, caption}&#96;. Images processed by &#96;{% image %}&#96; shortcode. |
-| `items[].image` | `image` | **required** | Not documented | Image |  |
-| `items[].caption` | `string` | optional | Not documented | Caption |  |
-| `aspect_ratio` | `string` | optional | Not documented | Aspect Ratio | Aspect ratio for images (e.g. &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;). Default: no cropping. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `masonry` | `boolean` | optional | `false` | Masonry Grid | If true, renders as a masonry grid using uWrap for zero-reflow height prediction. |
-| `horizontal` | `boolean` | optional | `false` | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid. |
+| --- | --- | --- | --- | --- | --- |
+| <code>items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Gallery Images | Image objects&#46; Each: &#96;{image, caption}&#96;&#46; Images processed by &#96;{% image %}&#96; shortcode&#46; |
+| <code>items&#91;&#93;&#46;image</code> | <code>image</code> | **required** | Not documented | Image |  |
+| <code>items&#91;&#93;&#46;caption</code> | <code>string</code> | optional | Not documented | Caption |  |
+| <code>aspect&#95;ratio</code> | <code>string</code> | optional | Not documented | Aspect Ratio | Aspect ratio for images (e&#46;g&#46; &#96;"16/9"&#96;, &#96;"1/1"&#96;, &#96;"4/3"&#96;&#41;&#46; Default: no cropping&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>masonry</code> | <code>boolean</code> | optional | <code>false</code> | Masonry Grid | If true, renders as a masonry grid using uWrap for zero&#45;reflow height prediction&#46; |
+| <code>horizontal</code> | <code>boolean</code> | optional | <code>false</code> | Horizontal Slider | If true, renders as a horizontal slider instead of a wrapping grid&#46; |
 
 ### Canonical example
 
@@ -1403,35 +1404,35 @@ blocks:
         caption: Fireworks
 ```
 
-## `marquee-images`
+## <code>marquee&#45;images</code>
 
-Continuously scrolling marquee of images (e.g. brand logos, partner badges).
+Continuously scrolling marquee of images (e&#46;g&#46; brand logos, partner badges&#41;&#46;
 
-**Schema:** `src/_lib/utils/block-schema/marquee-images.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/marquee&#45;images&#46;js</code>
 
-**Component:** `block_marquee_images`
+**Component:** <code>block&#95;marquee&#95;images</code>
 
-**Template:** `src/_includes/design-system/blocks/marquee-images.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/marquee&#45;images&#46;html</code>
 
-**SCSS:** `src/css/design-system/_marquee-images.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;marquee&#45;images&#46;scss</code>
 
-**HTML root:** `<div class="marquee-images">`
+**HTML root:** <code>&lt;div class&#61;"marquee&#45;images"&gt;</code>
 
-**Container width:** `full`
+**Container width:** <code>full</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** No
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `items` | `array<object>` | **required** | Not documented | Images | Image objects. Each: &#96;{image, alt, link&#95;url}&#96;. &#96;image&#96; is a path; &#96;alt&#96; is optional alt text; &#96;link&#95;url&#96; is an optional URL to wrap the image in a link. Images are processed via the &#96;{% image %}&#96; shortcode for responsive formats and proper URL normalization. |
-| `items[].image` | `string` | **required** | Not documented | Image Path |  |
-| `items[].alt` | `string` | optional | Not documented | Alt Text |  |
-| `items[].link_url` | `string` | optional | Not documented | Link URL |  |
-| `speed` | `string` | optional | `"30s"` | Scroll Speed (e.g. 30s) | CSS animation duration for one full scroll cycle (e.g. &#96;"20s"&#96;, &#96;"45s"&#96;). Slower = longer duration. |
-| `height` | `string` | optional | `"50px"` | Image Height (e.g. 50px) | CSS height for the images (e.g. &#96;"60px"&#96;, &#96;"80px"&#96;). Width scales proportionally. |
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
+| --- | --- | --- | --- | --- | --- |
+| <code>items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Images | Image objects&#46; Each: &#96;{image, alt, link&#95;url}&#96;&#46; &#96;image&#96; is a path; &#96;alt&#96; is optional alt text; &#96;link&#95;url&#96; is an optional URL to wrap the image in a link&#46; Images are processed via the &#96;{% image %}&#96; shortcode for responsive formats and proper URL normalization&#46; |
+| <code>items&#91;&#93;&#46;image</code> | <code>string</code> | **required** | Not documented | Image Path |  |
+| <code>items&#91;&#93;&#46;alt</code> | <code>string</code> | optional | Not documented | Alt Text |  |
+| <code>items&#91;&#93;&#46;link&#95;url</code> | <code>string</code> | optional | Not documented | Link URL |  |
+| <code>speed</code> | <code>string</code> | optional | <code>"30s"</code> | Scroll Speed (e&#46;g&#46; 30s&#41; | CSS animation duration for one full scroll cycle (e&#46;g&#46; &#96;"20s"&#96;, &#96;"45s"&#96;&#41;&#46; Slower &#61; longer duration&#46; |
+| <code>height</code> | <code>string</code> | optional | <code>"50px"</code> | Image Height (e&#46;g&#46; 50px&#41; | CSS height for the images (e&#46;g&#46; &#96;"60px"&#96;, &#96;"80px"&#96;&#41;&#46; Width scales proportionally&#46; |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
 
 ### Canonical example
 
@@ -1450,34 +1451,34 @@ blocks:
         alt: Fireworks
 ```
 
-## `icon-links`
+## <code>icon&#45;links</code>
 
-Vertical list of links with icons, rendered as a flex column stack.
+Vertical list of links with icons, rendered as a flex column stack&#46;
 
-**Schema:** `src/_lib/utils/block-schema/icon-links.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/icon&#45;links&#46;js</code>
 
-**Component:** `block_icon_links`
+**Component:** <code>block&#95;icon&#95;links</code>
 
-**Template:** `src/_includes/design-system/blocks/icon-links.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/icon&#45;links&#46;html</code>
 
-**SCSS:** `src/css/design-system/_icon-links.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;icon&#45;links&#46;scss</code>
 
-**HTML root:** `<ul class="icon-links" role="list">`
+**HTML root:** <code>&lt;ul class&#61;"icon&#45;links" role&#61;"list"&gt;</code>
 
-**Container width:** `narrow`
+**Container width:** <code>narrow</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `items` | `array<object>` | **required** | Not documented | Links | Link objects. Each: &#96;{icon, text, url}&#96;. &#96;url&#96; is optional — items without it render as plain text. Icon can be an Iconify ID (&#96;"prefix:name"&#96;), image path, or raw HTML/emoji. |
-| `items[].icon` | `string` | **required** | Not documented | Icon (Iconify ID or HTML entity) |  |
-| `items[].text` | `string` | **required** | Not documented | Link Text |  |
-| `items[].url` | `string` | optional | Not documented | URL |  |
-| `reveal` | `boolean` | optional | `true` | Not exposed | Adds &#96;data-reveal&#96; to each link item. |
+| --- | --- | --- | --- | --- | --- |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Links | Link objects&#46; Each: &#96;{icon, text, url}&#96;&#46; &#96;url&#96; is optional — items without it render as plain text&#46; Icon can be an Iconify ID (&#96;"prefix:name"&#96;&#41;, image path, or raw HTML/emoji&#46; |
+| <code>items&#91;&#93;&#46;icon</code> | <code>string</code> | **required** | Not documented | Icon (Iconify ID or HTML entity&#41; |  |
+| <code>items&#91;&#93;&#46;text</code> | <code>string</code> | **required** | Not documented | Link Text |  |
+| <code>items&#91;&#93;&#46;url</code> | <code>string</code> | optional | Not documented | URL |  |
+| <code>reveal</code> | <code>boolean</code> | optional | <code>true</code> | Not exposed | Adds &#96;data&#45;reveal&#96; to each link item&#46; |
 
 ### Canonical example
 
@@ -1497,35 +1498,35 @@ blocks:
         url: /search/
 ```
 
-## `downloads`
+## <code>downloads</code>
 
-List of downloadable files. Each item auto-detects its icon from the file extension and its size from the filesystem at build time.
+List of downloadable files&#46; Each item auto&#45;detects its icon from the file extension and its size from the filesystem at build time&#46;
 
-**Schema:** `src/_lib/utils/block-schema/downloads.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/downloads&#46;js</code>
 
-**Component:** `block_downloads`
+**Component:** <code>block&#95;downloads</code>
 
-**Template:** `src/_includes/design-system/blocks/downloads.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/downloads&#46;html</code>
 
-**SCSS:** `src/css/design-system/_downloads.scss`
+**SCSS:** <code>src/css/design&#45;system/&#95;downloads&#46;scss</code>
 
-**HTML root:** `<ul class="downloads" role="list">`
+**HTML root:** <code>&lt;ul class&#61;"downloads" role&#61;"list"&gt;</code>
 
-**Container width:** `narrow`
+**Container width:** <code>narrow</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `intro_content` | `markdown` | optional | Not documented | Intro Content (Markdown) | Markdown content rendered above the block in &#96;.prose&#96;. |
-| `items` | `array<object>` | **required** | Not documented | Downloads | Download objects. Each: &#96;{file, label}&#96;. &#96;file&#96; is a site-relative URL path; &#96;label&#96; is the visible text. |
-| `items[].file` | `string` | **required** | Not documented | File Path (e.g. /files/guide.pdf) |  |
-| `items[].label` | `string` | **required** | Not documented | Label |  |
-| `reveal` | `boolean` | optional | `true` | Not exposed | Adds &#96;data-reveal&#96; to each download item. |
+| --- | --- | --- | --- | --- | --- |
+| <code>intro&#95;content</code> | <code>markdown</code> | optional | Not documented | Intro Content (Markdown&#41; | Markdown content rendered above the block in &#96;&#46;prose&#96;&#46; |
+| <code>items</code> | <code>array&lt;object&gt;</code> | **required** | Not documented | Downloads | Download objects&#46; Each: &#96;{file, label}&#96;&#46; &#96;file&#96; is a site&#45;relative URL path; &#96;label&#96; is the visible text&#46; |
+| <code>items&#91;&#93;&#46;file</code> | <code>string</code> | **required** | Not documented | File Path (e&#46;g&#46; /files/guide&#46;pdf&#41; |  |
+| <code>items&#91;&#93;&#46;label</code> | <code>string</code> | **required** | Not documented | Label |  |
+| <code>reveal</code> | <code>boolean</code> | optional | <code>true</code> | Not exposed | Adds &#96;data&#45;reveal&#96; to each download item&#46; |
 
-**Usage notes:** The &#96;file&#96; path is resolved against &#96;src/&#96; (e.g. &#96;/files/guide.pdf&#96; reads from &#96;src/files/guide.pdf&#96;). Missing files cause a build error. Ensure the containing directory is configured as a passthrough-copy target so the file is also served to the browser.
+**Usage notes:** The &#96;file&#96; path is resolved against &#96;src/&#96; (e&#46;g&#46; &#96;/files/guide&#46;pdf&#96; reads from &#96;src/files/guide&#46;pdf&#96;&#41;&#46; Missing files cause a build error&#46; Ensure the containing directory is configured as a passthrough&#45;copy target so the file is also served to the browser&#46;
 
 ### Canonical example
 
@@ -1538,27 +1539,27 @@ blocks:
         label: Template overview (TXT)
 ```
 
-## `snippet`
+## <code>snippet</code>
 
-Renders blocks from a named snippet file, enabling reusable block compositions.
+Renders blocks from a named snippet file, enabling reusable block compositions&#46;
 
-**Schema:** `src/_lib/utils/block-schema/snippet.js`
+**Schema:** <code>src/&#95;lib/utils/block&#45;schema/snippet&#46;js</code>
 
-**Component:** `block_snippet`
+**Component:** <code>block&#95;snippet</code>
 
-**Template:** `src/_includes/design-system/blocks/snippet.html`
+**Template:** <code>src/&#95;includes/design&#45;system/blocks/snippet&#46;html</code>
 
-**Container width:** `wide`
+**Container width:** <code>wide</code>
 
 **CMS collection availability:** All collections with a block editor
 
 **Columns / sidebar:** Yes
 
 | Field | Schema type | Presence | Documented default | CMS label | Description |
-|---|---|---|---|---|---|
-| `reference` | `reference` | **required** | Not documented | Snippet | Filename of the snippet (without &#96;.md&#96; extension) from &#96;src/snippets/&#96;. CMS options: {"collection":"snippets"} |
+| --- | --- | --- | --- | --- | --- |
+| <code>reference</code> | <code>reference</code> | **required** | Not documented | Snippet | Filename of the snippet (without &#96;&#46;md&#96; extension&#41; from &#96;src/snippets/&#96;&#46; CMS options: {"collection":"snippets"} |
 
-**Usage notes:** The referenced snippet must exist in &#96;src/snippets/&#96; and have a &#96;blocks&#96; frontmatter array. The snippet block is transparent — it renders no wrapping section element, so each inner block renders its own section directly.
+**Usage notes:** The referenced snippet must exist in &#96;src/snippets/&#96; and have a &#96;blocks&#96; frontmatter array&#46; The snippet block is transparent — it renders no wrapping section element, so each inner block renders its own section directly&#46;
 
 ### Canonical example
 

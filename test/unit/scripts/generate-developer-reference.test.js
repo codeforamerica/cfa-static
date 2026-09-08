@@ -1,7 +1,27 @@
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import MarkdownIt from "markdown-it";
 import { describe, expect, test } from "vitest";
 import YAML from "yaml";
-import { renderDeveloperReference } from "#scripts/generate-developer-reference.js";
+import { COLLECTIONS } from "#scripts/customise-cms/collections.js";
+import { FEATURE_QUESTIONS } from "#scripts/customise-cms/feature-questions.js";
+import {
+  readDeveloperReferenceInputs,
+  renderDeveloperReference,
+} from "#scripts/generate-developer-reference.js";
+import { getFiles, rootDir } from "#test/test-utils.js";
+
+const markdown = new MarkdownIt({ html: true });
+const codeBlocks = (output, language) =>
+  markdown
+    .parse(output, {})
+    .filter((token) => token.type === "fence" && token.info === language)
+    .map((token) => token.content);
+
+const cmsRuntimeDefinitions = [
+  ["COLLECTIONS", COLLECTIONS],
+  ["FEATURE_QUESTIONS", FEATURE_QUESTIONS],
+];
 
 const inputs = (overrides = {}) => ({
   packageJson: {
@@ -27,7 +47,7 @@ const inputs = (overrides = {}) => ({
   fpSources: [],
   themeSources: [],
   sassSources: [],
-  cmsSources: [],
+  cmsDefinitions: [],
   workflowSources: [],
   ...overrides,
 });
@@ -41,20 +61,64 @@ const documentedWorkflow = (content) => {
       workflowSources: [{ path: "workflow.yml", content }],
     }),
   );
-  const [match] = output.matchAll(/```yaml\n([\s\S]*?)```/g);
-  return YAML.parse(match[1]);
+  return YAML.parse(codeBlocks(output, "yaml")[0]);
 };
 
 describe("developer reference rendering", () => {
+  test.each([
+    ["fpSources", /^src\/_lib\/utils\/fp\/[^/]+\.js$/],
+    ["themeSources", /^src\/css\/theme(?:-[^/]+)?\.scss$/],
+  ])("discovers the complete %s source catalog", (key, pattern) => {
+    const expected = getFiles(pattern).toSorted();
+    expect(expected.length).toBeGreaterThan(0);
+    expect(
+      readDeveloperReferenceInputs()
+        [key].map(({ path }) => path)
+        .toSorted(),
+    ).toEqual(expected);
+  });
+
+  test("documented FP exports exactly match the runtime APIs", async () => {
+    const files = getFiles(/^src\/_lib\/utils\/fp\/[^/]+\.js$/);
+    const expected = (
+      await Promise.all(
+        files.map(async (file) => {
+          const module = await import(pathToFileURL(join(rootDir, file)).href);
+          return Object.keys(module).map((name) => `${file}:${name}`);
+        }),
+      )
+    )
+      .flat()
+      .toSorted();
+    const document = new DOMParser().parseFromString(
+      markdown.render(renderDeveloperReference(readDeveloperReferenceInputs())),
+      "text/html",
+    );
+    const actual = [
+      ...document.querySelectorAll(
+        'a[href^="../src/_lib/utils/fp/"][href*="#L"]',
+      ),
+    ]
+      .map(
+        (link) =>
+          `${link
+            .getAttribute("href")
+            .slice(3)
+            .replace(/#L\d+$/, "")}:${link.textContent}`,
+      )
+      .toSorted();
+    expect(actual).toEqual(expected);
+  });
+
   test("renders the supplied Node requirement", () => {
     expect(renderDeveloperReference(inputs())).toContain(
-      "Node requirement: <code>&gt;=99</code>",
+      "Node requirement: <code>&gt;&#61;99</code>",
     );
   });
 
   test("lists every script with its exact command", () => {
     expect(renderDeveloperReference(inputs())).toContain(
-      "| <code>npm run inspect</code> | <code>node inspect.js --strict</code> |\n" +
+      "| <code>npm run inspect</code> | <code>node inspect&#46;js &#45;&#45;strict</code> |\n" +
         "| <code>npm run test</code> | <code>vitest run</code> |",
     );
   });
@@ -104,10 +168,10 @@ describe("developer reference rendering", () => {
       },
     });
     expect(output).toContain(
-      "| <code>#fixture/&#42;</code> | <code>./fixtures/&#42;</code> |",
+      "| <code>&#35;fixture/&#42;</code> | <code>&#46;/fixtures/&#42;</code> |",
     );
     expect(output).toContain(
-      '<code>{"node":"./node.js","default":"./web.js"}</code>',
+      '<code>{"node":"&#46;/node&#46;js","default":"&#46;/web&#46;js"}</code>',
     );
   });
 
@@ -154,7 +218,7 @@ describe("developer reference rendering", () => {
       ),
     );
     expect(output).toContain(
-      "[<code>named</code>](../src/_lib/utils/fp/example.js#L5) | <code>First line continues here.</code>",
+      "[<code>named</code>](../src/_lib/utils/fp/example.js#L5) | <code>First line continues here&#46;</code>",
     );
     expect(output).not.toContain("@param");
   });
@@ -165,8 +229,8 @@ describe("developer reference rendering", () => {
         "/** Summary.\n *\n * Details deliberately omitted.\n */\nexport const named = 1;",
       ),
     );
-    expect(output).toContain("<code>Summary.</code>");
-    expect(output).not.toContain("Details deliberately omitted.");
+    expect(output).toContain("<code>Summary&#46;</code>");
+    expect(output).not.toContain("Details deliberately omitted");
   });
 
   test.each([
@@ -217,14 +281,16 @@ describe("developer reference rendering", () => {
       }),
     );
     expect(output).toContain(
-      "[src/css/theme-sample.scss](../src/css/theme-sample.scss)",
+      "[src/css/theme&#45;sample&#46;scss](../src/css/theme-sample.scss)",
     );
     expect(output).toContain(
-      "| <code>--color</code> | <code>rgb(1 2 3 / 5%)</code> |",
+      "| <code>&#45;&#45;color</code> | <code>rgb(1 2 3 / 5%&#41;</code> |",
     );
-    expect(output).toContain('| <code>--font</code> | <code>"A; B"</code> |');
+    expect(output).toContain(
+      '| <code>&#45;&#45;font</code> | <code>"A; B"</code> |',
+    );
     expect(output).not.toMatch(
-      /--commented|--scoped|--nested|theme-editor\.scss/,
+      /&#45;&#45;(?:commented|scoped|nested)|theme-editor\.scss/,
     );
   });
 
@@ -252,7 +318,7 @@ describe("developer reference rendering", () => {
       }),
     );
     expect(output).toContain(
-      "| <code>--color</code> | <code>red !important</code> |",
+      "| <code>&#45;&#45;color</code> | <code>red &#33;important</code> |",
     );
   });
 
@@ -268,8 +334,8 @@ describe("developer reference rendering", () => {
     const output = renderDeveloperReference(
       inputs({ fpSources, themeSources }),
     );
-    expect(output.indexOf("#utils/fp/a.js")).toBeLessThan(
-      output.indexOf("#utils/fp/z.js"),
+    expect(output.indexOf("src/_lib/utils/fp/a.js")).toBeLessThan(
+      output.indexOf("src/_lib/utils/fp/z.js"),
     );
     expect(output.indexOf("src/css/theme-a.scss")).toBeLessThan(
       output.indexOf("src/css/theme-z.scss"),
@@ -293,12 +359,14 @@ describe("developer reference rendering", () => {
       }),
     );
     expect(output).toContain(
-      "| <code>$unit</code> | <code>9px !default</code> |",
+      "| <code>$unit</code> | <code>9px &#33;default</code> |",
     );
     expect(output).toContain(
-      "| <code>$width</code> | <code>$unit &#42; 7 !default</code> |",
+      "| <code>$width</code> | <code>$unit &#42; 7 &#33;default</code> |",
     );
-    expect(output).toContain('<code>("small": 701px, "large": 999px)</code>');
+    expect(output).toContain(
+      '<code>("small": 701px, "large": 999px&#41;</code>',
+    );
     expect(output).toContain(
       '@function alias($name) { @return unquote("var(--#{$name})"); }',
     );
@@ -323,79 +391,84 @@ describe("developer reference rendering", () => {
     expect(output).toContain(`\`\`\`scss\n${content}\n\`\`\``);
   });
 
-  test.each([
-    "COLLECTIONS",
-    "FEATURE_QUESTIONS",
-  ])("extracts only the requested CMS definition %s without importing runtime modules", (constant) => {
-    const definition =
-      '[{ name: "guides", path: "content/guides", dependencies: ["categories"], required: false }]';
-    const output = renderDeveloperReference(
-      inputs({
-        cmsSources: [
-          {
-            path: "scripts/customise-cms/example.js",
-            constant,
-            content: `import config from "does-not-exist";\nthrow new Error("must not execute");\nconst unrelated = ["omit-me"];\nexport const ${constant} = ${definition};`,
-          },
-        ],
-      }),
+  test.each(
+    cmsRuntimeDefinitions,
+  )("discovers %s from its actual runtime source", async (constant, value) => {
+    const definition = readDeveloperReferenceInputs().cmsDefinitions.find(
+      (entry) => entry.constant === constant,
     );
-    expect(output).toContain(`const ${constant} = ${definition};`);
-    expect(output).not.toMatch(/does-not-exist|omit-me|internal:/);
+    expect(definition.value).toBe(value);
+    const module = await import(
+      pathToFileURL(join(rootDir, definition.path)).href
+    );
+    expect(module[constant]).toBe(value);
   });
 
-  test("preserves feature choice labels in declaration order", () => {
-    const definition = `[
-  ["z_choice", "First question?"],
-  ["a_choice", "Second question?"],
-]`;
-    const output = renderDeveloperReference(
-      inputs({
-        cmsSources: [
-          {
-            path: "scripts/customise-cms/prompts.js",
-            constant: "FEATURE_QUESTIONS",
-            content: `const FEATURE_QUESTIONS = ${definition};`,
-          },
-        ],
-      }),
+  test.each(
+    cmsRuntimeDefinitions,
+  )("documents the same %s values used by the CMS runtime", (_constant, value) => {
+    const output = renderDeveloperReference(readDeveloperReferenceInputs());
+    const definitions = codeBlocks(output, "json").map((content) =>
+      JSON.parse(content),
     );
-    expect(output).toContain(`const FEATURE_QUESTIONS = ${definition};`);
+    expect(definitions).toContainEqual(value);
   });
 
   test.each([
-    "const OTHER = [];",
-    "const COLLECTIONS = getCollections();",
-  ])("fails when the requested CMS array is unavailable: %s", (content) => {
-    expect(() =>
-      renderDeveloperReference(
-        inputs({
-          cmsSources: [
-            {
-              path: "definitions.js",
-              constant: "COLLECTIONS",
-              content,
-            },
-          ],
-        }),
-      ),
-    ).toThrow("Expected top-level array COLLECTIONS in definitions.js");
+    [
+      "COLLECTIONS",
+      [
+        {
+          ...COLLECTIONS[0],
+          name: "guides",
+          path: "content/guides",
+          required: false,
+          dependencies: [],
+        },
+      ],
+    ],
+    [
+      "FEATURE_QUESTIONS",
+      [
+        ["no_index", "First question?\n```\n````\n<script>"],
+        ["faqs", "Second question?"],
+      ],
+    ],
+  ])("serializes supplied %s data without inserting defaults or changing order", (constant, value) => {
+    const output = renderDeveloperReference(
+      inputs({
+        cmsDefinitions: [{ path: "fixture.js", constant, value }],
+      }),
+    );
+    expect(JSON.parse(codeBlocks(output, "json").at(-1))).toEqual(value);
+    expect(output).toContain("(../fixture.js)");
   });
 
-  test("reports invalid CMS source at its path", () => {
-    expect(() =>
-      renderDeveloperReference(
-        inputs({
-          cmsSources: [
-            {
-              path: "definitions.js",
-              constant: "COLLECTIONS",
-              content: "const = ;",
-            },
-          ],
-        }),
-      ),
-    ).toThrow("Cannot parse definitions.js");
+  test("preserves Sass source with fence collisions as one complete fenced block", () => {
+    const source = {
+      path: "helpers.scss",
+      content: "@mixin sample {\n/*\n```\n````\n*/\n@content;\n}",
+    };
+    const output = renderDeveloperReference(inputs({ sassSources: [source] }));
+    const fences = codeBlocks(output, "scss");
+    expect(fences).toHaveLength(1);
+    expect(fences[0]).toBe(`${source.content}\n`);
+  });
+
+  test("preserves workflow commands containing fence collisions", () => {
+    const workflow = {
+      jobs: { build: { steps: [{ run: "```\n````\nend" }] } },
+    };
+    const output = renderDeveloperReference(
+      inputs({
+        workflowSources: [
+          { path: "workflow.yml", content: YAML.stringify(workflow) },
+        ],
+      }),
+    );
+    const fences = codeBlocks(output, "yaml");
+    expect(fences).toHaveLength(1);
+    expect(YAML.parse(fences[0])).toEqual(workflow);
   });
 
   test("preserves configured workflow runner, build, environment, and expression values", () => {

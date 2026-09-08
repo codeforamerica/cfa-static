@@ -89,7 +89,7 @@ const toCmsField = (name, fieldSchema, useVisualEditor) => {
  * @param {string} type - Block type slug
  * @returns {string} Component name
  */
-const componentNameFor = (type) => `block_${type.replace(/-/g, "_")}`;
+export const componentNameFor = (type) => `block_${type.replace(/-/g, "_")}`;
 
 /**
  * Build a CMS block component definition from BLOCK_CMS_FIELDS for one block type.

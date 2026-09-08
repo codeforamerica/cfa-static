@@ -9,6 +9,7 @@ import {
   resolveDependencies,
 } from "#scripts/customise-cms/collections.js";
 import { createEmptyConfig } from "#scripts/customise-cms/config.js";
+import { FEATURE_QUESTIONS } from "#scripts/customise-cms/feature-questions.js";
 import { filter, map, notMemberOf, pipe, unique } from "#utils/fp/array.js";
 
 /**
@@ -196,30 +197,6 @@ const askCustomCollections = async (rl, defaultCustomCollections) => {
   );
   return parseCustomCollectionNames(answer);
 };
-
-/**
- * The optional-feature questions, asked in order. Keys match CmsFeatures.
- * no_index always applies because the pages collection is always enabled.
- * @type {[keyof CmsFeatures, string][]}
- */
-const FEATURE_QUESTIONS = [
-  ["permalinks", "Do you want custom permalinks on items?"],
-  ["redirects", "Do you want redirect_from support (for URL redirects)?"],
-  ["faqs", "Do you want FAQs on items?"],
-  ["galleries", "Do you want image galleries on items?"],
-  [
-    "external_navigation_urls",
-    "Do you want to link to external URLs in your navigation?",
-  ],
-  [
-    "use_visual_editor",
-    "Do you want to use a visual rich-text editor instead of markdown?",
-  ],
-  [
-    "no_index",
-    "Do you want to hide pages/news from listings (no_index field)?",
-  ],
-];
 
 /**
  * Ask every feature question in order

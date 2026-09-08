@@ -1,6 +1,13 @@
 /** Pure block documentation rendering, shared by the CLI and freshness tests. */
 import { stringify } from "yaml";
-import { COLUMN_DISALLOWED_TYPES } from "#utils/block-columns.js";
+import { componentNameFor } from "#scripts/customise-cms/blocks.js";
+import {
+  escapeText,
+  fencedCode,
+  inlineCode,
+  markdownTable,
+} from "#scripts/lib/markdown.js";
+import { isColumnSafeType } from "#utils/block-columns.js";
 import { CONTAINER_FIELDS } from "#utils/block-schema/shared.js";
 import {
   BLOCK_DOCS,
@@ -8,6 +15,7 @@ import {
   BLOCK_SCHEMAS,
   getBlockContainerWidth,
   getBlockTemplate,
+  validateBlocks,
 } from "#utils/block-schema.js";
 
 /** @typedef {import("#scripts/customise-cms/blocks.js").BlockFieldSchema & { description?: string, allowPipeDelimitedItems?: boolean }} DocField */
@@ -16,33 +24,6 @@ import {
 const FIELD_SCHEMAS = /** @type {Record<string, Record<string, DocField>>} */ (
   BLOCK_SCHEMAS
 );
-
-/** Escape literal text, including table delimiters and embedded HTML.
- * @param {unknown} value
- */
-const escapeText = (value) =>
-  String(value)
-    .replace(/[&<>\\`*_[\]|]/g, (char) => `&#${char.charCodeAt(0)};`)
-    .replace(/\r\n|\r|\n/g, "<br>");
-
-/** @param {string} text @param {number} minimum */
-const codeFence = (text, minimum) =>
-  "`".repeat(
-    Math.max(
-      minimum - 1,
-      ...[...text.matchAll(/`+/g)].map(([run]) => run.length),
-    ) + 1,
-  );
-
-/** @param {unknown} value */
-const inlineCode = (value) => {
-  const text = String(value)
-    .replaceAll("|", "\\|")
-    .replace(/\r\n|\r|\n/g, " ");
-  const fence = codeFence(text, 1);
-  const padding = text.includes("`") ? " " : "";
-  return `${fence}${padding}${text}${padding}${fence}`;
-};
 
 /** @param {DocField} field */
 const fieldDescription = (field) =>
@@ -58,7 +39,7 @@ const fieldDescription = (field) =>
 const renderFieldRow = (path, field) => {
   const type = field.list ? `array<${field.type}>` : field.type;
   const defaultText = field.default === "" ? '""' : field.default;
-  const cells = [
+  return [
     inlineCode(path),
     inlineCode(type),
     field.required ? "**required**" : "optional",
@@ -66,53 +47,66 @@ const renderFieldRow = (path, field) => {
     field.label === undefined ? "Not exposed" : escapeText(field.label),
     escapeText(fieldDescription(field)),
   ];
-  return `| ${cells.join(" | ")} |`;
 };
 
 /**
- * @param {Record<string, DocField>} fields
  * @param {string} [prefix]
- * @returns {string[]}
+ * @returns {(entry: [string, DocField]) => string[][]}
  */
-const fieldRows = (fields, prefix = "") =>
-  Object.entries(fields).flatMap(([key, field]) => {
+const fieldRows =
+  (prefix = "") =>
+  ([key, field]) => {
     const path = `${prefix}${key}`;
     const childPrefix = `${path}${field.list ? "[]" : ""}.`;
     return [
       renderFieldRow(path, field),
-      ...(field.fields ? fieldRows(field.fields, childPrefix) : []),
+      ...(field.fields
+        ? Object.entries(field.fields).flatMap(fieldRows(childPrefix))
+        : []),
     ];
-  });
+  };
 
 /** Render full field schemas, retaining nested required flags and falsy defaults.
  * @param {Record<string, DocField>} fields
  */
 export const renderFieldTable = (fields) =>
-  [
-    "| Field | Schema type | Presence | Documented default | CMS label | Description |",
-    "|---|---|---|---|---|---|",
-    ...fieldRows(fields),
-  ].join("\n");
+  markdownTable(
+    [
+      "Field",
+      "Schema type",
+      "Presence",
+      "Documented default",
+      "CMS label",
+      "Description",
+    ],
+    Object.entries(fields).flatMap(fieldRows()),
+  );
 
 /** @param {string} type */
-const columnCompatibility = (type) =>
-  COLUMN_DISALLOWED_TYPES.includes(type) || type.startsWith("split-")
-    ? "No"
-    : "Yes";
+const columnCompatibility = (type) => (isColumnSafeType(type) ? "Yes" : "No");
+
+/** @param {(typeof BLOCK_EXAMPLES)[number]} entry */
+const validateCanonicalExample = ({ type, example }) => {
+  if (!BLOCK_DOCS[type]?.summary || !example) {
+    throw new Error(`Missing documentation or canonical example for ${type}`);
+  }
+  if (example.type !== type) {
+    throw new Error(
+      `Canonical example type must match registry type "${type}"`,
+    );
+  }
+  validateBlocks([example], ` in canonical example for ${type}`);
+};
 
 /** @param {(typeof BLOCK_EXAMPLES)[number]} entry */
 const renderBlock = ({ type, collections, example }) => {
   const doc = BLOCK_DOCS[type];
-  if (!doc?.summary || !example) {
-    throw new Error(`Missing documentation or canonical example for ${type}`);
-  }
   const yaml = stringify({ blocks: [example] }).trimEnd();
-  const fence = codeFence(yaml, 3);
   return [
     `## ${inlineCode(type)}`,
     escapeText(doc.summary),
     `**Schema:** ${inlineCode(`src/_lib/utils/block-schema/${type}.js`)}`,
-    `**Component:** ${inlineCode(`block_${type.replaceAll("-", "_")}`)}`,
+    `**Component:** ${inlineCode(componentNameFor(type))}`,
     `**Template:** ${inlineCode(`src/_includes/${getBlockTemplate(type)}`)}`,
     ...(doc.scss ? [`**SCSS:** ${inlineCode(doc.scss)}`] : []),
     ...(doc.htmlRoot ? [`**HTML root:** ${inlineCode(doc.htmlRoot)}`] : []),
@@ -124,7 +118,7 @@ const renderBlock = ({ type, collections, example }) => {
       : "No block-specific fields. Common fields still apply.",
     ...(doc.notes ? [`**Usage notes:** ${escapeText(doc.notes)}`] : []),
     "### Canonical example",
-    `${fence}yaml\n${yaml}\n${fence}`,
+    fencedCode(yaml, "yaml"),
   ].join("\n\n");
 };
 
@@ -146,6 +140,7 @@ export const renderBlocksReference = (examples = BLOCK_EXAMPLES) => {
       "Block schemas and canonical examples must have identical registry order",
     );
   }
+  for (const entry of examples) validateCanonicalExample(entry);
   return `${[
     REFERENCE_INTRO,
     "## Common fields",
@@ -153,14 +148,14 @@ export const renderBlocksReference = (examples = BLOCK_EXAMPLES) => {
     renderFieldTable(CONTAINER_FIELDS),
     "## Column and sidebar compatibility",
     "This table covers registered types only. `No` types are rejected inside columns and the right-content sidebar, but may appear in full-width `before` slots. `Yes` means the type passes the placement check, not that it is context-free. Snippets are reusable compositions: keep their contents appropriate for their destination too.",
-    [
-      "| Block | Container width | Columns / sidebar |",
-      "|---|---|---|",
-      ...types.map(
-        (type) =>
-          `| [${inlineCode(type)}](#${type}) | ${inlineCode(getBlockContainerWidth(type))} | ${columnCompatibility(type)} |`,
-      ),
-    ].join("\n"),
+    markdownTable(
+      ["Block", "Container width", "Columns / sidebar"],
+      types.map((type) => [
+        `[${inlineCode(type)}](#${type})`,
+        inlineCode(getBlockContainerWidth(type)),
+        columnCompatibility(type),
+      ]),
+    ),
     ...examples.map(renderBlock),
   ].join("\n\n")}\n`;
 };

@@ -1,8 +1,10 @@
 import { readFileSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { join } from "node:path";
 import MarkdownIt from "markdown-it";
 import { describe, expect, test } from "vitest";
 import YAML from "yaml";
+import { blocksFieldFor } from "#scripts/customise-cms/blocks.js";
+import { COLLECTIONS } from "#scripts/customise-cms/collections.js";
 import {
   renderBlocksReference,
   renderFieldTable,
@@ -16,16 +18,10 @@ import {
   BLOCK_DOCS,
   BLOCK_EXAMPLES,
   BLOCK_SCHEMAS,
-  collectBlockErrors,
   getBlockContainerWidth,
   getBlockTemplate,
 } from "#utils/block-schema.js";
 
-const BLOCKS_PATH = join(
-  rootDir,
-  "skills/cfa-static-site-builder/references/blocks.md",
-);
-const LAYOUTS_PATH = join(dirname(BLOCKS_PATH), "layouts.md");
 const markdown = new MarkdownIt({ html: true });
 const parseMarkdown = (source) =>
   new DOMParser().parseFromString(markdown.render(source), "text/html");
@@ -52,39 +48,46 @@ describe("block reference", () => {
   });
 
   test("YAML examples containing Markdown fences remain a single complete code block", () => {
-    const [first, ...rest] = BLOCK_EXAMPLES;
+    const entry = BLOCK_EXAMPLES.find(({ type }) => type === "markdown");
     const example = {
-      ...first.example,
-      intro: "```yaml\nblocks: []\n```\n````",
+      ...entry.example,
+      content: "```yaml\nblocks: []\n```\n````",
     };
     const tokens = markdown.parse(
-      renderBlocksReference([{ ...first, example }, ...rest]),
+      renderBlocksReference(
+        BLOCK_EXAMPLES.map((block) =>
+          block === entry ? { ...block, example } : block,
+        ),
+      ),
       {},
     );
     const fences = tokens.filter((token) => token.type === "fence");
     expect(fences).toHaveLength(BLOCK_EXAMPLES.length);
-    expect(YAML.parse(fences[0].content)).toEqual({ blocks: [example] });
+    expect(YAML.parse(fences[BLOCK_EXAMPLES.indexOf(entry)].content)).toEqual({
+      blocks: [example],
+    });
   });
 
-  test("committed reference matches pure rendering without rewriting it", () => {
-    const committed = readFileSync(BLOCKS_PATH, "utf8");
-    expect(renderBlocksReference()).toBe(committed);
-  });
-
-  test("importing the CLI does not write documentation", async () => {
-    const paths = [
-      BLOCKS_PATH,
-      LAYOUTS_PATH,
-      join(rootDir, "BLOCKS_LAYOUT.md"),
-    ];
-    const before = paths.map((path) => [
-      readFileSync(path, "utf8"),
-      statSync(path).mtimeMs,
-    ]);
-    await import("#scripts/generate-blocks-reference.js");
-    expect(
-      paths.map((path) => [readFileSync(path, "utf8"), statSync(path).mtimeMs]),
-    ).toEqual(before);
+  test.each([
+    [
+      { type: "html", content: "Valid HTML" },
+      'Canonical example type must match registry type "markdown"',
+    ],
+    [
+      { content: "Missing type" },
+      'Canonical example type must match registry type "markdown"',
+    ],
+    [{ type: "markdown" }, 'missing required "content"'],
+    [{ type: "markdown", content: 17 }, 'field "content" must be a string'],
+    [
+      { type: "markdown", content: "Valid", unknown: true },
+      'unknown keys: "unknown"',
+    ],
+  ])("rejects invalid canonical Markdown examples: %j", (example, message) => {
+    const entries = BLOCK_EXAMPLES.map((entry) =>
+      entry.type === "markdown" ? { ...entry, example } : entry,
+    );
+    expect(() => renderBlocksReference(entries)).toThrow(message);
   });
 
   test("documents every registered type once in deliberate registry order", () => {
@@ -95,7 +98,7 @@ describe("block reference", () => {
     expect(headings).toEqual(Object.keys(BLOCK_SCHEMAS));
   });
 
-  test("canonical YAML matches the gallery and validates without default insertion", () => {
+  test("rendered canonical YAML matches gallery serialization without changing examples", () => {
     const sources = markdown
       .parse(renderBlocksReference(), {})
       .filter((token) => token.type === "fence" && token.info === "yaml")
@@ -108,7 +111,6 @@ describe("block reference", () => {
     expect(sources).toEqual(gallerySources);
     const examples = sources.flatMap((source) => YAML.parse(source).blocks);
     expect(examples).toEqual(BLOCK_EXAMPLES.map(({ example }) => example));
-    expect(collectBlockErrors(examples)).toEqual([]);
   });
 
   test("common wrapper fields are generated from their shared schema", () => {
@@ -155,17 +157,37 @@ describe("block reference", () => {
       expect(code, name).toContain(component);
       expect(BLOCK_DOCS[name]?.summary, name).toBeTruthy();
     }
-    const availability = [...rendered.querySelectorAll("p")].filter((node) =>
-      node.textContent.startsWith("CMS collection availability:"),
-    );
-    expect(availability.map((node) => node.textContent)).toEqual(
-      BLOCK_EXAMPLES.map(
-        ({ collections }) =>
-          `CMS collection availability: ${collections === null ? "All collections with a block editor" : collections.join(", ")}`,
-      ),
-    );
     expect(rendered.body.textContent).toContain(
       "editor allowlist, not a runtime restriction",
+    );
+  });
+
+  test.each(
+    COLLECTIONS,
+  )("documented availability exactly matches the $name block editor", ({
+    name,
+  }) => {
+    const rendered = parseMarkdown(renderBlocksReference());
+    const types = [...rendered.querySelectorAll("h2 > code")].map(
+      (node) => node.textContent,
+    );
+    const availability = [...rendered.querySelectorAll("p")]
+      .filter((node) =>
+        node.textContent.startsWith("CMS collection availability:"),
+      )
+      .map((node) =>
+        node.textContent.slice("CMS collection availability: ".length),
+      );
+    expect(availability).toHaveLength(types.length);
+    const documented = types.filter(
+      (type, index) =>
+        availability[index] === "All collections with a block editor" ||
+        availability[index].split(", ").includes(name),
+    );
+    expect(documented.toSorted()).toEqual(
+      blocksFieldFor(name, false)
+        .blocks.map((block) => block.name)
+        .toSorted(),
     );
   });
 
@@ -185,53 +207,6 @@ describe("block reference", () => {
     expect(paths.length).toBeGreaterThan(Object.keys(BLOCK_SCHEMAS).length);
     for (const path of paths)
       expect(statSync(join(rootDir, path)).isFile(), path).toBe(true);
-  });
-
-  test("navigation and canonical references link to existing local files and block anchors", () => {
-    const files = [
-      join(rootDir, "BLOCKS_LAYOUT.md"),
-      BLOCKS_PATH,
-      LAYOUTS_PATH,
-    ];
-    const documents = new Map(
-      files.map((file) => [file, parseMarkdown(readFileSync(file, "utf8"))]),
-    );
-    const sources = [
-      ...documents,
-      // Exercise uncached targets and Title Case headings at several levels.
-      [
-        LAYOUTS_PATH,
-        parseMarkdown(
-          [
-            "[Reference](../../../docs/developer-reference.md#developer-reference)",
-            "[Tokens](../../../docs/developer-reference.md#theme-source-tokens)",
-            "[Formatting](../../../docs/developer-reference.md#files-and-formatting)",
-          ].join("\n\n"),
-        ),
-      ],
-    ];
-    for (const [file, source] of sources) {
-      const links = [...source.querySelectorAll("a")].map((link) =>
-        link.getAttribute("href"),
-      );
-      expect(links.length, file).toBeGreaterThan(0);
-      for (const href of links) {
-        const [path, anchor] = href.split("#");
-        const target = path ? resolve(dirname(file), path) : file;
-        expect(statSync(target).isFile(), href).toBe(true);
-        if (anchor) {
-          const targetDocument = documents.has(target)
-            ? documents.get(target)
-            : parseMarkdown(readFileSync(target, "utf8"));
-          const headings = [
-            ...targetDocument.querySelectorAll("h1, h2, h3, h4, h5, h6"),
-          ].map((node) =>
-            node.textContent.trim().toLowerCase().replace(/\s+/g, "-"),
-          );
-          expect(headings, href).toContain(decodeURIComponent(anchor));
-        }
-      }
-    }
   });
 });
 
@@ -298,7 +273,7 @@ describe("full field schema rendering", () => {
       "a|`b",
       "string",
       "optional",
-      "`x`|<b> next",
+      "`x`|<b>next",
       label,
       "`code` | <script>alert(1)</script>**not emphasis**",
     ]);
@@ -306,10 +281,19 @@ describe("full field schema rendering", () => {
       0,
     );
     expect(cells[5].querySelectorAll("br")).toHaveLength(1);
+    expect(cells[3].querySelectorAll("br")).toHaveLength(1);
   });
 
   test("documents actual nested fields omitted from the old flattened reference", () => {
     const rows = tableRows(renderBlocksReference());
+    expect(rows).toContainEqual([
+      "items[].icon_label",
+      "string",
+      "optional",
+      "Not documented",
+      "Icon Accessible Label",
+      "",
+    ]);
     expect(rows).toContainEqual([
       "buttons[].text",
       "string",

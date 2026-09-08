@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-import { COLUMN_DISALLOWED_TYPES } from "#utils/block-columns.js";
 import {
   splitHoistedBanner,
   validateSidebarBlocks,
@@ -19,12 +18,16 @@ describe("validateSidebarBlocks", () => {
     expect(validateSidebarBlocks(null)).toEqual([]);
   });
 
-  test("throws for every column-disallowed type", () => {
-    for (const type of COLUMN_DISALLOWED_TYPES) {
-      expect(() => validateSidebarBlocks([{ type }])).toThrow(
-        `Block type "${type}" is not supported inside the right-content sidebar.`,
-      );
-    }
+  test.each([
+    "hero",
+    "video-background",
+    "bunny-video-background",
+    "image-background",
+    "marquee-images",
+  ])("rejects full-width %s in the sidebar", (type) => {
+    expect(() => validateSidebarBlocks([{ type }])).toThrow(
+      `Block type "${type}" is not supported inside the right-content sidebar.`,
+    );
   });
 
   test("throws for split-* types", () => {

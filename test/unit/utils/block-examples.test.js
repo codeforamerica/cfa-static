@@ -4,8 +4,11 @@
  * page. These tests keep that guarantee honest.
  */
 
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { describe, expect, test } from "vitest";
 import { parse } from "yaml";
+import { getFiles, rootDir } from "#test/test-utils.js";
 import { buildGalleryBlocks } from "#utils/block-gallery.js";
 import {
   BLOCK_EXAMPLES,
@@ -14,6 +17,19 @@ import {
 } from "#utils/block-schema.js";
 
 describe("block examples", () => {
+  test("the registry contains every block module exactly once", async () => {
+    const files = getFiles(/^src\/_lib\/utils\/block-schema\/[^/]+\.js$/);
+    const modules = await Promise.all(
+      files.map((file) => import(pathToFileURL(join(rootDir, file)).href)),
+    );
+    // Shared field factories have no type; every concrete block module does.
+    const types = modules
+      .filter((module) => Object.hasOwn(module, "type"))
+      .map((module) => module.type);
+    expect(types.length).toBeGreaterThan(0);
+    expect(types.toSorted()).toEqual(Object.keys(BLOCK_SCHEMAS).toSorted());
+  });
+
   test("every registered block type has an example of its own type", () => {
     expect(BLOCK_EXAMPLES.length).toBe(Object.keys(BLOCK_SCHEMAS).length);
     for (const { type, example } of BLOCK_EXAMPLES) {

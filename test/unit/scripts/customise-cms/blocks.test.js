@@ -75,6 +75,17 @@ describe("generateBlocksField markdown field conversion", () => {
 });
 
 describe("generateBlocksField list field conversion", () => {
+  test("exposes the supported optional accessible label for feature icons", () => {
+    const [{ fields }] = generateBlocksField(["features"], false).blocks;
+    expect(
+      fields.find((field) => field.name === "items").fields,
+    ).toContainEqual({
+      name: "icon_label",
+      label: "Icon Accessible Label",
+      type: "string",
+    });
+  });
+
   test("emits a list string field for items-array.items paths", () => {
     // items-array.items declares type:"string" with list:true to accept an
     // array of file paths.

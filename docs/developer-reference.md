@@ -8,65 +8,65 @@ Handwritten policy and workflow: [CLAUDE.md](../CLAUDE.md). Architecture: [libra
 
 ## Runtime And Commands
 
-Source: [package.json](../package.json). Node requirement: <code>&gt;=22</code>. Package manager: npm; install with `npm install`.
+Source: [package&#46;json](../package.json). Node requirement: <code>&gt;&#61;22</code>. Package manager: npm; install with `npm install`.
 
 Every declared npm script is listed below in package order. Values are the exact script definitions, not expanded lifecycle hooks or inferred descriptions. Pass extra arguments after `--`.
 
 | Invocation | Package Script |
 | --- | --- |
-| <code>npm run build</code> | <code>rm -rf &#95;site &amp;&amp; node scripts/eleventy-build.js &amp;&amp; npm run check:links</code> |
-| <code>npm run serve</code> | <code>rm -rf &#95;site &amp;&amp; node scripts/eleventy-build.js --serve --incremental</code> |
-| <code>npm run test</code> | <code>node ./test/run-tests.js</code> |
+| <code>npm run build</code> | <code>rm &#45;rf &#95;site &amp;&amp; node scripts/eleventy&#45;build&#46;js &amp;&amp; npm run check:links</code> |
+| <code>npm run serve</code> | <code>rm &#45;rf &#95;site &amp;&amp; node scripts/eleventy&#45;build&#46;js &#45;&#45;serve &#45;&#45;incremental</code> |
+| <code>npm run test</code> | <code>node &#46;/test/run&#45;tests&#46;js</code> |
 | <code>npm run test:unit</code> | <code>vitest run test/unit</code> |
 | <code>npm run test:integration</code> | <code>vitest run test/integration</code> |
-| <code>npm run typecheck</code> | <code>tsc --noEmit --incremental --tsBuildInfoFile tsconfig.tsbuildinfo</code> |
-| <code>npm run typecheck:strict</code> | <code>node scripts/strict-typecheck-ratchet.js</code> |
-| <code>npm run cpd:fp</code> | <code>jscpd src/&#95;lib/utils/fp --min-tokens 12</code> |
-| <code>npm run cpd:design-system</code> | <code>jscpd src/css/design-system --min-tokens 17</code> |
-| <code>npm run cpd</code> | <code>node scripts/cpd.js &amp;&amp; node scripts/cpd.js src/&#95;lib src/&#95;data scripts --min-tokens 18 --ignore '&#42;&#42;/index.js,&#42;&#42;/customise-cms/&#42;&#42;,&#42;&#42;/mutation/&#42;&#42;' --ignore-pattern 'import.&#42;from'</code> |
-| <code>npm run cpd:ratchet</code> | <code>node scripts/cpd-ratchet.js</code> |
+| <code>npm run typecheck</code> | <code>tsc &#45;&#45;noEmit &#45;&#45;incremental &#45;&#45;tsBuildInfoFile tsconfig&#46;tsbuildinfo</code> |
+| <code>npm run typecheck:strict</code> | <code>node scripts/strict&#45;typecheck&#45;ratchet&#46;js</code> |
+| <code>npm run cpd:fp</code> | <code>jscpd src/&#95;lib/utils/fp &#45;&#45;min&#45;tokens 12</code> |
+| <code>npm run cpd:design&#45;system</code> | <code>jscpd src/css/design&#45;system &#45;&#45;min&#45;tokens 17</code> |
+| <code>npm run cpd</code> | <code>node scripts/cpd&#46;js &amp;&amp; node scripts/cpd&#46;js src/&#95;lib src/&#95;data scripts &#45;&#45;min&#45;tokens 18 &#45;&#45;ignore '&#42;&#42;/index&#46;js,&#42;&#42;/customise&#45;cms/&#42;&#42;,&#42;&#42;/mutation/&#42;&#42;' &#45;&#45;ignore&#45;pattern 'import&#46;&#42;from'</code> |
+| <code>npm run cpd:ratchet</code> | <code>node scripts/cpd&#45;ratchet&#46;js</code> |
 | <code>npm run knip</code> | <code>knip</code> |
-| <code>npm run knip:fix</code> | <code>knip --fix</code> |
-| <code>npm run mutation</code> | <code>node scripts/mutation.js</code> |
+| <code>npm run knip:fix</code> | <code>knip &#45;&#45;fix</code> |
+| <code>npm run mutation</code> | <code>node scripts/mutation&#46;js</code> |
 | <code>npm run profile</code> | <code>bash bin/profile</code> |
-| <code>npm run lint</code> | <code>node scripts/biome.js check --error-on-warnings .</code> |
-| <code>npm run lint:fix</code> | <code>node scripts/biome.js check --write .</code> |
-| <code>npm run lint:scss</code> | <code>npx stylelint "src/css/&#42;&#42;/&#42;.scss"</code> |
-| <code>npm run lint:scss:fix</code> | <code>npx stylelint --fix "src/css/&#42;&#42;/&#42;.scss"</code> |
-| <code>npm run precommit</code> | <code>node test/precommit.js</code> |
-| <code>npm run customise-cms</code> | <code>node scripts/customise-cms/index.js</code> |
-| <code>npm run generate-pages-yml</code> | <code>node scripts/customise-cms/generate-full.js</code> |
-| <code>npm run generate-cms-types</code> | <code>node scripts/generate-pages-cms-types.js</code> |
-| <code>npm run generate-blocks-reference</code> | <code>node scripts/generate-blocks-reference.js</code> |
-| <code>npm run generate-developer-reference</code> | <code>node scripts/generate-developer-reference.js</code> |
-| <code>npm run generate-references</code> | <code>npm run generate-blocks-reference &amp;&amp; npm run generate-pages-yml &amp;&amp; npm run generate-cms-types &amp;&amp; npm run generate-developer-reference</code> |
-| <code>npm run screenshot</code> | <code>node scripts/screenshot.js</code> |
-| <code>npm run lighthouse</code> | <code>node scripts/lighthouse.js</code> |
-| <code>npm run check:links</code> | <code>node scripts/check-internal-links.js &#95;site</code> |
-| <code>npm run check:a11y</code> | <code>node scripts/check-accessibility.js &#95;site</code> |
+| <code>npm run lint</code> | <code>node scripts/biome&#46;js check &#45;&#45;error&#45;on&#45;warnings &#46;</code> |
+| <code>npm run lint:fix</code> | <code>node scripts/biome&#46;js check &#45;&#45;write &#46;</code> |
+| <code>npm run lint:scss</code> | <code>npx stylelint "src/css/&#42;&#42;/&#42;&#46;scss"</code> |
+| <code>npm run lint:scss:fix</code> | <code>npx stylelint &#45;&#45;fix "src/css/&#42;&#42;/&#42;&#46;scss"</code> |
+| <code>npm run precommit</code> | <code>node test/precommit&#46;js</code> |
+| <code>npm run customise&#45;cms</code> | <code>node scripts/customise&#45;cms/index&#46;js</code> |
+| <code>npm run generate&#45;pages&#45;yml</code> | <code>node scripts/customise&#45;cms/generate&#45;full&#46;js</code> |
+| <code>npm run generate&#45;cms&#45;types</code> | <code>node scripts/generate&#45;pages&#45;cms&#45;types&#46;js</code> |
+| <code>npm run generate&#45;blocks&#45;reference</code> | <code>node scripts/generate&#45;blocks&#45;reference&#46;js</code> |
+| <code>npm run generate&#45;developer&#45;reference</code> | <code>node scripts/generate&#45;developer&#45;reference&#46;js</code> |
+| <code>npm run generate&#45;references</code> | <code>npm run generate&#45;blocks&#45;reference &amp;&amp; npm run generate&#45;pages&#45;yml &amp;&amp; npm run generate&#45;developer&#45;reference</code> |
+| <code>npm run screenshot</code> | <code>node scripts/screenshot&#46;js</code> |
+| <code>npm run lighthouse</code> | <code>node scripts/lighthouse&#46;js</code> |
+| <code>npm run check:links</code> | <code>node scripts/check&#45;internal&#45;links&#46;js &#95;site</code> |
+| <code>npm run check:a11y</code> | <code>node scripts/check&#45;accessibility&#46;js &#95;site</code> |
 
 ## Import Aliases
 
 | Alias | Target |
 | --- | --- |
-| <code>#data/&#42;</code> | <code>./src/&#95;data/&#42;</code> |
-| <code>#lib/&#42;</code> | <code>./src/&#95;lib/&#42;</code> |
-| <code>#collections/&#42;</code> | <code>./src/&#95;lib/collections/&#42;</code> |
-| <code>#config/&#42;</code> | <code>./src/&#95;lib/config/&#42;</code> |
-| <code>#eleventy/&#42;</code> | <code>./src/&#95;lib/eleventy/&#42;</code> |
-| <code>#build/&#42;</code> | <code>./src/&#95;lib/build/&#42;</code> |
-| <code>#media/&#42;</code> | <code>./src/&#95;lib/media/&#42;</code> |
-| <code>#transforms/&#42;</code> | <code>./src/&#95;lib/transforms/&#42;</code> |
-| <code>#utils/&#42;</code> | <code>./src/&#95;lib/utils/&#42;</code> |
-| <code>#public/&#42;</code> | <code>./src/&#95;lib/public/&#42;</code> |
-| <code>#guide-categories/&#42;</code> | <code>./src/guide-categories/&#42;</code> |
-| <code>#test/&#42;</code> | <code>./test/&#42;</code> |
-| <code>#scripts/&#42;</code> | <code>./scripts/&#42;</code> |
-| <code>#bin/&#42;</code> | <code>./bin/&#42;</code> |
+| <code>&#35;data/&#42;</code> | <code>&#46;/src/&#95;data/&#42;</code> |
+| <code>&#35;lib/&#42;</code> | <code>&#46;/src/&#95;lib/&#42;</code> |
+| <code>&#35;collections/&#42;</code> | <code>&#46;/src/&#95;lib/collections/&#42;</code> |
+| <code>&#35;config/&#42;</code> | <code>&#46;/src/&#95;lib/config/&#42;</code> |
+| <code>&#35;eleventy/&#42;</code> | <code>&#46;/src/&#95;lib/eleventy/&#42;</code> |
+| <code>&#35;build/&#42;</code> | <code>&#46;/src/&#95;lib/build/&#42;</code> |
+| <code>&#35;media/&#42;</code> | <code>&#46;/src/&#95;lib/media/&#42;</code> |
+| <code>&#35;transforms/&#42;</code> | <code>&#46;/src/&#95;lib/transforms/&#42;</code> |
+| <code>&#35;utils/&#42;</code> | <code>&#46;/src/&#95;lib/utils/&#42;</code> |
+| <code>&#35;public/&#42;</code> | <code>&#46;/src/&#95;lib/public/&#42;</code> |
+| <code>&#35;guide&#45;categories/&#42;</code> | <code>&#46;/src/guide&#45;categories/&#42;</code> |
+| <code>&#35;test/&#42;</code> | <code>&#46;/test/&#42;</code> |
+| <code>&#35;scripts/&#42;</code> | <code>&#46;/scripts/&#42;</code> |
+| <code>&#35;bin/&#42;</code> | <code>&#46;/bin/&#42;</code> |
 
 ## Biome Configuration
 
-Source: [biome.json](../biome.json). These are the actual configured values, not a complete list of Biome defaults or an inferred effective rule set. Overrides retain their source order and include patterns. Separate code-quality tests have their own scopes; consult the root guide and the failing gate.
+Source: [biome&#46;json](../biome.json). These are the actual configured values, not a complete list of Biome defaults or an inferred effective rule set. Overrides retain their source order and include patterns. Separate code-quality tests have their own scopes; consult the root guide and the failing gate.
 
 ### Files And Formatting
 
@@ -197,491 +197,491 @@ Source: [biome.json](../biome.json). These are the actual configured values, not
 
 Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from parsed local named exports, not a handwritten inventory. Summaries are only the immediately preceding JSDoc prose before tags or a paragraph break; missing prose is explicitly marked. Follow source links for signatures, currying, examples, and caveats. No utility behavior is inferred, and source modules are not executed.
 
-### `#utils/fp/array.js`
+### <code>&#35;utils/fp/array&#46;js</code>
 
-[src/_lib/utils/fp/array.js](../src/_lib/utils/fp/array.js)
+[src/&#95;lib/utils/fp/array&#46;js](../src/_lib/utils/fp/array.js)
 
 | Export | JSDoc Summary |
 | --- | --- |
 | [<code>compact</code>](../src/_lib/utils/fp/array.js#L206) | <code>Remove falsy values from an array</code> |
-| [<code>exclude</code>](../src/_lib/utils/fp/array.js#L309) | <code>Filter out items that are in the exclusion list. Shorthand for filter(notMemberOf(values)).</code> |
+| [<code>exclude</code>](../src/_lib/utils/fp/array.js#L309) | <code>Filter out items that are in the exclusion list&#46; Shorthand for filter(notMemberOf(values&#41;&#41;&#46;</code> |
 | [<code>filter</code>](../src/_lib/utils/fp/array.js#L52) | <code>Curried filter function</code> |
-| [<code>filterMap</code>](../src/_lib/utils/fp/array.js#L172) | <code>Filter and map in a single pass (curried)</code> |
+| [<code>filterMap</code>](../src/_lib/utils/fp/array.js#L172) | <code>Filter and map in a single pass (curried&#41;</code> |
 | [<code>findDuplicate</code>](../src/_lib/utils/fp/array.js#L226) | <code>Find the first duplicate item in an array</code> |
 | [<code>flatMap</code>](../src/_lib/utils/fp/array.js#L68) | <code>Curried flatMap function</code> |
 | [<code>join</code>](../src/_lib/utils/fp/array.js#L140) | <code>Curried join function</code> |
 | [<code>map</code>](../src/_lib/utils/fp/array.js#L60) | <code>Curried map function</code> |
-| [<code>mapAsync</code>](../src/_lib/utils/fp/array.js#L330) | <code>Async map with Promise.all (curried)</code> |
+| [<code>mapAsync</code>](../src/_lib/utils/fp/array.js#L330) | <code>Async map with Promise&#46;all (curried&#41;</code> |
 | [<code>memberOf</code>](../src/_lib/utils/fp/array.js#L270) | <code>Create a membership predicate</code> |
 | [<code>notMemberOf</code>](../src/_lib/utils/fp/array.js#L289) | <code>Create a negated membership predicate</code> |
-| [<code>pick</code>](../src/_lib/utils/fp/array.js#L188) | <code>Create a picker function for the specified keys (curried form)</code> |
-| [<code>pipe</code>](../src/_lib/utils/fp/array.js#L30) | <code>Left-to-right function composition</code> |
-| [<code>pluralize</code>](../src/_lib/utils/fp/array.js#L359) | <code>Create a pluralization formatter. Curried: (singular, plural?) =&gt; (count) =&gt; string</code> |
+| [<code>pick</code>](../src/_lib/utils/fp/array.js#L188) | <code>Create a picker function for the specified keys (curried form&#41;</code> |
+| [<code>pipe</code>](../src/_lib/utils/fp/array.js#L30) | <code>Left&#45;to&#45;right function composition</code> |
+| [<code>pluralize</code>](../src/_lib/utils/fp/array.js#L359) | <code>Create a pluralization formatter&#46; Curried: (singular, plural?&#41; &#61;&gt; (count&#41; &#61;&gt; string</code> |
 | [<code>reduce</code>](../src/_lib/utils/fp/array.js#L77) | <code>Curried reduce function</code> |
-| [<code>sort</code>](../src/_lib/utils/fp/array.js#L85) | <code>Non-mutating sort function</code> |
-| [<code>sortBy</code>](../src/_lib/utils/fp/array.js#L105) | <code>Sort by a property or getter function. Auto-detects type: uses localeCompare for strings, subtraction for numbers.</code> |
+| [<code>sort</code>](../src/_lib/utils/fp/array.js#L85) | <code>Non&#45;mutating sort function</code> |
+| [<code>sortBy</code>](../src/_lib/utils/fp/array.js#L105) | <code>Sort by a property or getter function&#46; Auto&#45;detects type: uses localeCompare for strings, subtraction for numbers&#46;</code> |
 | [<code>split</code>](../src/_lib/utils/fp/array.js#L147) | <code>Curried split function</code> |
 | [<code>unique</code>](../src/_lib/utils/fp/array.js#L123) | <code>Remove duplicate values</code> |
 | [<code>uniqueBy</code>](../src/_lib/utils/fp/array.js#L131) | <code>Remove duplicates by key extraction function</code> |
 
-### `#utils/fp/grouping.js`
+### <code>&#35;utils/fp/grouping&#46;js</code>
 
-[src/_lib/utils/fp/grouping.js](../src/_lib/utils/fp/grouping.js)
+[src/&#95;lib/utils/fp/grouping&#46;js](../src/_lib/utils/fp/grouping.js)
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [<code>buildFirstOccurrenceLookup</code>](../src/_lib/utils/fp/grouping.js#L95) | <code>Build a first-occurrence-wins lookup from items</code> |
-| [<code>buildReverseIndex</code>](../src/_lib/utils/fp/grouping.js#L46) | <code>Build a reverse index from items to keys (many-to-many relationship)</code> |
-| [<code>groupBy</code>](../src/_lib/utils/fp/grouping.js#L114) | <code>Group items by a single key (one-to-many relationship)</code> |
+| [<code>buildFirstOccurrenceLookup</code>](../src/_lib/utils/fp/grouping.js#L95) | <code>Build a first&#45;occurrence&#45;wins lookup from items</code> |
+| [<code>buildReverseIndex</code>](../src/_lib/utils/fp/grouping.js#L46) | <code>Build a reverse index from items to keys (many&#45;to&#45;many relationship&#41;</code> |
+| [<code>groupBy</code>](../src/_lib/utils/fp/grouping.js#L114) | <code>Group items by a single key (one&#45;to&#45;many relationship&#41;</code> |
 | [<code>groupValuesBy</code>](../src/_lib/utils/fp/grouping.js#L69) | <code>Group values by key with deduplication</code> |
 
-### `#utils/fp/memoize.js`
+### <code>&#35;utils/fp/memoize&#46;js</code>
 
-[src/_lib/utils/fp/memoize.js](../src/_lib/utils/fp/memoize.js)
+[src/&#95;lib/utils/fp/memoize&#46;js](../src/_lib/utils/fp/memoize.js)
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [<code>dedupeAsync</code>](../src/_lib/utils/fp/memoize.js#L165) | <code>Deduplicate concurrent async calls by key.</code> |
-| [<code>groupByWithCache</code>](../src/_lib/utils/fp/memoize.js#L136) | <code>Create a grouper that builds and caches a reverse index for arrays.</code> |
+| [<code>dedupeAsync</code>](../src/_lib/utils/fp/memoize.js#L165) | <code>Deduplicate concurrent async calls by key&#46;</code> |
+| [<code>groupByWithCache</code>](../src/_lib/utils/fp/memoize.js#L136) | <code>Create a grouper that builds and caches a reverse index for arrays&#46;</code> |
 | [<code>indexBy</code>](../src/_lib/utils/fp/memoize.js#L104) | No adjacent JSDoc summary; see source. |
-| [<code>jsonKey</code>](../src/_lib/utils/fp/memoize.js#L145) | <code>Generate a cache key from function arguments by JSON stringifying them. Useful for memoizing functions that take object arguments.</code> |
-| [<code>memoize</code>](../src/_lib/utils/fp/memoize.js#L23) | <code>Memoize a function with optional custom cache key.</code> |
-| [<code>memoizeByRef</code>](../src/_lib/utils/fp/memoize.js#L45) | <code>Create a cached function using WeakMap for object identity caching. The result is cached per array reference, allowing garbage collection.</code> |
+| [<code>jsonKey</code>](../src/_lib/utils/fp/memoize.js#L145) | <code>Generate a cache key from function arguments by JSON stringifying them&#46; Useful for memoizing functions that take object arguments&#46;</code> |
+| [<code>memoize</code>](../src/_lib/utils/fp/memoize.js#L23) | <code>Memoize a function with optional custom cache key&#46;</code> |
+| [<code>memoizeByRef</code>](../src/_lib/utils/fp/memoize.js#L45) | <code>Create a cached function using WeakMap for object identity caching&#46; The result is cached per array reference, allowing garbage collection&#46;</code> |
 
-### `#utils/fp/object.js`
+### <code>&#35;utils/fp/object&#46;js</code>
 
-[src/_lib/utils/fp/object.js](../src/_lib/utils/fp/object.js)
+[src/&#95;lib/utils/fp/object&#46;js](../src/_lib/utils/fp/object.js)
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [<code>filterObject</code>](../src/_lib/utils/fp/object.js#L61) | <code>Curried object filtering -&gt; returns new object</code> |
+| [<code>filterObject</code>](../src/_lib/utils/fp/object.js#L61) | <code>Curried object filtering &#45;&gt; returns new object</code> |
 | [<code>fromPairs</code>](../src/_lib/utils/fp/object.js#L139) | <code>Build an object directly from an array of &#91;key, value&#93; pairs</code> |
-| [<code>frozenObject</code>](../src/_lib/utils/fp/object.js#L191) | <code>Create a frozen (shallowly immutable) object from key-value pairs</code> |
+| [<code>frozenObject</code>](../src/_lib/utils/fp/object.js#L191) | <code>Create a frozen (shallowly immutable&#41; object from key&#45;value pairs</code> |
 | [<code>mapBoth</code>](../src/_lib/utils/fp/object.js#L72) | <code>Transform both key and value with the same function</code> |
-| [<code>mapEntries</code>](../src/_lib/utils/fp/object.js#L19) | <code>Curried map over entries -&gt; returns array</code> |
-| [<code>mapObject</code>](../src/_lib/utils/fp/object.js#L42) | <code>Curried object transformation -&gt; returns new object Callback must return &#91;newKey, newValue&#93; tuple</code> |
-| [<code>omit</code>](../src/_lib/utils/fp/object.js#L146) | <code>Create a curried function that omits specified keys from an object.</code> |
-| [<code>pickNonNull</code>](../src/_lib/utils/fp/object.js#L93) | <code>Keep only entries with non-null values (keeps false, 0, '', etc.) Useful for config merging where null means "use default"</code> |
+| [<code>mapEntries</code>](../src/_lib/utils/fp/object.js#L19) | <code>Curried map over entries &#45;&gt; returns array</code> |
+| [<code>mapObject</code>](../src/_lib/utils/fp/object.js#L42) | <code>Curried object transformation &#45;&gt; returns new object Callback must return &#91;newKey, newValue&#93; tuple</code> |
+| [<code>omit</code>](../src/_lib/utils/fp/object.js#L146) | <code>Create a curried function that omits specified keys from an object&#46;</code> |
+| [<code>pickNonNull</code>](../src/_lib/utils/fp/object.js#L93) | <code>Keep only entries with non&#45;null values (keeps false, 0, '', etc&#46;&#41; Useful for config merging where null means "use default"</code> |
 | [<code>pickTruthy</code>](../src/_lib/utils/fp/object.js#L82) | <code>Keep only entries with truthy values</code> |
-| [<code>toObject</code>](../src/_lib/utils/fp/object.js#L117) | <code>Build an object from an array by extracting key-value pairs</code> |
+| [<code>toObject</code>](../src/_lib/utils/fp/object.js#L117) | <code>Build an object from an array by extracting key&#45;value pairs</code> |
 
-### `#utils/fp/set.js`
+### <code>&#35;utils/fp/set&#46;js</code>
 
-[src/_lib/utils/fp/set.js](../src/_lib/utils/fp/set.js)
+[src/&#95;lib/utils/fp/set&#46;js](../src/_lib/utils/fp/set.js)
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [<code>frozenSet</code>](../src/_lib/utils/fp/set.js#L148) | <code>Create a frozen (immutable) Set from values</code> |
+| [<code>frozenSet</code>](../src/_lib/utils/fp/set.js#L148) | <code>Create a frozen (immutable&#41; Set from values</code> |
 | [<code>frozenSetFrom</code>](../src/_lib/utils/fp/set.js#L128) | <code>Create a frozen Set from any iterable</code> |
-| [<code>setHas</code>](../src/_lib/utils/fp/set.js#L167) | <code>Create a membership predicate using a Set for O(1) lookups</code> |
-| [<code>setLacks</code>](../src/_lib/utils/fp/set.js#L182) | <code>Create a negated membership predicate using a Set for O(1) lookups</code> |
+| [<code>setHas</code>](../src/_lib/utils/fp/set.js#L167) | <code>Create a membership predicate using a Set for O(1&#41; lookups</code> |
+| [<code>setLacks</code>](../src/_lib/utils/fp/set.js#L182) | <code>Create a negated membership predicate using a Set for O(1&#41; lookups</code> |
 
-### `#utils/fp/sorting.js`
+### <code>&#35;utils/fp/sorting&#46;js</code>
 
-[src/_lib/utils/fp/sorting.js](../src/_lib/utils/fp/sorting.js)
+[src/&#95;lib/utils/fp/sorting&#46;js](../src/_lib/utils/fp/sorting.js)
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [<code>compareBy</code>](../src/_lib/utils/fp/sorting.js#L43) | <code>Create a comparator from a key-extraction function. Auto-detects type: uses localeCompare for strings, subtraction for numbers.</code> |
-| [<code>descending</code>](../src/_lib/utils/fp/sorting.js#L61) | <code>Reverse a comparator (flip ascending to descending or vice versa).</code> |
-| [<code>orderThenString</code>](../src/_lib/utils/fp/sorting.js#L71) | <code>Factory function to create a comparator that sorts by numeric value first, then by string value as a secondary sort key.</code> |
+| [<code>compareBy</code>](../src/_lib/utils/fp/sorting.js#L43) | <code>Create a comparator from a key&#45;extraction function&#46; Auto&#45;detects type: uses localeCompare for strings, subtraction for numbers&#46;</code> |
+| [<code>descending</code>](../src/_lib/utils/fp/sorting.js#L61) | <code>Reverse a comparator (flip ascending to descending or vice versa&#41;&#46;</code> |
+| [<code>orderThenString</code>](../src/_lib/utils/fp/sorting.js#L71) | <code>Factory function to create a comparator that sorts by numeric value first, then by string value as a secondary sort key&#46;</code> |
 
 ## Theme Source Tokens
 
 Source-file catalog: `src/css/theme.scss` and `src/css/theme-*.scss` files that contain a top-level `:root` rule. Files without that rule (such as editor styles) are omitted. Tables preserve literal custom-property declarations in source order. This is not the compiled theme-switcher registry, a complete design-system token inventory, computed CSS, or a claim about scoped overrides and Sass defaults. Follow the source links for the rest of each theme.
 
-### [src/css/theme-90s-computer.scss](../src/css/theme-90s-computer.scss)
+### [src/css/theme&#45;90s&#45;computer&#46;scss](../src/css/theme-90s-computer.scss)
 
 | Token | Source Value |
 | --- | --- |
-| <code>--width-content</code> | <code>1100px</code> |
-| <code>--color-bg</code> | <code>#c0c0c0</code> |
-| <code>--color-card-bg</code> | <code>#c8c8c8</code> |
-| <code>--color-accent</code> | <code>#a8a8a8</code> |
-| <code>--body-background</code> | <code>#008080<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill='%2300b3b3' fill-opacity='0.15'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#006e6e<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill='%2300b3b3' fill-opacity='0.15'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#000</code> |
-| <code>--color-link</code> | <code>#00f</code> |
-| <code>--color-tint</code> | <code>#d0d0ff</code> |
-| <code>--color-link-hover</code> | <code>#f00</code> |
-| <code>--color-gradient-start</code> | <code>rgb(0 128 128 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(0 0 255 / 20%)</code> |
-| <code>--border</code> | <code>2px outset #c0c0c0</code> |
-| <code>--border-radius</code> | <code>0</code> |
-| <code>--box-shadow</code> | <code>inset -1px -1px #000, inset 1px 1px #fff</code> |
-| <code>--font-family-heading</code> | <code>"MS Sans Serif", "Chicago", sans-serif</code> |
-| <code>--font-family-body</code> | <code>"MS Sans Serif", "Chicago", sans-serif</code> |
-| <code>--line-height</code> | <code>1.3</code> |
-| <code>--link-decoration</code> | <code>underline</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>solid</code> |
-| <code>--list-marker-content</code> | <code>"■ "</code> |
-| <code>--list-marker-color</code> | <code>#000080</code> |
+| <code>&#45;&#45;width&#45;content</code> | <code>1100px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;c0c0c0</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;c8c8c8</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;a8a8a8</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;008080<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'60' height&#61;'60' viewBox&#61;'0 0 60 60'%3E%3Cpath d&#61;'M36 34v&#45;4h&#45;2v4h&#45;4v2h4v4h2v&#45;4h4v&#45;2h&#45;4zm0&#45;30V0h&#45;2v4h&#45;4v2h4v4h2V6h4V4h&#45;4zM6 34v&#45;4H4v4H0v2h4v4h2v&#45;4h4v&#45;2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill&#61;'%2300b3b3' fill&#45;opacity&#61;'0&#46;15'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;006e6e<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'60' height&#61;'60' viewBox&#61;'0 0 60 60'%3E%3Cpath d&#61;'M36 34v&#45;4h&#45;2v4h&#45;4v2h4v4h2v&#45;4h4v&#45;2h&#45;4zm0&#45;30V0h&#45;2v4h&#45;4v2h4v4h2V6h4V4h&#45;4zM6 34v&#45;4H4v4H0v2h4v4h2v&#45;4h4v&#45;2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill&#61;'%2300b3b3' fill&#45;opacity&#61;'0&#46;15'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;000</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;00f</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;d0d0ff</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;f00</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(0 128 128 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(0 0 255 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>2px outset &#35;c0c0c0</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>0</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>inset &#45;1px &#45;1px &#35;000, inset 1px 1px &#35;fff</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>"MS Sans Serif", "Chicago", sans&#45;serif</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>"MS Sans Serif", "Chicago", sans&#45;serif</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;3</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>solid</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"■ "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;000080</code> |
 
-### [src/css/theme-floral.scss](../src/css/theme-floral.scss)
-
-| Token | Source Value |
-| --- | --- |
-| <code>--width-content</code> | <code>1100px</code> |
-| <code>--color-bg</code> | <code>#ffe0f0</code> |
-| <code>--color-card-bg</code> | <code>#fff0f8</code> |
-| <code>--color-accent</code> | <code>#ffd0e8</code> |
-| <code>--body-background</code> | <code>#ffc0e0<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23ff69b4' fill-opacity='0.15'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#f8b0d8<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23ff69b4' fill-opacity='0.15'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#d1006c</code> |
-| <code>--color-link</code> | <code>#ff69b4</code> |
-| <code>--color-tint</code> | <code>#ffe0ef</code> |
-| <code>--color-link-hover</code> | <code>#ff1493</code> |
-| <code>--color-contrast-text</code> | <code>#1a1a1a</code> |
-| <code>--color-contrast-text-muted</code> | <code>rgb(0 0 0 / 70%)</code> |
-| <code>--color-gradient-start</code> | <code>rgb(255 105 180 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(255 182 193 / 20%)</code> |
-| <code>--border</code> | <code>3px solid #ffb6c1</code> |
-| <code>--border-radius</code> | <code>25px</code> |
-| <code>--box-shadow</code> | <code>5px 5px 15px rgb(255 182 193 / 50%)</code> |
-| <code>--font-family-heading</code> | <code>"Princess Sofia", "Brush Script MT", cursive</code> |
-| <code>--font-family-body</code> | <code>georgia, "Times New Roman", serif</code> |
-| <code>--line-height</code> | <code>1.6</code> |
-| <code>--link-decoration</code> | <code>none</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>wavy</code> |
-| <code>--list-marker-content</code> | <code>"✿ "</code> |
-| <code>--list-marker-color</code> | <code>#ff69b4</code> |
-
-### [src/css/theme-hacker.scss](../src/css/theme-hacker.scss)
+### [src/css/theme&#45;floral&#46;scss](../src/css/theme-floral.scss)
 
 | Token | Source Value |
 | --- | --- |
-| <code>--width-content</code> | <code>1100px</code> |
-| <code>--color-bg</code> | <code>#000</code> |
-| <code>--color-card-bg</code> | <code>#0a0f0a</code> |
-| <code>--color-accent</code> | <code>#0a120a</code> |
-| <code>--body-background</code> | <code>#0a0a0a<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z' fill='%2300ff00' fill-opacity='0.04'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#0f1a0f<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z' fill='%2300ff00' fill-opacity='0.04'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#0f0</code> |
-| <code>--color-link</code> | <code>#0f0</code> |
-| <code>--color-tint</code> | <code>#0a1f0a</code> |
-| <code>--color-link-hover</code> | <code>#3f3</code> |
-| <code>--color-contrast-text</code> | <code>#000</code> |
-| <code>--color-contrast-text-muted</code> | <code>rgb(0 0 0 / 70%)</code> |
-| <code>--color-gradient-start</code> | <code>rgb(0 255 0 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(0 180 0 / 20%)</code> |
-| <code>--border</code> | <code>2px solid #0f0</code> |
-| <code>--border-radius</code> | <code>0</code> |
-| <code>--box-shadow</code> | <code>0 0 10px #0f0</code> |
-| <code>--font-family-heading</code> | <code>"Share Tech Mono", "Lucida Console", "Courier New", monospace</code> |
-| <code>--font-family-body</code> | <code>"Share Tech Mono", "Lucida Console", "Courier New", monospace</code> |
-| <code>--line-height</code> | <code>1.2</code> |
-| <code>--link-decoration</code> | <code>none</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>solid</code> |
-| <code>--list-marker-content</code> | <code>"&gt; "</code> |
-| <code>--list-marker-color</code> | <code>#0f0</code> |
+| <code>&#45;&#45;width&#45;content</code> | <code>1100px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;ffe0f0</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;fff0f8</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;ffd0e8</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;ffc0e0<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'20' height&#61;'20' viewBox&#61;'0 0 20 20'%3E%3Ccircle cx&#61;'10' cy&#61;'10' r&#61;'1&#46;5' fill&#61;'%23ff69b4' fill&#45;opacity&#61;'0&#46;15'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;f8b0d8<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'20' height&#61;'20' viewBox&#61;'0 0 20 20'%3E%3Ccircle cx&#61;'10' cy&#61;'10' r&#61;'1&#46;5' fill&#61;'%23ff69b4' fill&#45;opacity&#61;'0&#46;15'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;d1006c</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;ff69b4</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;ffe0ef</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;ff1493</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text</code> | <code>&#35;1a1a1a</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(0 0 0 / 70%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(255 105 180 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(255 182 193 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>3px solid &#35;ffb6c1</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>25px</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>5px 5px 15px rgb(255 182 193 / 50%&#41;</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>"Princess Sofia", "Brush Script MT", cursive</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>georgia, "Times New Roman", serif</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;6</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>none</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>wavy</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"✿ "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;ff69b4</code> |
 
-### [src/css/theme-monochrome.scss](../src/css/theme-monochrome.scss)
-
-| Token | Source Value |
-| --- | --- |
-| <code>--width-content</code> | <code>1200px</code> |
-| <code>--color-bg</code> | <code>#1a1a1a</code> |
-| <code>--color-card-bg</code> | <code>#222</code> |
-| <code>--color-accent</code> | <code>#222</code> |
-| <code>--body-background</code> | <code>#2a2a2a<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23ffffff' fill-opacity='0.05' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#323232<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23ffffff' fill-opacity='0.05' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#e0e0e0</code> |
-| <code>--color-link</code> | <code>#fff</code> |
-| <code>--color-tint</code> | <code>#2a2a2a</code> |
-| <code>--color-link-hover</code> | <code>#ccc</code> |
-| <code>--color-contrast-text</code> | <code>#1a1a1a</code> |
-| <code>--color-contrast-text-muted</code> | <code>rgb(0 0 0 / 70%)</code> |
-| <code>--color-gradient-start</code> | <code>rgb(255 255 255 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(128 128 128 / 20%)</code> |
-| <code>--border</code> | <code>1px solid #808080</code> |
-| <code>--border-radius</code> | <code>2px</code> |
-| <code>--box-shadow</code> | <code>0 0 20px rgb(255 255 255 / 10%)</code> |
-| <code>--font-family-heading</code> | <code>system-ui, sans-serif</code> |
-| <code>--font-family-body</code> | <code>system-ui, sans-serif</code> |
-| <code>--line-height</code> | <code>1.4</code> |
-| <code>--link-decoration</code> | <code>underline</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>solid</code> |
-| <code>--list-marker-content</code> | <code>"— "</code> |
-| <code>--list-marker-color</code> | <code>#808080</code> |
-
-### [src/css/theme-neon.scss](../src/css/theme-neon.scss)
+### [src/css/theme&#45;hacker&#46;scss](../src/css/theme-hacker.scss)
 
 | Token | Source Value |
 | --- | --- |
-| <code>--width-content</code> | <code>1100px</code> |
-| <code>--color-bg</code> | <code>#0a0a0a</code> |
-| <code>--color-card-bg</code> | <code>#12101a</code> |
-| <code>--color-accent</code> | <code>#150a18</code> |
-| <code>--body-background</code> | <code>#1a0a1a<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill='%23ff00ff' fill-opacity='0.07'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#221228<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill='%23ff00ff' fill-opacity='0.07'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#f0f</code> |
-| <code>--color-link</code> | <code>#0ff</code> |
-| <code>--color-tint</code> | <code>#002a2a</code> |
-| <code>--color-link-hover</code> | <code>#ff0</code> |
-| <code>--color-contrast-text</code> | <code>#0a0a0a</code> |
-| <code>--color-contrast-text-muted</code> | <code>rgb(0 0 0 / 70%)</code> |
-| <code>--color-gradient-start</code> | <code>rgb(255 0 255 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(0 255 255 / 20%)</code> |
-| <code>--border</code> | <code>2px solid #f0f</code> |
-| <code>--border-radius</code> | <code>12px</code> |
-| <code>--box-shadow</code> | <code>0 0 8px rgb(255 0 255 / 50%)</code> |
-| <code>--font-family-heading</code> | <code>"Orbitron", bahnschrift, "DIN Alternate", "Franklin Gothic Medium", sans-serif</code> |
-| <code>--font-family-body</code> | <code>"Orbitron", avenir, montserrat, corbel, sans-serif</code> |
-| <code>--line-height</code> | <code>1.5</code> |
-| <code>--link-decoration</code> | <code>none</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>double</code> |
-| <code>--list-marker-content</code> | <code>"◆ "</code> |
-| <code>--list-marker-color</code> | <code>#0ff</code> |
+| <code>&#45;&#45;width&#45;content</code> | <code>1100px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;000</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;0a0f0a</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;0a120a</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;0a0a0a<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'40' height&#61;'40' viewBox&#61;'0 0 40 40'%3E%3Cpath d&#61;'M0 38&#46;59l2&#46;83&#45;2&#46;83 1&#46;41 1&#46;41L1&#46;41 40H0v&#45;1&#46;41zM0 1&#46;4l2&#46;83 2&#46;83 1&#46;41&#45;1&#46;41L1&#46;41 0H0v1&#46;41zM38&#46;59 40l&#45;2&#46;83&#45;2&#46;83 1&#46;41&#45;1&#46;41L40 38&#46;59V40h&#45;1&#46;41zM40 1&#46;41l&#45;2&#46;83 2&#46;83&#45;1&#46;41&#45;1&#46;41L38&#46;59 0H40v1&#46;41zM20 18&#46;6l2&#46;83&#45;2&#46;83 1&#46;41 1&#46;41L21&#46;41 20l2&#46;83 2&#46;83&#45;1&#46;41 1&#46;41L20 21&#46;41l&#45;2&#46;83 2&#46;83&#45;1&#46;41&#45;1&#46;41L18&#46;59 20l&#45;2&#46;83&#45;2&#46;83 1&#46;41&#45;1&#46;41L20 18&#46;59z' fill&#61;'%2300ff00' fill&#45;opacity&#61;'0&#46;04'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;0f1a0f<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'40' height&#61;'40' viewBox&#61;'0 0 40 40'%3E%3Cpath d&#61;'M0 38&#46;59l2&#46;83&#45;2&#46;83 1&#46;41 1&#46;41L1&#46;41 40H0v&#45;1&#46;41zM0 1&#46;4l2&#46;83 2&#46;83 1&#46;41&#45;1&#46;41L1&#46;41 0H0v1&#46;41zM38&#46;59 40l&#45;2&#46;83&#45;2&#46;83 1&#46;41&#45;1&#46;41L40 38&#46;59V40h&#45;1&#46;41zM40 1&#46;41l&#45;2&#46;83 2&#46;83&#45;1&#46;41&#45;1&#46;41L38&#46;59 0H40v1&#46;41zM20 18&#46;6l2&#46;83&#45;2&#46;83 1&#46;41 1&#46;41L21&#46;41 20l2&#46;83 2&#46;83&#45;1&#46;41 1&#46;41L20 21&#46;41l&#45;2&#46;83 2&#46;83&#45;1&#46;41&#45;1&#46;41L18&#46;59 20l&#45;2&#46;83&#45;2&#46;83 1&#46;41&#45;1&#46;41L20 18&#46;59z' fill&#61;'%2300ff00' fill&#45;opacity&#61;'0&#46;04'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;0f0</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;0f0</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;0a1f0a</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;3f3</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text</code> | <code>&#35;000</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(0 0 0 / 70%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(0 255 0 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(0 180 0 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>2px solid &#35;0f0</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>0</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>0 0 10px &#35;0f0</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>"Share Tech Mono", "Lucida Console", "Courier New", monospace</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>"Share Tech Mono", "Lucida Console", "Courier New", monospace</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;2</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>none</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>solid</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"&gt; "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;0f0</code> |
 
-### [src/css/theme-ocean.scss](../src/css/theme-ocean.scss)
-
-| Token | Source Value |
-| --- | --- |
-| <code>--width-content</code> | <code>1400px</code> |
-| <code>--color-bg</code> | <code>#001f3f</code> |
-| <code>--color-card-bg</code> | <code>#002850</code> |
-| <code>--color-accent</code> | <code>#002b54</code> |
-| <code>--body-background</code> | <code>#002a55<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='26' viewBox='0 0 52 26'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' fill='%230074d9' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#036<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='26' viewBox='0 0 52 26'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' fill='%230074d9' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#7fdbff</code> |
-| <code>--color-link</code> | <code>#39cccc</code> |
-| <code>--color-tint</code> | <code>#0a2a2a</code> |
-| <code>--color-link-hover</code> | <code>#7fdbff</code> |
-| <code>--color-contrast-text</code> | <code>#001f3f</code> |
-| <code>--color-contrast-text-muted</code> | <code>rgb(0 31 63 / 80%)</code> |
-| <code>--color-gradient-start</code> | <code>rgb(0 116 217 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(57 204 204 / 20%)</code> |
-| <code>--border</code> | <code>2px solid #0074d9</code> |
-| <code>--border-radius</code> | <code>0</code> |
-| <code>--box-shadow</code> | <code>8px 8px 16px rgb(0 0 0 / 40%)</code> |
-| <code>--font-family-heading</code> | <code>"Courier New", monospace</code> |
-| <code>--font-family-body</code> | <code>"Courier New", monospace</code> |
-| <code>--line-height</code> | <code>1.8</code> |
-| <code>--link-decoration</code> | <code>underline</code> |
-| <code>--link-decoration-hover</code> | <code>none</code> |
-| <code>--link-decoration-style</code> | <code>wavy</code> |
-| <code>--list-marker-content</code> | <code>"〜 "</code> |
-| <code>--list-marker-color</code> | <code>#39cccc</code> |
-
-### [src/css/theme-old-mac.scss](../src/css/theme-old-mac.scss)
+### [src/css/theme&#45;monochrome&#46;scss](../src/css/theme-monochrome.scss)
 
 | Token | Source Value |
 | --- | --- |
-| <code>--width-content</code> | <code>1100px</code> |
-| <code>--color-bg</code> | <code>#ddd</code> |
-| <code>--color-card-bg</code> | <code>#e8e8e8</code> |
-| <code>--color-accent</code> | <code>#ccc</code> |
-| <code>--body-background</code> | <code>#eee<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' viewBox='0 0 6 6'%3E%3Cpath fill='%23000000' fill-opacity='0.05' d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#e4e4e8<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' viewBox='0 0 6 6'%3E%3Cpath fill='%23000000' fill-opacity='0.05' d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#000</code> |
-| <code>--color-link</code> | <code>#00e</code> |
-| <code>--color-tint</code> | <code>#d8d8f8</code> |
-| <code>--color-link-hover</code> | <code>#551a8b</code> |
-| <code>--color-gradient-start</code> | <code>rgb(0 0 238 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(85 26 139 / 20%)</code> |
-| <code>--border</code> | <code>1px solid #000</code> |
-| <code>--border-radius</code> | <code>4px</code> |
-| <code>--box-shadow</code> | <code>2px 2px 0 rgb(0 0 0 / 50%)</code> |
-| <code>--font-family-heading</code> | <code>chicago, charcoal, sans-serif</code> |
-| <code>--font-family-body</code> | <code>geneva, sans-serif</code> |
-| <code>--line-height</code> | <code>1.4</code> |
-| <code>--link-decoration</code> | <code>underline</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>solid</code> |
-| <code>--list-marker-content</code> | <code>"◇ "</code> |
-| <code>--list-marker-color</code> | <code>#000</code> |
+| <code>&#45;&#45;width&#45;content</code> | <code>1200px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;1a1a1a</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;222</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;222</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;2a2a2a<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'4' height&#61;'4' viewBox&#61;'0 0 4 4'%3E%3Cpath fill&#61;'%23ffffff' fill&#45;opacity&#61;'0&#46;05' d&#61;'M1 3h1v1H1V3zm2&#45;2h1v1H3V1z'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;323232<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'4' height&#61;'4' viewBox&#61;'0 0 4 4'%3E%3Cpath fill&#61;'%23ffffff' fill&#45;opacity&#61;'0&#46;05' d&#61;'M1 3h1v1H1V3zm2&#45;2h1v1H3V1z'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;e0e0e0</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;fff</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;2a2a2a</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;ccc</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text</code> | <code>&#35;1a1a1a</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(0 0 0 / 70%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(255 255 255 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(128 128 128 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>1px solid &#35;808080</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>2px</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>0 0 20px rgb(255 255 255 / 10%&#41;</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>system&#45;ui, sans&#45;serif</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>system&#45;ui, sans&#45;serif</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;4</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>solid</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"— "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;808080</code> |
 
-### [src/css/theme-rainbow.scss](../src/css/theme-rainbow.scss)
-
-| Token | Source Value |
-| --- | --- |
-| <code>--width-content</code> | <code>1200px</code> |
-| <code>--color-bg</code> | <code>#fff</code> |
-| <code>--color-card-bg</code> | <code>#fff</code> |
-| <code>--color-accent</code> | <code>#f0e8f8</code> |
-| <code>--body-background</code> | <code>#f0f0f0<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6.172L6.172 0h5.656L0 11.828V6.172zm40 5.656L28.172 0h5.656L40 6.172v5.656zM6.172 12l12-12h3.656l12 12h-5.656L20 3.828 11.828 12H6.172zm12 0L20 10.172 21.828 12h-3.656z' fill='%23ff6b6b' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#e8e0f0<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6.172L6.172 0h5.656L0 11.828V6.172zm40 5.656L28.172 0h5.656L40 6.172v5.656zM6.172 12l12-12h3.656l12 12h-5.656L20 3.828 11.828 12H6.172zm12 0L20 10.172 21.828 12h-3.656z' fill='%23ff6b6b' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#333</code> |
-| <code>--color-link</code> | <code>#f0f</code> |
-| <code>--color-tint</code> | <code>#f0e0f5</code> |
-| <code>--color-link-hover</code> | <code>#f6f</code> |
-| <code>--color-contrast-text</code> | <code>#1a1a1a</code> |
-| <code>--color-contrast-text-muted</code> | <code>rgb(0 0 0 / 70%)</code> |
-| <code>--color-gradient-start</code> | <code>rgb(255 107 107 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(177 156 217 / 20%)</code> |
-| <code>--border</code> | <code>3px solid #ff6b6b</code> |
-| <code>--border-radius</code> | <code>15px</code> |
-| <code>--box-shadow</code> | <code>5px 5px 15px rgb(0 0 0 / 20%)</code> |
-| <code>--font-family-heading</code> | <code>"Comic Sans MS", "Marker Felt", fantasy</code> |
-| <code>--font-family-body</code> | <code>"Trebuchet MS", verdana, sans-serif</code> |
-| <code>--line-height</code> | <code>1.6</code> |
-| <code>--link-decoration</code> | <code>none</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>wavy</code> |
-| <code>--list-marker-content</code> | <code>"★ "</code> |
-| <code>--list-marker-color</code> | <code>#ff6b6b</code> |
-
-### [src/css/theme-sunset.scss](../src/css/theme-sunset.scss)
+### [src/css/theme&#45;neon&#46;scss](../src/css/theme-neon.scss)
 
 | Token | Source Value |
 | --- | --- |
-| <code>--width-content</code> | <code>1400px</code> |
-| <code>--color-bg</code> | <code>#3d1e6d</code> |
-| <code>--color-card-bg</code> | <code>#462578</code> |
-| <code>--color-accent</code> | <code>#4a2880</code> |
-| <code>--body-background</code> | <code>#4d2d7d<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='0' cy='24' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='48' cy='24' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='24' cy='0' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='24' cy='48' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E")</code> |
-| <code>--body-background-alt</code> | <code>#583590<br>    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='0' cy='24' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='48' cy='24' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='24' cy='0' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3Ccircle cx='24' cy='48' r='16' fill='none' stroke='%23f4a261' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E")</code> |
-| <code>--color-text</code> | <code>#f4a261</code> |
-| <code>--color-link</code> | <code>#e76f51</code> |
-| <code>--color-tint</code> | <code>#2d1610</code> |
-| <code>--color-link-hover</code> | <code>#f4a261</code> |
-| <code>--color-contrast-text</code> | <code>#1a1a1a</code> |
-| <code>--color-contrast-text-muted</code> | <code>rgb(0 0 0 / 70%)</code> |
-| <code>--color-gradient-start</code> | <code>rgb(136 67 242 / 20%)</code> |
-| <code>--color-gradient-end</code> | <code>rgb(231 111 81 / 20%)</code> |
-| <code>--border</code> | <code>3px solid #8843f2</code> |
-| <code>--border-radius</code> | <code>15px</code> |
-| <code>--box-shadow</code> | <code>10px 10px 20px rgb(0 0 0 / 30%)</code> |
-| <code>--font-family-heading</code> | <code>impact, sans-serif</code> |
-| <code>--font-family-body</code> | <code>arial, sans-serif</code> |
-| <code>--line-height</code> | <code>1.5</code> |
-| <code>--link-decoration</code> | <code>none</code> |
-| <code>--link-decoration-hover</code> | <code>underline</code> |
-| <code>--link-decoration-style</code> | <code>double</code> |
-| <code>--list-marker-content</code> | <code>"● "</code> |
-| <code>--list-marker-color</code> | <code>#e76f51</code> |
+| <code>&#45;&#45;width&#45;content</code> | <code>1100px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;0a0a0a</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;12101a</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;150a18</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;1a0a1a<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'60' height&#61;'60' viewBox&#61;'0 0 60 60'%3E%3Cpath d&#61;'M36 34v&#45;4h&#45;2v4h&#45;4v2h4v4h2v&#45;4h4v&#45;2h&#45;4zm0&#45;30V0h&#45;2v4h&#45;4v2h4v4h2V6h4V4h&#45;4zM6 34v&#45;4H4v4H0v2h4v4h2v&#45;4h4v&#45;2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill&#61;'%23ff00ff' fill&#45;opacity&#61;'0&#46;07'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;221228<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'60' height&#61;'60' viewBox&#61;'0 0 60 60'%3E%3Cpath d&#61;'M36 34v&#45;4h&#45;2v4h&#45;4v2h4v4h2v&#45;4h4v&#45;2h&#45;4zm0&#45;30V0h&#45;2v4h&#45;4v2h4v4h2V6h4V4h&#45;4zM6 34v&#45;4H4v4H0v2h4v4h2v&#45;4h4v&#45;2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z' fill&#61;'%23ff00ff' fill&#45;opacity&#61;'0&#46;07'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;f0f</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;0ff</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;002a2a</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;ff0</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text</code> | <code>&#35;0a0a0a</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(0 0 0 / 70%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(255 0 255 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(0 255 255 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>2px solid &#35;f0f</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>12px</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>0 0 8px rgb(255 0 255 / 50%&#41;</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>"Orbitron", bahnschrift, "DIN Alternate", "Franklin Gothic Medium", sans&#45;serif</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>"Orbitron", avenir, montserrat, corbel, sans&#45;serif</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;5</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>none</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>double</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"◆ "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;0ff</code> |
 
-### [src/css/theme.scss](../src/css/theme.scss)
+### [src/css/theme&#45;ocean&#46;scss](../src/css/theme-ocean.scss)
 
 | Token | Source Value |
 | --- | --- |
-| <code>--color-bg</code> | <code>#fafafa</code> |
-| <code>--body-background</code> | <code>#fafafa</code> |
-| <code>--body-background-alt</code> | <code>#f0f1f3</code> |
-| <code>--color-card-bg</code> | <code>#fff</code> |
-| <code>--color-text</code> | <code>#1f2937</code> |
-| <code>--color-text-muted</code> | <code>#6b7280</code> |
-| <code>--color-link</code> | <code>#2563eb</code> |
-| <code>--color-link-hover</code> | <code>#1d4ed8</code> |
-| <code>--color-tint</code> | <code>#dbeafe</code> |
-| <code>--color-secondary</code> | <code>#7c3aed</code> |
-| <code>--color-accent</code> | <code>#ebebeb</code> |
-| <code>--color-hover-bg</code> | <code>rgb(0 0 0 / 5%)</code> |
+| <code>&#45;&#45;width&#45;content</code> | <code>1400px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;001f3f</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;002850</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;002b54</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;002a55<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'52' height&#61;'26' viewBox&#61;'0 0 52 26'%3E%3Cpath d&#61;'M10 10c0&#45;2&#46;21&#45;1&#46;79&#45;4&#45;4&#45;4&#45;3&#46;314 0&#45;6&#45;2&#46;686&#45;6&#45;6h2c0 2&#46;21 1&#46;79 4 4 4 3&#46;314 0 6 2&#46;686 6 6 0 2&#46;21 1&#46;79 4 4 4 3&#46;314 0 6 2&#46;686 6 6 0 2&#46;21 1&#46;79 4 4 4v2c&#45;3&#46;314 0&#45;6&#45;2&#46;686&#45;6&#45;6 0&#45;2&#46;21&#45;1&#46;79&#45;4&#45;4&#45;4&#45;3&#46;314 0&#45;6&#45;2&#46;686&#45;6&#45;6zm25&#46;464&#45;1&#46;95l8&#46;486 8&#46;486&#45;1&#46;414 1&#46;414&#45;8&#46;486&#45;8&#46;486 1&#46;414&#45;1&#46;414z' fill&#61;'%230074d9' fill&#45;opacity&#61;'0&#46;15' fill&#45;rule&#61;'evenodd'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;036<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'52' height&#61;'26' viewBox&#61;'0 0 52 26'%3E%3Cpath d&#61;'M10 10c0&#45;2&#46;21&#45;1&#46;79&#45;4&#45;4&#45;4&#45;3&#46;314 0&#45;6&#45;2&#46;686&#45;6&#45;6h2c0 2&#46;21 1&#46;79 4 4 4 3&#46;314 0 6 2&#46;686 6 6 0 2&#46;21 1&#46;79 4 4 4 3&#46;314 0 6 2&#46;686 6 6 0 2&#46;21 1&#46;79 4 4 4v2c&#45;3&#46;314 0&#45;6&#45;2&#46;686&#45;6&#45;6 0&#45;2&#46;21&#45;1&#46;79&#45;4&#45;4&#45;4&#45;3&#46;314 0&#45;6&#45;2&#46;686&#45;6&#45;6zm25&#46;464&#45;1&#46;95l8&#46;486 8&#46;486&#45;1&#46;414 1&#46;414&#45;8&#46;486&#45;8&#46;486 1&#46;414&#45;1&#46;414z' fill&#61;'%230074d9' fill&#45;opacity&#61;'0&#46;15' fill&#45;rule&#61;'evenodd'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;7fdbff</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;39cccc</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;0a2a2a</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;7fdbff</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text</code> | <code>&#35;001f3f</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(0 31 63 / 80%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(0 116 217 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(57 204 204 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>2px solid &#35;0074d9</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>0</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>8px 8px 16px rgb(0 0 0 / 40%&#41;</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>"Courier New", monospace</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>"Courier New", monospace</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;8</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>none</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>wavy</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"〜 "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;39cccc</code> |
+
+### [src/css/theme&#45;old&#45;mac&#46;scss](../src/css/theme-old-mac.scss)
+
+| Token | Source Value |
+| --- | --- |
+| <code>&#45;&#45;width&#45;content</code> | <code>1100px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;ddd</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;e8e8e8</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;ccc</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;eee<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'6' height&#61;'6' viewBox&#61;'0 0 6 6'%3E%3Cpath fill&#61;'%23000000' fill&#45;opacity&#61;'0&#46;05' d&#61;'M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;e4e4e8<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'6' height&#61;'6' viewBox&#61;'0 0 6 6'%3E%3Cpath fill&#61;'%23000000' fill&#45;opacity&#61;'0&#46;05' d&#61;'M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;000</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;00e</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;d8d8f8</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;551a8b</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(0 0 238 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(85 26 139 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>1px solid &#35;000</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>4px</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>2px 2px 0 rgb(0 0 0 / 50%&#41;</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>chicago, charcoal, sans&#45;serif</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>geneva, sans&#45;serif</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;4</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>solid</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"◇ "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;000</code> |
+
+### [src/css/theme&#45;rainbow&#46;scss](../src/css/theme-rainbow.scss)
+
+| Token | Source Value |
+| --- | --- |
+| <code>&#45;&#45;width&#45;content</code> | <code>1200px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;fff</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;fff</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;f0e8f8</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;f0f0f0<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'40' height&#61;'12' viewBox&#61;'0 0 40 12'%3E%3Cpath d&#61;'M0 6&#46;172L6&#46;172 0h5&#46;656L0 11&#46;828V6&#46;172zm40 5&#46;656L28&#46;172 0h5&#46;656L40 6&#46;172v5&#46;656zM6&#46;172 12l12&#45;12h3&#46;656l12 12h&#45;5&#46;656L20 3&#46;828 11&#46;828 12H6&#46;172zm12 0L20 10&#46;172 21&#46;828 12h&#45;3&#46;656z' fill&#61;'%23ff6b6b' fill&#45;opacity&#61;'0&#46;1' fill&#45;rule&#61;'evenodd'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;e8e0f0<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'40' height&#61;'12' viewBox&#61;'0 0 40 12'%3E%3Cpath d&#61;'M0 6&#46;172L6&#46;172 0h5&#46;656L0 11&#46;828V6&#46;172zm40 5&#46;656L28&#46;172 0h5&#46;656L40 6&#46;172v5&#46;656zM6&#46;172 12l12&#45;12h3&#46;656l12 12h&#45;5&#46;656L20 3&#46;828 11&#46;828 12H6&#46;172zm12 0L20 10&#46;172 21&#46;828 12h&#45;3&#46;656z' fill&#61;'%23ff6b6b' fill&#45;opacity&#61;'0&#46;1' fill&#45;rule&#61;'evenodd'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;333</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;f0f</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;f0e0f5</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;f6f</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text</code> | <code>&#35;1a1a1a</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(0 0 0 / 70%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(255 107 107 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(177 156 217 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>3px solid &#35;ff6b6b</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>15px</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>5px 5px 15px rgb(0 0 0 / 20%&#41;</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>"Comic Sans MS", "Marker Felt", fantasy</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>"Trebuchet MS", verdana, sans&#45;serif</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;6</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>none</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>wavy</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"★ "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;ff6b6b</code> |
+
+### [src/css/theme&#45;sunset&#46;scss](../src/css/theme-sunset.scss)
+
+| Token | Source Value |
+| --- | --- |
+| <code>&#45;&#45;width&#45;content</code> | <code>1400px</code> |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;3d1e6d</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;462578</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;4a2880</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;4d2d7d<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'48' height&#61;'48' viewBox&#61;'0 0 48 48'%3E%3Ccircle cx&#61;'24' cy&#61;'24' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'0' cy&#61;'24' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'48' cy&#61;'24' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'24' cy&#61;'0' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'24' cy&#61;'48' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;583590<br>    url("data:image/svg&#43;xml,%3Csvg xmlns&#61;'http://www&#46;w3&#46;org/2000/svg' width&#61;'48' height&#61;'48' viewBox&#61;'0 0 48 48'%3E%3Ccircle cx&#61;'24' cy&#61;'24' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'0' cy&#61;'24' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'48' cy&#61;'24' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'24' cy&#61;'0' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3Ccircle cx&#61;'24' cy&#61;'48' r&#61;'16' fill&#61;'none' stroke&#61;'%23f4a261' stroke&#45;opacity&#61;'0&#46;08' stroke&#45;width&#61;'1'/%3E%3C/svg%3E"&#41;</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;f4a261</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;e76f51</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;2d1610</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;f4a261</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text</code> | <code>&#35;1a1a1a</code> |
+| <code>&#45;&#45;color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(0 0 0 / 70%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;start</code> | <code>rgb(136 67 242 / 20%&#41;</code> |
+| <code>&#45;&#45;color&#45;gradient&#45;end</code> | <code>rgb(231 111 81 / 20%&#41;</code> |
+| <code>&#45;&#45;border</code> | <code>3px solid &#35;8843f2</code> |
+| <code>&#45;&#45;border&#45;radius</code> | <code>15px</code> |
+| <code>&#45;&#45;box&#45;shadow</code> | <code>10px 10px 20px rgb(0 0 0 / 30%&#41;</code> |
+| <code>&#45;&#45;font&#45;family&#45;heading</code> | <code>impact, sans&#45;serif</code> |
+| <code>&#45;&#45;font&#45;family&#45;body</code> | <code>arial, sans&#45;serif</code> |
+| <code>&#45;&#45;line&#45;height</code> | <code>1&#46;5</code> |
+| <code>&#45;&#45;link&#45;decoration</code> | <code>none</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;hover</code> | <code>underline</code> |
+| <code>&#45;&#45;link&#45;decoration&#45;style</code> | <code>double</code> |
+| <code>&#45;&#45;list&#45;marker&#45;content</code> | <code>"● "</code> |
+| <code>&#45;&#45;list&#45;marker&#45;color</code> | <code>&#35;e76f51</code> |
+
+### [src/css/theme&#46;scss](../src/css/theme.scss)
+
+| Token | Source Value |
+| --- | --- |
+| <code>&#45;&#45;color&#45;bg</code> | <code>&#35;fafafa</code> |
+| <code>&#45;&#45;body&#45;background</code> | <code>&#35;fafafa</code> |
+| <code>&#45;&#45;body&#45;background&#45;alt</code> | <code>&#35;f0f1f3</code> |
+| <code>&#45;&#45;color&#45;card&#45;bg</code> | <code>&#35;fff</code> |
+| <code>&#45;&#45;color&#45;text</code> | <code>&#35;1f2937</code> |
+| <code>&#45;&#45;color&#45;text&#45;muted</code> | <code>&#35;6b7280</code> |
+| <code>&#45;&#45;color&#45;link</code> | <code>&#35;2563eb</code> |
+| <code>&#45;&#45;color&#45;link&#45;hover</code> | <code>&#35;1d4ed8</code> |
+| <code>&#45;&#45;color&#45;tint</code> | <code>&#35;dbeafe</code> |
+| <code>&#45;&#45;color&#45;secondary</code> | <code>&#35;7c3aed</code> |
+| <code>&#45;&#45;color&#45;accent</code> | <code>&#35;ebebeb</code> |
+| <code>&#45;&#45;color&#45;hover&#45;bg</code> | <code>rgb(0 0 0 / 5%&#41;</code> |
 
 ## Sass Source Declarations
 
 Top-level Sass variable declarations from `src/css/_variables.scss` and `src/css/_breakpoints.scss`, plus their function/mixin definitions. Values are source expressions, not evaluated CSS: `!default` is a Sass configuration flag, references and arithmetic remain unevaluated, and the breakpoint map is not a table of computed media-query thresholds. Nested helper variables are only shown inside their definitions. No equivalence between separately declared breakpoint values is inferred.
 
-### [src/css/_variables.scss](../src/css/_variables.scss)
+### [src/css/&#95;variables&#46;scss](../src/css/_variables.scss)
 
 | Sass Variable | Source Expression |
 | --- | --- |
-| <code>$color-bg</code> | <code>#fafafa !default</code> |
-| <code>$body-background-alt</code> | <code>#f3f4f6 !default</code> |
-| <code>$color-card-bg</code> | <code>#fff !default</code> |
-| <code>$color-text</code> | <code>#1f2937 !default</code> |
-| <code>$color-text-muted</code> | <code>#6b7280 !default</code> |
-| <code>$color-primary</code> | <code>#2563eb !default</code> |
-| <code>$color-primary-dark</code> | <code>#1d4ed8 !default</code> |
-| <code>$color-tint</code> | <code>#dbeafe !default</code> |
-| <code>$color-secondary</code> | <code>#7c3aed !default</code> |
-| <code>$color-accent</code> | <code>color.adjust($color-bg, $lightness: -5%) !default</code> |
-| <code>$color-hover-bg</code> | <code>rgb(0 0 0 / 5%) !default</code> |
-| <code>$color-dark-bg</code> | <code>#1f2937 !default</code> |
-| <code>$color-dark-bg-alt</code> | <code>color.scale($color-dark-bg, $lightness: -15%) !default</code> |
-| <code>$color-dark-text</code> | <code>#f9fafb !default</code> |
-| <code>$color-dark-text-muted</code> | <code>#9ca3af !default</code> |
-| <code>$color-dark-card-bg</code> | <code>#374151 !default</code> |
-| <code>$color-dark-link</code> | <code>#d1d5db !default</code> |
-| <code>$color-white</code> | <code>#fff !default</code> |
-| <code>$color-contrast-text</code> | <code>$color-white !default</code> |
-| <code>$color-contrast-text-muted</code> | <code>rgb(255 255 255 / 80%) !default</code> |
-| <code>$shadow-sm</code> | <code>0 2px 8px rgb(0 0 0 / 12%) !default</code> |
-| <code>$shadow-md</code> | <code>0 4px 12px rgb(0 0 0 / 18%) !default</code> |
-| <code>$color-video-play-bg</code> | <code>#212121 !default</code> |
-| <code>$color-video-play-hover</code> | <code>#ef4444 !default</code> |
-| <code>$color-dot-red</code> | <code>#ef4444 !default</code> |
-| <code>$color-dot-yellow</code> | <code>#f59e0b !default</code> |
-| <code>$color-dot-green</code> | <code>#10b981 !default</code> |
-| <code>$font-sans</code> | <code>system-ui, -apple-system, blinkmacsystemfont, "Segoe UI", roboto,<br>  "Helvetica Neue", arial, sans-serif !default</code> |
-| <code>$font-mono</code> | <code>ui-monospace, sfmono-regular, "SF Mono", menlo, consolas,<br>  monospace !default</code> |
-| <code>$space-unit-raw</code> | <code>8px !default</code> |
-| <code>$space-xs-raw</code> | <code>$space-unit-raw !default</code> |
-| <code>$space-sm-raw</code> | <code>$space-unit-raw &#42; 2 !default</code> |
-| <code>$space-md-raw</code> | <code>$space-unit-raw &#42; 3 !default</code> |
-| <code>$space-lg-raw</code> | <code>$space-unit-raw &#42; 4 !default</code> |
-| <code>$space-xl-raw</code> | <code>$space-unit-raw &#42; 6 !default</code> |
-| <code>$space-2xl-raw</code> | <code>$space-unit-raw &#42; 8 !default</code> |
-| <code>$space-3xl-raw</code> | <code>$space-unit-raw &#42; 12 !default</code> |
-| <code>$space-4xl-raw</code> | <code>$space-unit-raw &#42; 16 !default</code> |
-| <code>$width-narrow</code> | <code>680px !default</code> |
-| <code>$width-default</code> | <code>900px !default</code> |
-| <code>$width-wide</code> | <code>1200px !default</code> |
-| <code>$width-full</code> | <code>100% !default</code> |
-| <code>$width-card</code> | <code>280px !default</code> |
-| <code>$width-card-lg</code> | <code>320px !default</code> |
-| <code>$width-author-thumbnail</code> | <code>100px !default</code> |
-| <code>$font-size-xs-raw</code> | <code>0.75rem !default</code> |
-| <code>$font-size-sm-raw</code> | <code>0.875rem !default</code> |
-| <code>$font-size-base-raw</code> | <code>1rem !default</code> |
-| <code>$font-size-md-raw</code> | <code>1.125rem !default</code> |
-| <code>$font-size-lg-raw</code> | <code>1.25rem !default</code> |
-| <code>$font-size-xl-raw</code> | <code>1.5rem !default</code> |
-| <code>$font-size-2xl-raw</code> | <code>2rem !default</code> |
-| <code>$font-size-3xl-raw</code> | <code>2.5rem !default</code> |
-| <code>$font-size-4xl-raw</code> | <code>3rem !default</code> |
-| <code>$font-size-5xl-raw</code> | <code>4rem !default</code> |
-| <code>$line-height-tight</code> | <code>1.2 !default</code> |
-| <code>$line-height-snug</code> | <code>1.375 !default</code> |
-| <code>$line-height-normal</code> | <code>1.5 !default</code> |
-| <code>$line-height-relaxed</code> | <code>1.625 !default</code> |
-| <code>$line-height-loose</code> | <code>2 !default</code> |
-| <code>$radius-sm</code> | <code>4px !default</code> |
-| <code>$radius-md</code> | <code>8px !default</code> |
-| <code>$radius-lg</code> | <code>12px !default</code> |
-| <code>$radius-xl</code> | <code>16px !default</code> |
-| <code>$radius-2xl</code> | <code>24px !default</code> |
-| <code>$radius-full</code> | <code>9999px !default</code> |
-| <code>$border-light</code> | <code>1px solid rgb(0 0 0 / 10%) !default</code> |
-| <code>$border-medium</code> | <code>1px solid rgb(0 0 0 / 15%) !default</code> |
-| <code>$border-dark</code> | <code>1px solid rgb(0 0 0 / 20%) !default</code> |
-| <code>$transition-fast</code> | <code>150ms ease !default</code> |
-| <code>$transition-normal</code> | <code>250ms ease !default</code> |
-| <code>$transition-slow</code> | <code>350ms ease !default</code> |
-| <code>$z-base</code> | <code>0 !default</code> |
-| <code>$z-dropdown</code> | <code>100 !default</code> |
-| <code>$z-sticky</code> | <code>200 !default</code> |
-| <code>$z-overlay</code> | <code>300 !default</code> |
-| <code>$z-modal</code> | <code>400 !default</code> |
-| <code>$z-toast</code> | <code>500 !default</code> |
-| <code>$bp-sm</code> | <code>650px !default</code> |
-| <code>$bp-md</code> | <code>768px !default</code> |
-| <code>$bp-lg</code> | <code>1000px !default</code> |
-| <code>$bp-xl</code> | <code>1200px !default</code> |
-| <code>$space-unit</code> | <code>css-var("space-unit", $space-unit-raw) !default</code> |
-| <code>$space-xs</code> | <code>css-var("space-xs", $space-xs-raw) !default</code> |
-| <code>$space-sm</code> | <code>css-var("space-sm", $space-sm-raw) !default</code> |
-| <code>$space-md</code> | <code>css-var("space-md", $space-md-raw) !default</code> |
-| <code>$space-lg</code> | <code>css-var("space-lg", $space-lg-raw) !default</code> |
-| <code>$space-xl</code> | <code>css-var("space-xl", $space-xl-raw) !default</code> |
-| <code>$space-2xl</code> | <code>css-var("space-2xl", $space-2xl-raw) !default</code> |
-| <code>$space-3xl</code> | <code>css-var("space-3xl", $space-3xl-raw) !default</code> |
-| <code>$space-4xl</code> | <code>css-var("space-4xl", $space-4xl-raw) !default</code> |
-| <code>$font-size-xs</code> | <code>css-var("font-size-xs", $font-size-xs-raw) !default</code> |
-| <code>$font-size-sm</code> | <code>css-var("font-size-sm", $font-size-sm-raw) !default</code> |
-| <code>$font-size-base</code> | <code>css-var("font-size-base", $font-size-base-raw) !default</code> |
-| <code>$font-size-md</code> | <code>css-var("font-size-md", $font-size-md-raw) !default</code> |
-| <code>$font-size-lg</code> | <code>css-var("font-size-lg", $font-size-lg-raw) !default</code> |
-| <code>$font-size-xl</code> | <code>css-var("font-size-xl", $font-size-xl-raw) !default</code> |
-| <code>$font-size-2xl</code> | <code>css-var("font-size-2xl", $font-size-2xl-raw) !default</code> |
-| <code>$font-size-3xl</code> | <code>css-var("font-size-3xl", $font-size-3xl-raw) !default</code> |
-| <code>$font-size-4xl</code> | <code>css-var("font-size-4xl", $font-size-4xl-raw) !default</code> |
-| <code>$font-size-5xl</code> | <code>css-var("font-size-5xl", $font-size-5xl-raw) !default</code> |
+| <code>$color&#45;bg</code> | <code>&#35;fafafa &#33;default</code> |
+| <code>$body&#45;background&#45;alt</code> | <code>&#35;f3f4f6 &#33;default</code> |
+| <code>$color&#45;card&#45;bg</code> | <code>&#35;fff &#33;default</code> |
+| <code>$color&#45;text</code> | <code>&#35;1f2937 &#33;default</code> |
+| <code>$color&#45;text&#45;muted</code> | <code>&#35;6b7280 &#33;default</code> |
+| <code>$color&#45;primary</code> | <code>&#35;2563eb &#33;default</code> |
+| <code>$color&#45;primary&#45;dark</code> | <code>&#35;1d4ed8 &#33;default</code> |
+| <code>$color&#45;tint</code> | <code>&#35;dbeafe &#33;default</code> |
+| <code>$color&#45;secondary</code> | <code>&#35;7c3aed &#33;default</code> |
+| <code>$color&#45;accent</code> | <code>color&#46;adjust($color&#45;bg, $lightness: &#45;5%&#41; &#33;default</code> |
+| <code>$color&#45;hover&#45;bg</code> | <code>rgb(0 0 0 / 5%&#41; &#33;default</code> |
+| <code>$color&#45;dark&#45;bg</code> | <code>&#35;1f2937 &#33;default</code> |
+| <code>$color&#45;dark&#45;bg&#45;alt</code> | <code>color&#46;scale($color&#45;dark&#45;bg, $lightness: &#45;15%&#41; &#33;default</code> |
+| <code>$color&#45;dark&#45;text</code> | <code>&#35;f9fafb &#33;default</code> |
+| <code>$color&#45;dark&#45;text&#45;muted</code> | <code>&#35;9ca3af &#33;default</code> |
+| <code>$color&#45;dark&#45;card&#45;bg</code> | <code>&#35;374151 &#33;default</code> |
+| <code>$color&#45;dark&#45;link</code> | <code>&#35;d1d5db &#33;default</code> |
+| <code>$color&#45;white</code> | <code>&#35;fff &#33;default</code> |
+| <code>$color&#45;contrast&#45;text</code> | <code>$color&#45;white &#33;default</code> |
+| <code>$color&#45;contrast&#45;text&#45;muted</code> | <code>rgb(255 255 255 / 80%&#41; &#33;default</code> |
+| <code>$shadow&#45;sm</code> | <code>0 2px 8px rgb(0 0 0 / 12%&#41; &#33;default</code> |
+| <code>$shadow&#45;md</code> | <code>0 4px 12px rgb(0 0 0 / 18%&#41; &#33;default</code> |
+| <code>$color&#45;video&#45;play&#45;bg</code> | <code>&#35;212121 &#33;default</code> |
+| <code>$color&#45;video&#45;play&#45;hover</code> | <code>&#35;ef4444 &#33;default</code> |
+| <code>$color&#45;dot&#45;red</code> | <code>&#35;ef4444 &#33;default</code> |
+| <code>$color&#45;dot&#45;yellow</code> | <code>&#35;f59e0b &#33;default</code> |
+| <code>$color&#45;dot&#45;green</code> | <code>&#35;10b981 &#33;default</code> |
+| <code>$font&#45;sans</code> | <code>system&#45;ui, &#45;apple&#45;system, blinkmacsystemfont, "Segoe UI", roboto,<br>  "Helvetica Neue", arial, sans&#45;serif &#33;default</code> |
+| <code>$font&#45;mono</code> | <code>ui&#45;monospace, sfmono&#45;regular, "SF Mono", menlo, consolas,<br>  monospace &#33;default</code> |
+| <code>$space&#45;unit&#45;raw</code> | <code>8px &#33;default</code> |
+| <code>$space&#45;xs&#45;raw</code> | <code>$space&#45;unit&#45;raw &#33;default</code> |
+| <code>$space&#45;sm&#45;raw</code> | <code>$space&#45;unit&#45;raw &#42; 2 &#33;default</code> |
+| <code>$space&#45;md&#45;raw</code> | <code>$space&#45;unit&#45;raw &#42; 3 &#33;default</code> |
+| <code>$space&#45;lg&#45;raw</code> | <code>$space&#45;unit&#45;raw &#42; 4 &#33;default</code> |
+| <code>$space&#45;xl&#45;raw</code> | <code>$space&#45;unit&#45;raw &#42; 6 &#33;default</code> |
+| <code>$space&#45;2xl&#45;raw</code> | <code>$space&#45;unit&#45;raw &#42; 8 &#33;default</code> |
+| <code>$space&#45;3xl&#45;raw</code> | <code>$space&#45;unit&#45;raw &#42; 12 &#33;default</code> |
+| <code>$space&#45;4xl&#45;raw</code> | <code>$space&#45;unit&#45;raw &#42; 16 &#33;default</code> |
+| <code>$width&#45;narrow</code> | <code>680px &#33;default</code> |
+| <code>$width&#45;default</code> | <code>900px &#33;default</code> |
+| <code>$width&#45;wide</code> | <code>1200px &#33;default</code> |
+| <code>$width&#45;full</code> | <code>100% &#33;default</code> |
+| <code>$width&#45;card</code> | <code>280px &#33;default</code> |
+| <code>$width&#45;card&#45;lg</code> | <code>320px &#33;default</code> |
+| <code>$width&#45;author&#45;thumbnail</code> | <code>100px &#33;default</code> |
+| <code>$font&#45;size&#45;xs&#45;raw</code> | <code>0&#46;75rem &#33;default</code> |
+| <code>$font&#45;size&#45;sm&#45;raw</code> | <code>0&#46;875rem &#33;default</code> |
+| <code>$font&#45;size&#45;base&#45;raw</code> | <code>1rem &#33;default</code> |
+| <code>$font&#45;size&#45;md&#45;raw</code> | <code>1&#46;125rem &#33;default</code> |
+| <code>$font&#45;size&#45;lg&#45;raw</code> | <code>1&#46;25rem &#33;default</code> |
+| <code>$font&#45;size&#45;xl&#45;raw</code> | <code>1&#46;5rem &#33;default</code> |
+| <code>$font&#45;size&#45;2xl&#45;raw</code> | <code>2rem &#33;default</code> |
+| <code>$font&#45;size&#45;3xl&#45;raw</code> | <code>2&#46;5rem &#33;default</code> |
+| <code>$font&#45;size&#45;4xl&#45;raw</code> | <code>3rem &#33;default</code> |
+| <code>$font&#45;size&#45;5xl&#45;raw</code> | <code>4rem &#33;default</code> |
+| <code>$line&#45;height&#45;tight</code> | <code>1&#46;2 &#33;default</code> |
+| <code>$line&#45;height&#45;snug</code> | <code>1&#46;375 &#33;default</code> |
+| <code>$line&#45;height&#45;normal</code> | <code>1&#46;5 &#33;default</code> |
+| <code>$line&#45;height&#45;relaxed</code> | <code>1&#46;625 &#33;default</code> |
+| <code>$line&#45;height&#45;loose</code> | <code>2 &#33;default</code> |
+| <code>$radius&#45;sm</code> | <code>4px &#33;default</code> |
+| <code>$radius&#45;md</code> | <code>8px &#33;default</code> |
+| <code>$radius&#45;lg</code> | <code>12px &#33;default</code> |
+| <code>$radius&#45;xl</code> | <code>16px &#33;default</code> |
+| <code>$radius&#45;2xl</code> | <code>24px &#33;default</code> |
+| <code>$radius&#45;full</code> | <code>9999px &#33;default</code> |
+| <code>$border&#45;light</code> | <code>1px solid rgb(0 0 0 / 10%&#41; &#33;default</code> |
+| <code>$border&#45;medium</code> | <code>1px solid rgb(0 0 0 / 15%&#41; &#33;default</code> |
+| <code>$border&#45;dark</code> | <code>1px solid rgb(0 0 0 / 20%&#41; &#33;default</code> |
+| <code>$transition&#45;fast</code> | <code>150ms ease &#33;default</code> |
+| <code>$transition&#45;normal</code> | <code>250ms ease &#33;default</code> |
+| <code>$transition&#45;slow</code> | <code>350ms ease &#33;default</code> |
+| <code>$z&#45;base</code> | <code>0 &#33;default</code> |
+| <code>$z&#45;dropdown</code> | <code>100 &#33;default</code> |
+| <code>$z&#45;sticky</code> | <code>200 &#33;default</code> |
+| <code>$z&#45;overlay</code> | <code>300 &#33;default</code> |
+| <code>$z&#45;modal</code> | <code>400 &#33;default</code> |
+| <code>$z&#45;toast</code> | <code>500 &#33;default</code> |
+| <code>$bp&#45;sm</code> | <code>650px &#33;default</code> |
+| <code>$bp&#45;md</code> | <code>768px &#33;default</code> |
+| <code>$bp&#45;lg</code> | <code>1000px &#33;default</code> |
+| <code>$bp&#45;xl</code> | <code>1200px &#33;default</code> |
+| <code>$space&#45;unit</code> | <code>css&#45;var("space&#45;unit", $space&#45;unit&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;xs</code> | <code>css&#45;var("space&#45;xs", $space&#45;xs&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;sm</code> | <code>css&#45;var("space&#45;sm", $space&#45;sm&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;md</code> | <code>css&#45;var("space&#45;md", $space&#45;md&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;lg</code> | <code>css&#45;var("space&#45;lg", $space&#45;lg&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;xl</code> | <code>css&#45;var("space&#45;xl", $space&#45;xl&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;2xl</code> | <code>css&#45;var("space&#45;2xl", $space&#45;2xl&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;3xl</code> | <code>css&#45;var("space&#45;3xl", $space&#45;3xl&#45;raw&#41; &#33;default</code> |
+| <code>$space&#45;4xl</code> | <code>css&#45;var("space&#45;4xl", $space&#45;4xl&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;xs</code> | <code>css&#45;var("font&#45;size&#45;xs", $font&#45;size&#45;xs&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;sm</code> | <code>css&#45;var("font&#45;size&#45;sm", $font&#45;size&#45;sm&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;base</code> | <code>css&#45;var("font&#45;size&#45;base", $font&#45;size&#45;base&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;md</code> | <code>css&#45;var("font&#45;size&#45;md", $font&#45;size&#45;md&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;lg</code> | <code>css&#45;var("font&#45;size&#45;lg", $font&#45;size&#45;lg&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;xl</code> | <code>css&#45;var("font&#45;size&#45;xl", $font&#45;size&#45;xl&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;2xl</code> | <code>css&#45;var("font&#45;size&#45;2xl", $font&#45;size&#45;2xl&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;3xl</code> | <code>css&#45;var("font&#45;size&#45;3xl", $font&#45;size&#45;3xl&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;4xl</code> | <code>css&#45;var("font&#45;size&#45;4xl", $font&#45;size&#45;4xl&#45;raw&#41; &#33;default</code> |
+| <code>$font&#45;size&#45;5xl</code> | <code>css&#45;var("font&#45;size&#45;5xl", $font&#45;size&#45;5xl&#45;raw&#41; &#33;default</code> |
 
 ```scss
 @function css-var($name, $fallback) {
@@ -689,11 +689,11 @@ Top-level Sass variable declarations from `src/css/_variables.scss` and `src/css
 }
 ```
 
-### [src/css/_breakpoints.scss](../src/css/_breakpoints.scss)
+### [src/css/&#95;breakpoints&#46;scss](../src/css/_breakpoints.scss)
 
 | Sass Variable | Source Expression |
 | --- | --- |
-| <code>$breakpoints</code> | <code>(<br>  "sm": 650px,<br>  "md": 768px,<br>  "lg": 1000px,<br>  "xl": 1200px,<br>)</code> |
+| <code>$breakpoints</code> | <code>(<br>  "sm": 650px,<br>  "md": 768px,<br>  "lg": 1000px,<br>  "xl": 1200px,<br>&#41;</code> |
 
 ```scss
 @mixin up($name) {
@@ -725,85 +725,99 @@ Top-level Sass variable declarations from `src/css/_variables.scss` and `src/css
 
 ## CMS Definitions
 
-The `COLLECTIONS` and `FEATURE_QUESTIONS` arrays are extracted from their definition modules without importing or executing them. Collection paths and direct dependencies are declared values, not resolved site paths or transitive dependencies. Optional flags are shown only when present. Feature questions identify available choices, not saved selections or inferred defaults. This is not the generated PagesCMS field schema or an inventory of runtime/custom collections.
+The generator imports `COLLECTIONS` from `scripts/customise-cms/collections.js` and `FEATURE_QUESTIONS` from `scripts/customise-cms/feature-questions.js`, the same definitions used by the CMS runtime. These modules have no import-time I/O; interactive prompts and saved site configuration are not loaded. This fixed catalog is serialized as JSON in declaration order, without copying JavaScript comments or evaluating source text. Collection paths and direct dependencies are declared values, not resolved site paths or transitive dependencies. Optional flags are shown only when present. Feature questions identify available choices, not saved selections or inferred defaults. This is not the generated PagesCMS field schema or an inventory of runtime/custom collections.
 
 ### COLLECTIONS
 
-Source: [scripts/customise-cms/collections.js](../scripts/customise-cms/collections.js).
+Source: [scripts/customise&#45;cms/collections&#46;js](../scripts/customise-cms/collections.js).
 
-```js
-const COLLECTIONS = [
+```json
+[
   {
-    name: "pages",
-    label: "Pages",
-    path: "src/pages",
-    description: "Static pages (about, contact, etc.)",
-    dependencies: [],
-    required: true,
+    "name": "pages",
+    "label": "Pages",
+    "path": "src/pages",
+    "description": "Static pages (about, contact, etc.)",
+    "dependencies": [],
+    "required": true
   },
   {
-    name: "news",
-    label: "News",
-    path: "src/news",
-    description: "Blog posts and news articles",
-    dependencies: [],
+    "name": "news",
+    "label": "News",
+    "path": "src/news",
+    "description": "Blog posts and news articles",
+    "dependencies": []
   },
   {
-    name: "guide-categories",
-    label: "Guide Categories",
-    path: "src/guide-categories",
-    description: "Categories for organizing guide pages",
-    dependencies: [],
+    "name": "guide-categories",
+    "label": "Guide Categories",
+    "path": "src/guide-categories",
+    "description": "Categories for organizing guide pages",
+    "dependencies": []
   },
   {
-    name: "guide-pages",
-    label: "Guide Pages",
-    path: "src/guide-pages",
-    description: "Individual guide/documentation pages",
-    dependencies: ["guide-categories"],
+    "name": "guide-pages",
+    "label": "Guide Pages",
+    "path": "src/guide-pages",
+    "description": "Individual guide/documentation pages",
+    "dependencies": [
+      "guide-categories"
+    ]
   },
   {
-    name: "snippets",
-    label: "Snippets",
-    path: "src/snippets",
-    description: "Reusable content snippets",
-    dependencies: [],
-    internal: true,
-    required: true,
-  },
-];
+    "name": "snippets",
+    "label": "Snippets",
+    "path": "src/snippets",
+    "description": "Reusable content snippets",
+    "dependencies": [],
+    "internal": true,
+    "required": true
+  }
+]
 ```
 
-### FEATURE_QUESTIONS
+### FEATURE&#95;QUESTIONS
 
-Source: [scripts/customise-cms/prompts.js](../scripts/customise-cms/prompts.js).
+Source: [scripts/customise&#45;cms/feature&#45;questions&#46;js](../scripts/customise-cms/feature-questions.js).
 
-```js
-const FEATURE_QUESTIONS = [
-  ["permalinks", "Do you want custom permalinks on items?"],
-  ["redirects", "Do you want redirect_from support (for URL redirects)?"],
-  ["faqs", "Do you want FAQs on items?"],
-  ["galleries", "Do you want image galleries on items?"],
+```json
+[
+  [
+    "permalinks",
+    "Do you want custom permalinks on items?"
+  ],
+  [
+    "redirects",
+    "Do you want redirect_from support (for URL redirects)?"
+  ],
+  [
+    "faqs",
+    "Do you want FAQs on items?"
+  ],
+  [
+    "galleries",
+    "Do you want image galleries on items?"
+  ],
   [
     "external_navigation_urls",
-    "Do you want to link to external URLs in your navigation?",
+    "Do you want to link to external URLs in your navigation?"
   ],
   [
     "use_visual_editor",
-    "Do you want to use a visual rich-text editor instead of markdown?",
+    "Do you want to use a visual rich-text editor instead of markdown?"
   ],
   [
     "no_index",
-    "Do you want to hide pages/news from listings (no_index field)?",
-  ],
-];
+    "Do you want to hide pages/news from listings (no_index field)?"
+  ]
+]
 ```
 
 ## Deployment Workflow Facts
 
 Parsed configured workflow metadata and job definitions from the linked YAML files. Job facts include declared runners, dependencies, conditions, strategy, environments, defaults, reusable-workflow inputs, and complete ordered steps (including build commands and step env/with mappings). YAML formatting and comments are normalized. Omitted keys stay omitted: no runner, shell, environment, or application defaults are inferred. GitHub expressions are literal source expressions; no environment variables or secret values are read or evaluated.
 
-### [.github/workflows/pages.yml](../.github/workflows/pages.yml)
+### [&#46;github/workflows/pages&#46;yml](../.github/workflows/pages.yml)
 
 ```yaml
 name: Deploy to GitHub Pages
@@ -869,7 +883,7 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
-### [.github/workflows/sharedservices-deploy.yaml](../.github/workflows/sharedservices-deploy.yaml)
+### [&#46;github/workflows/sharedservices&#45;deploy&#46;yaml](../.github/workflows/sharedservices-deploy.yaml)
 
 ```yaml
 name: Deploy to SharedServices

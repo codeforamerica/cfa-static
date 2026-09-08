@@ -8,7 +8,7 @@ Parameters (via block object):
         - Image path: starts with "/" (e.g., "/images/icon.svg")
         - Raw content: emoji or HTML entity (e.g., "&#128640;")
     - icon_label: Accessible label for icon (optional, defaults to decorative)
-    - title: Feature title
+    - name: Feature title
     - description: Feature description (supports markdown)
     - style: Optional inline styles (e.g., for custom colors)
   - block.reveal: If true, adds data-reveal animation (default: true)
@@ -21,8 +21,8 @@ Embeddable form:
     animations by passing block: { reveal: false }.
 
 Usage:
-  {% include "design-system/features.html", block: page.features_block %}
-  {% include "design-system/features.html", items: page.spec_feature_items %}
+  {% include "design-system/blocks/features.html", block: page.features_block %}
+  {% include "design-system/blocks/features.html", items: page.spec_feature_items %}
 {%- endcomment -%}
 
 {%- assign _items = items | default: block.items -%}

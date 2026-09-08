@@ -14,6 +14,7 @@ export const fields = {
   items: {
     ...objectList("Features", {
       icon: str("Icon (Iconify ID or HTML entity)"),
+      icon_label: str("Icon Accessible Label"),
       name: NAME_REQUIRED,
       description: md("Description"),
       style: str("Custom Style"),

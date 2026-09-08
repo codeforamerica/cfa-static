@@ -1,15 +1,17 @@
-import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
-import { basename, dirname, join, relative, resolve } from "node:path";
+import { readFileSync, statSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import matter from "gray-matter";
-import MarkdownIt from "markdown-it";
 import { describe, expect, test } from "vitest";
-import { getFiles, rootDir } from "#test/test-utils.js";
+import {
+  assertDocumentationTarget,
+  getDocumentationFiles,
+  rootDir,
+} from "#test/test-utils.js";
 
 const SKILL_NAME = "cfa-static-site-builder";
 const SKILL_DIR = join(rootDir, "skills", SKILL_NAME);
 const SKILL_FILE = join(SKILL_DIR, "SKILL.md");
 const EVALS_FILE = join(SKILL_DIR, "evals", "evals.json");
-const REAL_SKILL_DIR = realpathSync(SKILL_DIR);
 const ALLOWED_FIELDS = [
   "allowed-tools",
   "compatibility",
@@ -25,9 +27,8 @@ const evalConfig = JSON.parse(readFileSync(EVALS_FILE, "utf-8"));
 const packageJson = JSON.parse(
   readFileSync(join(rootDir, "package.json"), "utf8"),
 );
-const markdown = new MarkdownIt();
-const references = getFiles(
-  /^skills\/cfa-static-site-builder\/references\/[^/]+\.md$/,
+const references = getDocumentationFiles().filter((file) =>
+  /^skills\/cfa-static-site-builder\/references\/[^/]+\.md$/.test(file),
 );
 
 describe("CfA Static Agent Skill", () => {
@@ -72,8 +73,9 @@ describe("CfA Static Agent Skill", () => {
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) {
       const target = resolve(dirname(SKILL_FILE), link.split("#")[0]);
-      expect(relative(SKILL_DIR, target)).not.toMatch(/^\.\./);
-      expect(existsSync(target), `Missing skill reference: ${link}`).toBe(true);
+      expect(() =>
+        assertDocumentationTarget(SKILL_DIR, target, link),
+      ).not.toThrow();
     }
   });
 
@@ -98,55 +100,10 @@ describe("CfA Static Agent Skill", () => {
         expect(file).toEqual(expect.any(String));
         expect(file.trim().length).toBeGreaterThan(0);
         const target = resolve(SKILL_DIR, file);
-        expect(relative(SKILL_DIR, target)).not.toMatch(/^\.\./);
-        expect(existsSync(target), `Missing eval fixture: ${file}`).toBe(true);
-        const realTarget = realpathSync(target);
-        expect(relative(REAL_SKILL_DIR, realTarget)).not.toMatch(/^\.\./);
-        expect(statSync(realTarget).isFile()).toBe(true);
-      }
-    }
-  });
-
-  test("reference documents are included in documentation checks", () => {
-    expect(references.length).toBeGreaterThan(0);
-    expect(references).toContain(`skills/${SKILL_NAME}/references/blocks.md`);
-    expect(references).toContain(`skills/${SKILL_NAME}/references/layouts.md`);
-  });
-
-  test.each(references)("%s links to existing checkout resources", (file) => {
-    const source = readFileSync(join(rootDir, file), "utf8");
-    const doc = new DOMParser().parseFromString(
-      markdown.render(source),
-      "text/html",
-    );
-    const links = [...doc.querySelectorAll("a")].map((link) =>
-      link.getAttribute("href"),
-    );
-    for (const href of links.filter(
-      (link) => !/^(?:[a-z]+:|\/\/)/i.test(link),
-    )) {
-      const [path, anchor] = href.split("#");
-      const target = path
-        ? resolve(rootDir, dirname(file), path)
-        : join(rootDir, file);
-      expect(relative(rootDir, target), href).not.toMatch(/^\.\./);
-      expect(existsSync(target), `${file}: ${href}`).toBe(true);
-      if (anchor) {
-        const targetDoc =
-          target === join(rootDir, file)
-            ? doc
-            : new DOMParser().parseFromString(
-                markdown.render(readFileSync(target, "utf8")),
-                "text/html",
-              );
-        const headings = [
-          ...targetDoc.querySelectorAll("h1, h2, h3, h4, h5, h6"),
-        ].map((heading) =>
-          heading.textContent.trim().toLowerCase().replace(/\s+/g, "-"),
-        );
-        expect(headings, `${file}: ${href}`).toContain(
-          decodeURIComponent(anchor),
-        );
+        expect(() =>
+          assertDocumentationTarget(SKILL_DIR, target, file),
+        ).not.toThrow();
+        expect(statSync(target).isFile()).toBe(true);
       }
     }
   });

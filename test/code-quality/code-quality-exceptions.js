@@ -112,7 +112,6 @@ const ALLOWED_MUTABLE_CONST = frozenSet([
   "test/unit/utils/object-entries.test.js",
   "test/unit/transforms/images.test.js",
   "test/unit/utils/set.test.js",
-  "test/unit/utils/block-docs.test.js",
 
   // Frontend - Set used to track visible parallax elements for scroll updates
   "src/_lib/public/design-system.js:61",

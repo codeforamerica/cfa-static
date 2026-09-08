@@ -46,8 +46,8 @@ references and CMS artifacts:
 npm run generate-references
 ```
 
-This runs the block reference, PagesCMS config, CMS types, and developer
-reference generators in order, stopping on failure. CMS artifacts use the saved
+Its three steps generate the block reference, PagesCMS config plus CMS types,
+and developer reference in order, stopping on failure. CMS artifacts use the saved
 `cms_config`; the command does not change the selected collections or features.
 Individual generator commands remain available for focused work.
 
@@ -56,10 +56,11 @@ The block generator owns `references/blocks.md` inside this skill, not
 reference derives from package commands, Biome configuration, FP exports, Sass,
 CMS definitions, and deployment workflows.
 
-Freshness checks
-compare generated content without rewriting either reference. Skill packaging
-checks validate metadata, links, and evaluation definitions; they do not run
-an agent against the evaluation scenarios or prove task success.
+Freshness checks compare generated content without rewriting either reference.
+Precommit does not regenerate stale artifacts; regenerate and re-stage them
+before retrying. Skill packaging checks validate metadata, links, and evaluation
+definitions; they do not run an agent against the evaluation scenarios or prove
+task success.
 
 Never repair generated output by hand. Change its source schema or saved
 `cms_config`, regenerate, and inspect the diff.

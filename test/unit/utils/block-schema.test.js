@@ -40,10 +40,9 @@ const markdownWithUnknownKey = () => ({
 describe("BLOCK_DOCS shape", () => {
   // One test per block so the failure message identifies the broken module.
   for (const [blockType, docs] of Object.entries(BLOCK_DOCS)) {
-    test(`${blockType}: docs expose a non-empty summary and params object`, () => {
+    test(`${blockType}: docs expose a non-empty summary`, () => {
       expect(typeof docs.summary).toBe("string");
       expect(docs.summary.length).toBeGreaterThan(0);
-      expect(docs.params).toEqual(expect.any(Object));
     });
   }
 });
