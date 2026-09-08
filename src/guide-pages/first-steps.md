@@ -2,7 +2,6 @@
 name: Your First Page
 subtitle: Build a page out of blocks
 guide-category: getting-started
-order: 2
 blocks:
   - type: guide-header
   - type: guide-navigation
@@ -23,7 +22,8 @@ blocks:
       The [blocks page](/blocks/) renders standalone-previewable block types
       beside schema-backed YAML examples; collection-restricted contextual
       blocks show usage guidance instead. Copy a relevant example, confirm
-      consequential fields in the repository's `BLOCKS_LAYOUT.md`, and adjust
+      consequential fields in the repository's generated block reference at
+      `skills/cfa-static-site-builder/references/blocks.md`, and adjust
       it. Invalid block names and top-level fields fail the build with the file
       and block number.
 

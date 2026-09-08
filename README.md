@@ -1,7 +1,7 @@
 # CfA Static
 
 A static-site template for small informational and marketing sites, built on
-[Eleventy](https://www.11ty.dev/) and Node.js (≥22). Pages are
+[Eleventy](https://www.11ty.dev/) and Node.js. Pages are
 assembled from composable, schema-validated content blocks written in YAML
 frontmatter, so engineering-adjacent authors (and AI assistants) can build and
 edit pages without touching templates.
@@ -13,10 +13,12 @@ static pages.
 
 ## What's included
 
-- **Content blocks** — ~35 block types (hero, FAQs, callouts, image cards,
-  split layouts, galleries, stats…) declared in frontmatter and validated at
-  build time with loud, file-specific errors. See [BLOCKS_LAYOUT.md](BLOCKS_LAYOUT.md)
-  for the generated schema reference, or the deployed site's `/blocks/` page,
+- **Content blocks** — heroes, FAQs, callouts, image cards,
+  split layouts, galleries, and stats declared in frontmatter and validated at
+  build time with loud, file-specific errors. See the generated
+  [block reference](skills/cfa-static-site-builder/references/blocks.md)
+  and [layout reference](skills/cfa-static-site-builder/references/layouts.md),
+  or the deployed site's `/blocks/` page,
   where standalone-previewable types render next to YAML from the same tested
   fixtures. Collection-restricted contextual blocks show usage guidance
   instead.
@@ -25,7 +27,7 @@ static pages.
 - **Multi-language** — publish the same page in more than one language with
   `hreflang` tags, an `x-default`, and a footer language switcher. See the
   Languages section below.
-- **Theming** — CSS custom properties throughout, ten prebuilt themes, a
+- **Theming** — CSS custom properties throughout, prebuilt themes, a
   visual theme editor at `/theme-editor/` with export.
 - **Images** — responsive `srcset` via eleventy-img, base64 LQIP placeholders,
   aspect-ratio cropping, unused-image detection.
@@ -45,13 +47,16 @@ static pages.
 
 ## Quick start
 
+Use the Node.js version specified in the
+[developer reference](docs/developer-reference.md), then:
+
 ```bash
-npm install          # install dependencies (Node.js 22+)
+npm install          # install dependencies
 npm run serve        # dev server with hot reload
 npm run build        # build to _site/ (includes internal link check)
-npm test             # full suite: lint, typecheck, build, tests, coverage
-npm run check:a11y   # WCAG 2.2 AA check over the built _site/
 ```
+
+See the developer reference for the command inventory and verification checks.
 
 The build needs no application secrets or server-side services. Dependency
 installation, uncached Iconify icons, and configured remote source images may
@@ -81,8 +86,9 @@ Replace this README too. Once the fork is the site, a README describing the
 template misleads everyone who lands on the repository and hides the choices
 the site made. Say what the site is, how it departs from the template's
 defaults, and where its schemas and checks live — while keeping the pointers to
-[BLOCKS_LAYOUT.md](BLOCKS_LAYOUT.md), `CLAUDE.md`, and the `/blocks/` gallery
-that anyone editing the site will need. The skill's
+the [block reference](skills/cfa-static-site-builder/references/blocks.md),
+[developer reference](docs/developer-reference.md), `CLAUDE.md`, and the
+`/blocks/` gallery that anyone editing the site will need. The skill's
 [project setup reference](skills/cfa-static-site-builder/references/project-setup.md#site-readme)
 lists what to cover, including provenance and how the site deploys.
 
@@ -146,7 +152,8 @@ For a step-by-step walkthrough of the one-time
 setup — written for a DevOps engineer and whoever coordinates them — see
 [`docs/devops-sharedservices-setup.html`](docs/devops-sharedservices-setup.html).
 Both deploy workflows merge `docs/` into the built site, so the walkthrough is
-also served at `/docs/` on each deployment.
+also served at `/docs/devops-sharedservices-setup.html` under each deployment's
+base URL, not at a `/docs/` index page.
 
 ## Configuration
 
@@ -174,13 +181,14 @@ and no translations, which renders with no hreflang tags and no switcher.
 
 ## Development
 
-- [Biome](https://biomejs.dev/) linting, [Knip](https://knip.dev/) dead-code
-  detection, [jscpd](https://github.com/kucherenko/jscpd) duplicate detection
-- TypeScript checking via JSDoc, with a strictness ratchet
-- 140+ test files (unit, integration, code-quality) with mutation testing
-  (`npm run mutation`)
-- [Nix flakes](https://nixos.wiki/wiki/Flakes) with [direnv](https://direnv.net/)
-  support
+The [developer reference](docs/developer-reference.md) tracks runtime
+requirements, commands, and tooling configuration. For how to write useful
+tests rather than just pass the checks, read the authored
+[test quality criteria](test/TEST-QUALITY-CRITERIA.md).
+
+Run `npm run generate-references` to refresh both generated references,
+`.pages.yml`, and the CMS types from their sources and saved CMS configuration.
+The individual generator commands remain available for focused updates.
 
 ## License
 

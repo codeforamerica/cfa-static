@@ -2,7 +2,6 @@
 name: Deploying
 subtitle: GitHub Pages by default, any static host by artifact
 guide-category: getting-started
-order: 3
 blocks:
   - type: guide-header
   - type: guide-navigation

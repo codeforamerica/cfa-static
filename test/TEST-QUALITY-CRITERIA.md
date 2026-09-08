@@ -41,14 +41,23 @@ expect(item.data.title).toBe("News post");
 
 **Good:**
 ```javascript
-// This tests that the collection sorts newest-first
-const sorted = sortByDateDescending([older, newer]);
+import { sortByDateDescending } from "#utils/sorting.js";
+
+// Pass the production comparator to an array sort.
+const older = { date: new Date("2025-01-01") };
+const newer = { date: new Date("2025-02-01") };
+const sorted = [older, newer].toSorted(sortByDateDescending);
 expect(sorted[0]).toBe(newer);
 ```
 
 ---
 
 ### 3. Tests Behavior, Not Implementation Details
+
+Source-analysis quality gates are an intentional exception: their behavior is
+to detect prohibited source patterns or broken documentation links. Exercise
+the checker against representative valid and invalid inputs where possible;
+ordinary feature tests must still exercise production behavior.
 
 - [ ] The test verifies observable outcomes, not internal state
 - [ ] Refactoring production code shouldn't break the test (unless behavior changes)

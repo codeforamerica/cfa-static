@@ -1,8 +1,9 @@
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import matter from "gray-matter";
+import MarkdownIt from "markdown-it";
 import { describe, expect, test } from "vitest";
-import { rootDir } from "#test/test-utils.js";
+import { getFiles, rootDir } from "#test/test-utils.js";
 
 const SKILL_NAME = "cfa-static-site-builder";
 const SKILL_DIR = join(rootDir, "skills", SKILL_NAME);
@@ -21,6 +22,13 @@ const ALLOWED_FIELDS = [
 const skillSource = readFileSync(SKILL_FILE, "utf-8");
 const skill = matter(skillSource);
 const evalConfig = JSON.parse(readFileSync(EVALS_FILE, "utf-8"));
+const packageJson = JSON.parse(
+  readFileSync(join(rootDir, "package.json"), "utf8"),
+);
+const markdown = new MarkdownIt();
+const references = getFiles(
+  /^skills\/cfa-static-site-builder\/references\/[^/]+\.md$/,
+);
 
 describe("CfA Static Agent Skill", () => {
   test("frontmatter follows the Agent Skills specification", () => {
@@ -96,6 +104,66 @@ describe("CfA Static Agent Skill", () => {
         expect(relative(REAL_SKILL_DIR, realTarget)).not.toMatch(/^\.\./);
         expect(statSync(realTarget).isFile()).toBe(true);
       }
+    }
+  });
+
+  test("reference documents are included in documentation checks", () => {
+    expect(references.length).toBeGreaterThan(0);
+    expect(references).toContain(`skills/${SKILL_NAME}/references/blocks.md`);
+    expect(references).toContain(`skills/${SKILL_NAME}/references/layouts.md`);
+  });
+
+  test.each(references)("%s links to existing checkout resources", (file) => {
+    const source = readFileSync(join(rootDir, file), "utf8");
+    const doc = new DOMParser().parseFromString(
+      markdown.render(source),
+      "text/html",
+    );
+    const links = [...doc.querySelectorAll("a")].map((link) =>
+      link.getAttribute("href"),
+    );
+    for (const href of links.filter(
+      (link) => !/^(?:[a-z]+:|\/\/)/i.test(link),
+    )) {
+      const [path, anchor] = href.split("#");
+      const target = path
+        ? resolve(rootDir, dirname(file), path)
+        : join(rootDir, file);
+      expect(relative(rootDir, target), href).not.toMatch(/^\.\./);
+      expect(existsSync(target), `${file}: ${href}`).toBe(true);
+      if (anchor) {
+        const targetDoc =
+          target === join(rootDir, file)
+            ? doc
+            : new DOMParser().parseFromString(
+                markdown.render(readFileSync(target, "utf8")),
+                "text/html",
+              );
+        const headings = [
+          ...targetDoc.querySelectorAll("h1, h2, h3, h4, h5, h6"),
+        ].map((heading) =>
+          heading.textContent.trim().toLowerCase().replace(/\s+/g, "-"),
+        );
+        expect(headings, `${file}: ${href}`).toContain(
+          decodeURIComponent(anchor),
+        );
+      }
+    }
+  });
+
+  test.each([
+    `skills/${SKILL_NAME}/SKILL.md`,
+    ...references,
+  ])("%s uses npm scripts declared by this checkout", (file) => {
+    const source = readFileSync(join(rootDir, file), "utf8");
+    const scripts = [...source.matchAll(/\bnpm run ([\w:-]+)/g)].map(
+      (match) => match[1],
+    );
+    for (const name of scripts) {
+      expect(
+        Object.hasOwn(packageJson.scripts, name),
+        `${file}: npm run ${name}`,
+      ).toBe(true);
     }
   });
 });

@@ -4,7 +4,9 @@
  * Each block module in `./block-schema/<type>.js` exports:
  *   - `type`   — block type slug
  *   - `fields` — unified field definitions (CMS + doc info per key)
- *   - `docs`   — metadata (summary, template, scss, htmlRoot, notes)
+ *   - `docs`   — metadata (summary, scss, htmlRoot, notes)
+ *   - `example` — canonical block YAML data for the gallery and skill reference
+ *   - optionally `template` and `collections` — dispatch override and CMS allowlist
  *   - optionally `containerWidth` ("full" | "narrow"; defaults to "wide")
  *
  * This file aggregates them into:
@@ -12,7 +14,7 @@
  *     allowed-key checks and runtime value-shape validation. Indexed by
  *     block type; each entry maps field name → `{ type, list?, ... }`.
  *   - `BLOCK_CMS_FIELDS` — CMS field definitions (for .pages.yml generation)
- *   - `BLOCK_DOCS`       — documentation (for BLOCKS_LAYOUT.md generation)
+ *   - `BLOCK_DOCS`       — documentation for the generated skill block reference
  */
 
 import * as callout from "#utils/block-schema/callout.js";
@@ -55,8 +57,8 @@ import * as tableOfContents from "#utils/block-schema/table-of-contents.js";
 
 /**
  * Iteration order determines the order that `scripts/generate-blocks-reference.js`
- * emits block types into BLOCKS_LAYOUT.md, so keep it intentional rather than
- * alphabetical.
+ * emits block types into skills/cfa-static-site-builder/references/blocks.md,
+ * so keep it intentional rather than alphabetical.
  */
 const BLOCK_MODULES = [
   sectionHeader,

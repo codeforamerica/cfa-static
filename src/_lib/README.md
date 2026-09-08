@@ -3,116 +3,60 @@ permalink: false
 layout: ""
 ---
 
-# \_lib Directory Structure
+# Library Map
 
-This directory contains all JavaScript modules for the Eleventy build system, organized by concern.
+This directory contains build-time and browser JavaScript for CfA Static.
+[The root engineering guide](../../CLAUDE.md) owns handwritten policy and workflow;
+[the generated developer reference](../../docs/developer-reference.md) owns the
+runtime, command, alias, lint, FP export, and theme-token inventories. Test
+requirements live in [the canonical criteria](../../test/TEST-QUALITY-CRITERIA.md).
 
-## Directory Layout
+## Responsibilities
 
-```
-_lib/
-├── build/          # Build tooling (JS bundling, SCSS, themes)
-├── collections/    # Domain collections (news, guides, navigation)
-├── config/         # Configuration helpers (used by data files)
-├── eleventy/       # Eleventy-specific plugins and filters
-├── media/          # Image processing and asset handling
-├── public/         # Frontend JavaScript (bundled by esbuild)
-├── transforms/     # HTML output transforms
-└── utils/          # Pure utility functions (no Eleventy dependencies)
-```
+| Directory | Responsibility |
+| --- | --- |
+| `build/` | JavaScript bundling, SCSS/theme compilation, build validation |
+| `collections/` | Domain collections, normalized content defaults, navigation |
+| `config/` | Configuration helpers and startup validation used by data files |
+| `eleventy/` | Plugin registration, filters, block rendering, collection validation |
+| `media/` | Responsive image processing, cropping/LQIP, icons, asset handling |
+| `public/` | Browser code bundled through `bundle.js` |
+| `transforms/` | HTML output transforms applied by `eleventy/html-transform.js` |
+| `utils/` | Shared utilities, block schemas, i18n, structured data, generic `fp/` helpers |
+| `types/` | Shared JSDoc/TypeScript definitions, including generated CMS types |
 
-## Import Aliases
+## Integration Points
 
-The project uses Node.js subpath imports (defined in `package.json`) for clean imports:
+`.eleventy.js` runs the `CONFIGURATORS` list. Modules that register Eleventy
+behavior export a `configureX` function; follow the existing arrow-function
+pattern. Standalone filters belong in `eleventy/filters.js`'s central registry
+rather than a new module per filter. A quality gate checks that registered
+filters have template consumers.
+
+Eleventy data files cannot have named exports, so reusable configuration logic
+belongs in `config/`, not in `src/_data/` modules. Site-facing configuration is
+in `src/_data/config.json`, `site.json`, and `strings.json`.
+
+Pages declare a `blocks:` array in YAML frontmatter. The registry in
+`utils/block-schema.js` assembles schemas from `utils/block-schema/`; unknown
+block types or top-level fields fail build validation. Nested required fields
+are checked, but nested types and unknown keys are not all validated. Templates live in
+`src/_includes/design-system/blocks/` and styles in `src/css/design-system/`.
+Use the [block reference](../../skills/cfa-static-site-builder/references/blocks.md) and the root guide's generated
+artifact workflow when extending the block system. Reusable snippets live in
+`src/snippets/`; page, news, and guide content live in their corresponding
+directories under `src/`.
+
+Use Node subpath aliases for library imports, for example:
 
 ```js
-import { memoize } from "#utils/memoize.js";
-import { configureNews } from "#collections/news.js";
-import { configureImages } from "#media/image.js";
-import config from "#data/config.json" with { type: "json" };
+import { filter, map, pipe } from "#utils/fp/array.js";
+import { memoize } from "#utils/fp/memoize.js";
+import { ROOT_DIR } from "#lib/paths.js";
 ```
 
-See `package.json`'s `imports` field for the full alias list.
-
-## Conventions
-
-### Eleventy Plugin Files
-
-Files that register with Eleventy export a `configureX` function, and
-`.eleventy.js` runs every configurator from its `CONFIGURATORS` list:
-
-```js
-export function configureNews(eleventyConfig) {
-  eleventyConfig.addCollection("news", ...);
-}
-```
-
-Simple standalone filters live in the central registry in
-`eleventy/filters.js` rather than one module each; a code-quality test
-fails the suite when a registered filter has no template consumer.
-
-### Directory Details
-
-#### `build/`
-
-Build-time tooling that runs during the Eleventy build process:
-
-- `js-bundler.js` - JavaScript bundling
-- `scss.js` - SCSS compilation
-- `theme-compiler.js` - Compiles theme SCSS files for theme-switcher
-- `css-variable-validator.js` - Validates CSS custom properties
-
-#### `collections/`
-
-Domain-specific collections and their associated filters:
-
-- `news.js` - News posts
-- `guides.js` - Guide categories and pages
-- `navigation.js` - Site navigation rendering
-
-#### `config/`
-
-Configuration helpers separated from data files (required because Eleventy data files cannot have named exports):
-
-- `helpers.js` - Config defaults
-- `validated-config.js` - Startup validation for site.json and languages
-
-#### `eleventy/`
-
-Eleventy-specific configuration helpers:
-
-- `filters.js` - Central registry of standalone filters
-- `blocks.js` - Block rendering filters
-- `breadcrumbs.js` - Breadcrumb + schema.org decorators
-- `collection-lookup.js` - O(1) slug/path lookups
-- `file-utils.js` - Snippet rendering and markdown filters
-- `html-transform.js` - Unified HTML output transform
-- `layout-aliases.js` - Auto-registers layout aliases
-- `screenshots.js` - Optional post-build screenshot capture
-- `validate-collections.js` - Build-time collection reference validation
-
-#### `media/`
-
-Image and asset processing:
-
-- `image.js` - Responsive images, cropping, LQIP
-- `image-pipeline.js` - Shared local/external processing steps
-- `iconify.js` - Iconify SVG fetching and caching
-- `unused-images.js` - Reports unused images after build
-
-#### `public/`
-
-Frontend JavaScript bundled by esbuild (`bundle.js` is the entry).
-
-#### `transforms/`
-
-HTML output transforms applied by `eleventy/html-transform.js`.
-
-#### `utils/`
-
-Pure utility functions with no Eleventy dependencies:
-
-- `block-schema.js` - Block registry and validation
-- `sorting.js` - Collection sorting utilities
-- `slug-utils.js` - Slug normalization and permalink building
-- `schema-helper.js` - Schema.org/structured data helpers
+Consult the generated FP export index and linked JSDoc before choosing helpers.
+Keep caches at module scope; the memoization module distinguishes key-based
+Map caches from reference-based WeakMap caches. For images, use the shared
+`media/image.js` shortcode pipeline instead of adding independent image markup
+or processing paths; follow existing template calls for sizing and alt text.

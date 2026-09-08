@@ -9,7 +9,7 @@ eleventyNavigation:
 blocks:
   - type: markdown
     content: |
-      ## Get in Touch
+      # Get in Touch
 
       This template ships without contact forms, so there is no form backend
       to run and no user data to handle. For questions or problems with CfA

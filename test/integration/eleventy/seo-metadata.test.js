@@ -54,6 +54,11 @@ describe("generated SEO metadata", () => {
                   question: "Does it have schema?",
                   answer: "Yes, automatically.",
                 },
+                {
+                  question: "What can an answer contain?",
+                  answer:
+                    "**Formatted text** and a list:\n\n- First item\n- Second item",
+                },
               ],
             },
           ],
@@ -117,6 +122,20 @@ describe("generated SEO metadata", () => {
       publisher: { "@type": "Organization", name: "CfA Static" },
       datePublished: "2024-02-03",
     });
+  });
+
+  test("FAQ answers render rich text inside prose-styled definitions", async () => {
+    const doc = await getSite().getDoc("/faq-page/index.html");
+    const answers = [...doc.querySelectorAll("dl.faqs > dd.prose")];
+    expect(answers).toHaveLength(2);
+    expect(answers[1].querySelector("p > strong").textContent).toBe(
+      "Formatted text",
+    );
+    expect(
+      [...answers[1].querySelectorAll("ul > li")].map(
+        (item) => item.textContent,
+      ),
+    ).toEqual(["First item", "Second item"]);
   });
 
   test("renders news breadcrumb schema through the collection index", async () => {

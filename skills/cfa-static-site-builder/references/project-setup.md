@@ -13,8 +13,11 @@ A valid project root contains:
 - `BLOCKS_LAYOUT.md`
 - `package-lock.json`
 
-Use Node.js 22 or newer, npm, and a POSIX-compatible shell. Do not substitute
-Bun, Yarn, or pnpm. Installing dependencies normally requires network access.
+Use the Node.js version declared by the checkout's `package.json`, npm, and a
+POSIX-compatible shell. Do not substitute Bun, Yarn, or pnpm. The checkout's
+`docs/developer-reference.md` contains generated command, CMS, theme, and
+deployment facts; prefer its current values over copied inventories.
+Installing dependencies normally requires network access.
 
 For a new site, the durable model is a GitHub fork of
 `codeforamerica/cfa-static`. Confirm the destination owner and repository name
@@ -150,8 +153,10 @@ that workflow and arranges human review.
 
 The bundled GitHub Pages workflow supports project sites and custom domains.
 The user must enable **Settings > Pages > Source: GitHub Actions** once. The
-workflow jobs run on standard `ubuntu-latest` runners, so a new fork needs no
-extra integration or billing.
+current runners, build steps, and environment expressions are documented from
+source in `docs/developer-reference.md` under Deployment Workflow Facts. Inspect
+the selected workflow rather than assuming all deployment targets use the same
+runner or credentials.
 
 The workflow provides:
 
@@ -159,7 +164,8 @@ The workflow provides:
 - `SITE_URL` for canonical URLs, sitemap entries, feeds, and schema metadata
 
 For another static host, publish the generated `_site/` directory. There is no
-application server and no build-time secret requirement.
+application server. Building public site content does not require a backend
+secret, but deployment authentication depends on the selected host and workflow.
 
 Do not change runners, permissions, domains, or repository settings without a
 specific request. Report an unconfigured runner as a deployment prerequisite,
@@ -180,13 +186,14 @@ Rewrite it to cover:
 | What this site is | Real name, public URL, and a one-line purpose |
 | Provenance | Built from CfA Static, linked, and the fact that template updates arrive only through a reviewed `upstream` merge |
 | Customisations | How the site departs from template defaults: collections and CMS features enabled or removed, theme and brand changes, config toggles, and any custom blocks, includes, or snippets |
-| Working on it | `CLAUDE.md`, `BLOCKS_LAYOUT.md`, the `/blocks/` gallery, `src/_data/`, and the bundled skill |
+| Working on it | `CLAUDE.md`, `docs/developer-reference.md`, the skill's generated `references/blocks.md`, the `/blocks/` gallery, and `src/_data/` |
 | Checks | The commands that gate this site, plus any that are known to fail and why |
 | Deployment | Where the site publishes, and what a deploy needs |
 
-Keep the pointers a later agent depends on. `BLOCKS_LAYOUT.md`, the schema
-modules, and the block gallery stay the authority on block fields, so link
-them instead of summarising them. A field list copied into the README goes
+Keep the pointers a later agent depends on. The [generated block reference](blocks.md),
+schema modules, and block gallery stay the authority on block fields, so link
+them instead of summarising them. `BLOCKS_LAYOUT.md` remains a navigation page.
+A field list copied into the README goes
 stale silently the next time a schema changes, and a stale copy is consulted
 just as confidently as a fresh one.
 

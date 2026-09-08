@@ -2,7 +2,6 @@
 name: Configuration
 subtitle: Site identity, features, labels, and languages
 guide-category: advanced-topics
-order: 1
 blocks:
   - type: guide-header
   - type: guide-navigation
@@ -34,7 +33,7 @@ blocks:
 
       ## Theming
 
-      Colors, fonts, and spacing are CSS custom properties. Ten prebuilt
+      Colors, fonts, and spacing are CSS custom properties. Prebuilt
       themes ship with the template, and the [theme editor](/theme-editor/)
       lets you tune one visually and export the result.
 

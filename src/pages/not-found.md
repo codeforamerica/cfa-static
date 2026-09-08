@@ -6,7 +6,7 @@ permalink: /404.html
 blocks:
   - type: markdown
     content: |
-      ## Page Not Found
+      # Page Not Found
 
-      Whoops! It looks like you followed an invalid link - **[click here to go back to the homepage](/)**.
+      This page could not be found. Return to the [homepage](/) to find what you need.
 ---

@@ -2,7 +2,6 @@
 name: Installation
 subtitle: From clone to running dev server
 guide-category: getting-started
-order: 1
 blocks:
   - type: guide-header
   - type: guide-navigation
@@ -10,7 +9,8 @@ blocks:
     content: |
       ## Prerequisites
 
-      - Node.js 22 or newer (npm included)
+      - Node.js (npm included), using the version specified in the repository's
+        `docs/developer-reference.md`
       - Git
 
       ## Set up
@@ -25,17 +25,12 @@ blocks:
       production build, `npm run build` writes the whole site to `_site/`
       and checks every internal link on the way out.
 
-      ## Useful commands
-
-      | Command | What it does |
-      | --- | --- |
-      | `npm run serve` | Dev server with hot reload |
-      | `npm run build` | Production build to `_site/` |
-      | `npm test` | Full suite: lint, typecheck, build, tests, coverage |
-      | `npm run lint:fix` | Auto-format the codebase |
+      For the full command inventory and verification checks, see
+      `docs/developer-reference.md` in your checkout. Keep that reference
+      handy when preparing a change for review.
 faqs:
   - question: What are the system requirements?
-    answer: Node.js 22 or newer, on any platform. The build has no other services and needs no secrets.
+    answer: Use the Node.js version listed in the repository's `docs/developer-reference.md`. No application services or secrets are needed. Dependency installation, uncached icons, and remote source images may require network access.
     order: 1
   - question: How long does installation take?
     answer: A couple of minutes - one `npm install` and you're running.

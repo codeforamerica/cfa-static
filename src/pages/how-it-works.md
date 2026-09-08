@@ -16,7 +16,8 @@ blocks:
 
       Every page is a markdown file whose frontmatter declares a `blocks`
       array. Each entry has a `type` plus that block's fields - the full
-      vocabulary is on the [blocks page](/blocks/), rendered live.
+      vocabulary is on the [blocks page](/blocks/), with live previews where
+      a meaningful standalone preview is possible.
     figure_filename: src/pages/example.md
     figure_language: yaml
     figure_code: "---\nname: Example\npermalink: /example/\nblocks:\n  - type: hero\n    content: |\n      # Hello\n  - type: markdown\n    content: Body text here.\n---"
@@ -25,14 +26,16 @@ blocks:
     content: |
       ## The build checks every block
 
-      Unknown block types and unknown keys fail the build with an error
-      naming the file and the block - typos never reach production. The
-      same schemas generate the editor config and the reference docs, so
-      none of them can drift apart.
+      Unknown block types, unknown top-level keys, and missing required
+      values fail the build with an error naming the file and the block.
+      Nested validation does not catch every unknown or mistyped child
+      field, so compare nested entries with the schema and inspect the output.
+      The same schemas generate the editor config and reference docs;
+      tests check that those generated files stay current.
     reverse: true
     figure_filename: terminal
     figure_language: text
-    figure_code: "[11ty] Block type \"herro\" is unknown\n(block 1 in ./src/pages/example.md).\nValid types: section-header, features,\nimage-cards, stats, code-block, hero, ..."
+    figure_code: "Unknown block type \"herro\" (block 1 in ./src/pages/example.md).\nValid types: ..."
   - type: split-code
     subtitle: "Step 3 - Build"
     content: |
@@ -59,9 +62,10 @@ blocks:
     figure_code: "- name: Build Site\n  env:\n    PATH_PREFIX: ${{ steps.pages.outputs.base_path }}/\n    SITE_URL: ${{ steps.pages.outputs.base_url }}\n  run: npm run build"
   - type: cta
     content: |
-      ## See every block live
+      ## Explore the blocks
 
-      The blocks page renders each block type next to the exact YAML that produces it.
+      The blocks page pairs standalone previews with their YAML examples.
+      Collection-restricted blocks show usage guidance instead of a preview.
     button:
       text: Browse the blocks
       href: /blocks/
