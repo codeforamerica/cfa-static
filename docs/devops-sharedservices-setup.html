@@ -161,9 +161,9 @@
   <h2>Step 2 — Configure the GitHub environment <span class="who who-admin">Repo admin</span></h2>
   <p>
     The deploy workflow reads its settings from a GitHub
-    <em>environment</em> — a named bag of variables and one secret attached to
+    <em>environment</em> — a named bag of variables and secrets attached to
     the repo, so none of it lives in the code. Create one called
-    <code>sharedservices</code>:
+    <code>development</code>:
     <a href="https://github.com/codeforamerica/cfa-static/settings/environments">Settings → Environments → New environment</a>
     (if you can't see that screen, hand this step to whoever granted your repo
     access — it's admin-only).
@@ -191,11 +191,6 @@
       </td>
     </tr>
     <tr>
-      <td><code>CLOUDFRONT_DISTRIBUTION_ID</code></td>
-      <td><em>distribution ID from step 1</em></td>
-      <td>Flushed after each deploy so changes show immediately</td>
-    </tr>
-    <tr>
       <td><code>SITE_URL</code></td>
       <td><em>the app's endpoint URL</em>, e.g. <code>https://cfa-static.apps.dev.services.cfa.codes</code></td>
       <td>
@@ -207,9 +202,14 @@
       </td>
     </tr>
   </table>
-  <p>And one <strong>secret</strong>:</p>
+  <p>And these <strong>secrets</strong>:</p>
   <table>
     <tr><th>Name</th><th>Value</th><th>What it's for</th></tr>
+    <tr>
+      <td><code>CLOUDFRONT_DISTRIBUTION_ID</code></td>
+      <td><em>distribution ID from step 1</em></td>
+      <td>Flushed after each deploy so changes show immediately</td>
+    </tr>
     <tr>
       <td><code>AWS_ROLE_ARN</code></td>
       <td><em>deploy role ARN from step 1</em></td>
@@ -220,7 +220,7 @@
     </tr>
   </table>
   <div class="callout">
-    <strong>No AWS keys exist anywhere in this setup.</strong> When the
+    <strong>The site-deployment workflow needs no stored AWS access keys.</strong> When the
     workflow runs, GitHub and AWS exchange short-lived tokens: GitHub says
     "I'm this repo's deploy job", AWS checks that a role trusts exactly that
     repo, and hands out credentials that die when the run ends. That's OIDC —

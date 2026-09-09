@@ -924,21 +924,21 @@ jobs:
   deploy:
     name: Build and deploy internal site
     runs-on: ubuntu-latest
-    environment: sharedservices
+    environment: development
     steps:
       - name: Check deployment configuration
         env:
           SITE_URL: ${{ vars.SITE_URL }}
           STATIC_BUCKET: ${{ vars.STATIC_BUCKET }}
           STATIC_PREFIX: ${{ vars.STATIC_PREFIX }}
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
         run: |
           missing=0
           for var in SITE_URL STATIC_BUCKET STATIC_PREFIX CLOUDFRONT_DISTRIBUTION_ID AWS_REGION AWS_ROLE_ARN; do
             if [ -z "$(eval "echo \$$var")" ]; then
-              echo "MISSING: '$var' is not set on the 'sharedservices' environment"
+              echo "MISSING: '$var' is not set on the 'development' environment"
               missing=1
             fi
           done
@@ -981,8 +981,10 @@ jobs:
             --delete \
             --cache-control "public, max-age=300"
       - name: Invalidate CloudFront
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
             --paths "/*"
 ```

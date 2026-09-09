@@ -138,11 +138,10 @@ One-time setup is a DevOps task:
 
 1. Register the app by adding a spec to
    `shared-services-infra/tofu/configs/static-app/specs/` and applying it.
-2. Create the `sharedservices` environment on this repo with the variables
+2. Configure the `development` environment on this repo with the variables
    `AWS_REGION`, `STATIC_BUCKET`, `STATIC_PREFIX` (set to `cfa-static`),
-   `CLOUDFRONT_DISTRIBUTION_ID`, and `SITE_URL` (the app's endpoint URL,
-   with no trailing slash), plus the `AWS_ROLE_ARN`
-   secret from the static-app layer.
+   and `SITE_URL` (the app's endpoint URL, with no trailing slash), plus the
+   `AWS_ROLE_ARN` and `CLOUDFRONT_DISTRIBUTION_ID` secrets from the platform.
 
 The public GitHub Pages deployment is unaffected. `app.yaml` at the repo root
 declares the platform registration. SharedServices serves each app at the
