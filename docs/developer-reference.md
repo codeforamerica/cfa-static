@@ -913,7 +913,13 @@ jobs:
 ```yaml
 name: Deploy to SharedServices
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy to
+        type: environment
+        required: true
+        default: development
 permissions:
   contents: read
   id-token: write
@@ -924,7 +930,7 @@ jobs:
   build:
     name: Build internal site
     runs-on: ubuntu-latest
-    environment: development
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -946,7 +952,7 @@ jobs:
         env:
           SITE_URL: ${{ vars.SITE_URL }}
         run: |
-          test -n "$SITE_URL" || { echo "SITE_URL is required in the development environment" >&2; exit 1; }
+          test -n "$SITE_URL" || { echo "SITE_URL is required in the selected environment" >&2; exit 1; }
           npm run build
       - name: Merge docs into site output
         run: cp -r docs _site/
@@ -962,6 +968,6 @@ jobs:
     uses: codeforamerica/shared-services-infra/.github/workflows/shared-deploy-static.yaml@main
     with:
       artifact_ids: ${{ needs.build.outputs.artifact-id }}
-      environment: development
+      environment: ${{ inputs.environment }}
     secrets: inherit
 ```
