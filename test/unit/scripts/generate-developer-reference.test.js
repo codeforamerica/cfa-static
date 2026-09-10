@@ -480,6 +480,7 @@ describe("developer reference rendering", () => {
           "runs-on": "${{ matrix.runner }}",
           strategy: { matrix: { runner: ["custom-runner"] } },
           environment: "preview",
+          outputs: { "artifact-id": "${{ steps.upload.outputs.artifact-id }}" },
           env: { JOB_LEVEL: "configured" },
           defaults: { run: { shell: "bash", "working-directory": "app" } },
           steps: [

@@ -170,6 +170,7 @@ const renderWorkflow = ({ path, content }) => {
           "if",
           "strategy",
           "environment",
+          "outputs",
           "env",
           "defaults",
           "uses",
@@ -197,7 +198,7 @@ const renderStructuredSources = ({
     "The generator imports `COLLECTIONS` from `scripts/customise-cms/collections.js` and `FEATURE_QUESTIONS` from `scripts/customise-cms/feature-questions.js`, the same definitions used by the CMS runtime. These modules have no import-time I/O; interactive prompts and saved site configuration are not loaded. This fixed catalog is serialized as JSON in declaration order, without copying JavaScript comments or evaluating source text. Collection paths and direct dependencies are declared values, not resolved site paths or transitive dependencies. Optional flags are shown only when present. Feature questions identify available choices, not saved selections or inferred defaults. This is not the generated PagesCMS field schema or an inventory of runtime/custom collections.",
     ...cmsDefinitions.map(renderCmsDefinition),
     "## Deployment Workflow Facts",
-    "Parsed configured workflow metadata and job definitions from the linked YAML files. Job facts include declared runners, dependencies, conditions, strategy, environments, defaults, reusable-workflow inputs, and complete ordered steps (including build commands and step env/with mappings). YAML formatting and comments are normalized. Omitted keys stay omitted: no runner, shell, environment, or application defaults are inferred. GitHub expressions are literal source expressions; no environment variables or secret values are read or evaluated.",
+    "Parsed configured workflow metadata and job definitions from the linked YAML files. Job facts include declared runners, dependencies, conditions, strategy, environments, outputs, defaults, reusable-workflow inputs, and complete ordered steps (including build commands and step env/with mappings). YAML formatting and comments are normalized. Omitted keys stay omitted: no runner, shell, environment, or application defaults are inferred. GitHub expressions are literal source expressions; no environment variables or secret values are read or evaluated.",
     ...workflowSources.map(renderWorkflow),
   ].join("\n\n");
 

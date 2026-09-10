@@ -840,7 +840,7 @@ Source: [`scripts/customise-cms/feature-questions.js`](../scripts/customise-cms/
 
 ## Deployment Workflow Facts
 
-Parsed configured workflow metadata and job definitions from the linked YAML files. Job facts include declared runners, dependencies, conditions, strategy, environments, defaults, reusable-workflow inputs, and complete ordered steps (including build commands and step env/with mappings). YAML formatting and comments are normalized. Omitted keys stay omitted: no runner, shell, environment, or application defaults are inferred. GitHub expressions are literal source expressions; no environment variables or secret values are read or evaluated.
+Parsed configured workflow metadata and job definitions from the linked YAML files. Job facts include declared runners, dependencies, conditions, strategy, environments, outputs, defaults, reusable-workflow inputs, and complete ordered steps (including build commands and step env/with mappings). YAML formatting and comments are normalized. Omitted keys stay omitted: no runner, shell, environment, or application defaults are inferred. GitHub expressions are literal source expressions; no environment variables or secret values are read or evaluated.
 
 ### [`.github/workflows/pages.yml`](../.github/workflows/pages.yml)
 
@@ -921,28 +921,13 @@ concurrency:
   group: sharedservices-deploy
   cancel-in-progress: false
 jobs:
-  deploy:
-    name: Build and deploy internal site
+  build:
+    name: Build internal site
     runs-on: ubuntu-latest
     environment: development
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
-      - name: Check deployment configuration
-        env:
-          SITE_URL: ${{ vars.SITE_URL }}
-          STATIC_BUCKET: ${{ vars.STATIC_BUCKET }}
-          STATIC_PREFIX: ${{ vars.STATIC_PREFIX }}
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-        run: |
-          missing=0
-          for var in SITE_URL STATIC_BUCKET STATIC_PREFIX CLOUDFRONT_DISTRIBUTION_ID AWS_REGION AWS_ROLE_ARN; do
-            if [ -z "$(eval "echo \$$var")" ]; then
-              echo "MISSING: '$var' is not set on the 'development' environment"
-              missing=1
-            fi
-          done
-          test "$missing" -eq 0
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Setup Node
@@ -962,29 +947,23 @@ jobs:
       - name: Build site
         env:
           SITE_URL: ${{ vars.SITE_URL }}
-        run: npm run build
+        run: |
+          test -n "$SITE_URL" || { echo "SITE_URL is required in the development environment" >&2; exit 1; }
+          npm run build
       - name: Merge docs into site output
         run: cp -r docs _site/
       - name: Upload site artifact
+        id: upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: sharedservices-site
           path: _site
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-      - name: Sync site to S3
-        run: |
-          aws s3 sync _site/ "s3://${{ vars.STATIC_BUCKET }}/${{ vars.STATIC_PREFIX }}/" \
-            --delete \
-            --cache-control "public, max-age=300"
-      - name: Invalidate CloudFront
-        env:
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
-            --paths "/*"
+          if-no-files-found: error
+  deploy:
+    needs: build
+    uses: codeforamerica/shared-services-infra/.github/workflows/shared-deploy-static.yaml@main
+    with:
+      artifact_ids: ${{ needs.build.outputs.artifact-id }}
+      environment: development
+    secrets: inherit
 ```

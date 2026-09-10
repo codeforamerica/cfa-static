@@ -75,9 +75,9 @@
   <ul>
     <li>
       <a href="https://github.com/codeforamerica/cfa-static/blob/main/.github/workflows/sharedservices-deploy.yaml"><code>sharedservices-deploy.yaml</code></a>
-      — the deploy workflow. Builds the site with the internal URL settings,
-      uploads the result to the platform's S3 bucket, and flushes the edge
-      cache. Runs manually (Actions → <em>Deploy to SharedServices</em>), not
+      — builds the site with the internal URL settings, uploads a build artifact,
+      and calls the platform's shared workflow to publish it. Runs manually
+      (Actions → <em>Deploy to SharedServices</em>), not
       on every push, while this is being piloted.
     </li>
     <li>
@@ -160,13 +160,11 @@
 <div class="step">
   <h2>Step 2 — Configure the GitHub environment <span class="who who-admin">Repo admin</span></h2>
   <p>
-    The deploy workflow reads its settings from a GitHub
-    <em>environment</em> — a named bag of variables and secrets attached to
-    the repo, so none of it lives in the code. Create one called
-    <code>development</code>:
-    <a href="https://github.com/codeforamerica/cfa-static/settings/environments">Settings → Environments → New environment</a>
-    (if you can't see that screen, hand this step to whoever granted your repo
-    access — it's admin-only).
+    DevOps manages the <code>development</code> environment and its settings
+    through Doppler, which syncs them to GitHub. Ask DevOps to configure the
+    following values rather than editing only the GitHub copy. You can inspect
+    the environment under
+    <a href="https://github.com/codeforamerica/cfa-static/settings/environments">Settings → Environments</a>.
   </p>
   <p>Add these <strong>environment variables</strong> (exact names — the workflow looks these up):</p>
   <table>
@@ -191,6 +189,11 @@
       </td>
     </tr>
     <tr>
+      <td><code>CLOUDFRONT_DISTRIBUTION_ID</code></td>
+      <td><em>distribution ID from step 1</em></td>
+      <td>Enables cache invalidation in the shared deployment workflow</td>
+    </tr>
+    <tr>
       <td><code>SITE_URL</code></td>
       <td><em>the app's endpoint URL</em>, e.g. <code>https://cfa-static.apps.dev.services.cfa.codes</code></td>
       <td>
@@ -202,14 +205,9 @@
       </td>
     </tr>
   </table>
-  <p>And these <strong>secrets</strong>:</p>
+  <p>And one <strong>secret</strong>:</p>
   <table>
     <tr><th>Name</th><th>Value</th><th>What it's for</th></tr>
-    <tr>
-      <td><code>CLOUDFRONT_DISTRIBUTION_ID</code></td>
-      <td><em>distribution ID from step 1</em></td>
-      <td>Flushed after each deploy so changes show immediately</td>
-    </tr>
     <tr>
       <td><code>AWS_ROLE_ARN</code></td>
       <td><em>deploy role ARN from step 1</em></td>
@@ -239,14 +237,9 @@
   <p>What the run does, in order:</p>
   <ol>
     <li>
-      <strong>Check configuration.</strong> Fails immediately, naming any
-      missing variable — intentional, so a typo in step 2 surfaces as
-      "MISSING: STATIC_BUCKET" rather than a deploy to the wrong place
-    </li>
-    <li>
       <strong>Build.</strong> Same <code>npm ci</code> + <code>npm run build</code>
       as the public Pages deploy, from the same commit — differing only in
-      the internal <code>SITE_URL</code>. No path prefix applies, because
+      the internal <code>SITE_URL</code>, which must be configured. No path prefix applies, because
       the app is served at the root of its own subdomain
     </li>
     <li>
@@ -255,13 +248,15 @@
       it from the run's page if you ever need to inspect what went out
     </li>
     <li>
-      <strong>Sync to S3</strong> into <code>s3://&lt;bucket&gt;/cfa-static/</code>.
-      <code>--delete</code> means files removed from the site also disappear
-      from the bucket — no stale pages left behind
+      <strong>Deploy the artifact.</strong> The
+      <a href="https://github.com/codeforamerica/shared-services-infra/blob/main/.github/workflows/shared-deploy-static.yaml">shared workflow</a>
+      downloads the artifact by ID, authenticates to AWS, and syncs it to
+      <code>s3://&lt;bucket&gt;/cfa-static/</code>. Its <code>--delete</code> flag
+      removes files no longer present in the build
     </li>
     <li>
-      <strong>Invalidate CloudFront</strong> so the new content is live
-      immediately
+      <strong>Invalidate CloudFront.</strong> The shared workflow clears the
+      cache when the distribution ID variable is configured
     </li>
   </ol>
 </div>

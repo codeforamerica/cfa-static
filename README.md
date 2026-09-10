@@ -128,8 +128,10 @@ non-workflow builds.
 The repo can also publish the same site unchanged to SharedServices, CfA's
 Okta-protected internal hosting. The `sharedservices-deploy.yaml` workflow
 builds `_site/` from the same commit as the Pages deployment — differing only
-in `SITE_URL` — then syncs it to the platform's static S3
-bucket and invalidates the shared CloudFront distribution. Okta SSO is
+in `SITE_URL` — then passes its artifact to the platform's
+[shared static deployment workflow](https://github.com/codeforamerica/shared-services-infra/blob/main/.github/workflows/shared-deploy-static.yaml).
+The shared workflow handles AWS authentication, S3 sync, and CloudFront
+invalidation. Okta SSO is
 enforced at the edge, so the site itself never handles authentication.
 Deployment is manual while piloted: run **Actions → Deploy to
 SharedServices** on `main`.
@@ -138,10 +140,10 @@ One-time setup is a DevOps task:
 
 1. Register the app by adding a spec to
    `shared-services-infra/tofu/configs/static-app/specs/` and applying it.
-2. Configure the `development` environment on this repo with the variables
+2. Have DevOps configure the `development` environment through Doppler with the variables
    `AWS_REGION`, `STATIC_BUCKET`, `STATIC_PREFIX` (set to `cfa-static`),
-   and `SITE_URL` (the app's endpoint URL, with no trailing slash), plus the
-   `AWS_ROLE_ARN` and `CLOUDFRONT_DISTRIBUTION_ID` secrets from the platform.
+   `CLOUDFRONT_DISTRIBUTION_ID` (for cache invalidation), and `SITE_URL` (the app's
+   endpoint URL, with no trailing slash), plus the `AWS_ROLE_ARN` secret.
 
 The public GitHub Pages deployment is unaffected. `app.yaml` at the repo root
 declares the platform registration. SharedServices serves each app at the
