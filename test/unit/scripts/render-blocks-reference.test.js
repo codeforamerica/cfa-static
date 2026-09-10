@@ -9,7 +9,7 @@ import {
   renderBlocksReference,
   renderFieldTable,
 } from "#scripts/lib/render-blocks-reference.js";
-import { rootDir } from "#test/test-utils.js";
+import { getTableRows, rootDir } from "#test/test-utils.js";
 import { collectBlockReferences } from "#test/unit/utils/pages-yml-helpers.js";
 import { assertColumnSafeTypes } from "#utils/block-columns.js";
 import { buildGalleryBlocks } from "#utils/block-gallery.js";
@@ -25,10 +25,7 @@ import {
 const markdown = new MarkdownIt({ html: true });
 const parseMarkdown = (source) =>
   new DOMParser().parseFromString(markdown.render(source), "text/html");
-const tableRows = (source) =>
-  [...parseMarkdown(source).querySelectorAll("tbody tr")].map((row) =>
-    [...row.cells].map((cell) => cell.textContent),
-  );
+const tableRows = (source) => getTableRows(parseMarkdown(source));
 
 describe("block reference", () => {
   test("rejects missing or reordered canonical example types", () => {

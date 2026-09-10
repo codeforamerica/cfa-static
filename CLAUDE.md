@@ -7,7 +7,8 @@ form-processing, or user-data application.
 
 This is the canonical handwritten engineering policy and workflow. Consult:
 
-- [Developer reference](docs/developer-reference.md) for generated runtime requirements, exact npm scripts, aliases, configured Biome rules/scopes, FP exports, and theme source tokens.
+- [Site Builder Reference](docs/developer-reference.md) for the Node requirement, installation, selected site-building commands, CMS options, and authoring links.
+- [package.json](package.json) for all scripts and import aliases; [biome.json](biome.json) for configured lint rules and scopes; [FP source JSDoc](src/_lib/utils/fp/) for helper APIs.
 - [Library map](src/_lib/README.md) for architecture and extension points.
 - [Test quality criteria](test/TEST-QUALITY-CRITERIA.md) for the mandatory test standards. Apply every criterion; do not duplicate that checklist elsewhere.
 - [Block reference](skills/cfa-static-site-builder/references/blocks.md) for the generated content model and block authoring API; [layouts](skills/cfa-static-site-builder/references/layouts.md) for authored rendering guidance.
@@ -22,7 +23,7 @@ This is the canonical handwritten engineering policy and workflow. Consult:
 
 Use **npm**, not bun, yarn, or pnpm; maintain `package-lock.json` when dependencies
 change. Install with `npm install`; see the generated reference for the current
-Node requirement and command definitions. Do not describe scripts from memory.
+Node requirement and `package.json` for command definitions. Do not describe scripts from memory.
 
 ## Code Policy
 
@@ -30,14 +31,14 @@ Node requirement and command definitions. Do not describe scripts from memory.
 - Prefer arrow functions, `const`, curried helpers, and immutable transformations. Use `pipe` when it makes a transformation clearer; do not force composition or extract helpers solely to add indirection.
 - Use `map`/`filter` for transformations, `flatMap` for combined filtering/expansion, `reduce` for aggregation, and `Object.fromEntries` for object construction. Do not replace mutation with accumulating array/object spread: that can be quadratic and violates Biome's accumulating-spread rule.
 - Do not assume `.push()` is an allowed alternative. `test/unit/code-quality/array-push.test.js` scans source with an empty allowlist; `object-mutation.test.js` similarly gates bracket assignment. `let-usage.test.js` has different scopes, exempt directories, and specific allowlists. Read the relevant gate before choosing an implementation, including inside reducers.
-- Biome and code-quality tests are complementary. The generated reference records actual Biome limits and overrides, not an invented universal scope. Do not broaden enforcement or weaken checks merely to accommodate a change.
+- Biome and code-quality tests are complementary. Read `biome.json` for actual Biome limits and overrides, not an invented universal scope. Do not broaden enforcement or weaken checks merely to accommodate a change.
 - Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns. Remove dead/commented-out code rather than retaining it as documentation.
 
 Generic functional helpers live under `#utils/fp/`. In particular, memoization is
 imported from `#utils/fp/memoize.js`, not `#utils/memoize.js`. Create cached helpers
 at module scope so calls reuse the cache; use reference-based caching for
-collection lookups where appropriate. Consult the generated export index and
-source JSDoc for APIs rather than copying stale utility inventories.
+collection lookups where appropriate. Consult the [FP source JSDoc](src/_lib/utils/fp/)
+for APIs rather than copying stale utility inventories.
 
 ### Fail Fast, Never Mask
 
@@ -103,7 +104,7 @@ Edit sources, never generated output by hand. After block schema changes:
 
 1. Update `src/_lib/utils/block-schema/<type>.js` and register new modules in `src/_lib/utils/block-schema.js`.
 2. Add/update `src/_includes/design-system/blocks/<type>.html` and the matching SCSS partial under `src/css/design-system/`; forward new partials from its index.
-3. Run `npm run generate-references`. Its three steps generate the block reference, PagesCMS config plus CMS types, and developer reference in order, stopping on failure. Review all four artifacts: `skills/cfa-static-site-builder/references/blocks.md`, `.pages.yml`, `src/_lib/types/pages-cms-generated.d.ts`, and `docs/developer-reference.md`. Precommit checks freshness without regenerating; regenerate and re-stage stale artifacts before retrying.
+3. Run `npm run generate-references`. Its three steps generate the block reference, PagesCMS config plus CMS types, and Site Builder Reference in order, stopping on failure. Review all four artifacts: `skills/cfa-static-site-builder/references/blocks.md`, `.pages.yml`, `src/_lib/types/pages-cms-generated.d.ts`, and `docs/developer-reference.md`. Precommit checks freshness without regenerating; regenerate and re-stage stale artifacts before retrying.
 
 The block reference is wholly generated. `BLOCKS_LAYOUT.md` is a handwritten
 navigation page; the skill's `SKILL.md`, layout guidance, and other workflow
@@ -112,6 +113,6 @@ references remain handwritten. Edit those directly when procedures change.
 `docs/developer-reference.md` is wholly owned by
 `scripts/generate-developer-reference.js`. Regenerate it with
 `npm run generate-references` (or `npm run generate-developer-reference` for this file alone)
-after changing its package, Biome, FP, Sass, CMS definition, or deployment workflow inputs. Its freshness test
+after changing its `package.json` or shared CMS definition module inputs. Its freshness test
 compares in memory without rewriting the committed file. Keep policy here and
 test criteria in their canonical handwritten document, not in generated facts.

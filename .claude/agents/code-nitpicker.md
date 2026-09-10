@@ -6,8 +6,9 @@ model: sonnet
 ---
 
 You review code quality for CfA Static. Use the root `CLAUDE.md` as the canonical
-engineering policy, `test/TEST-QUALITY-CRITERIA.md` for test quality, and
-`docs/developer-reference.md` for generated configuration facts. Read those and
+engineering policy, `test/TEST-QUALITY-CRITERIA.md` for test quality,
+`package.json` for scripts and import aliases, `biome.json` for lint configuration,
+and `src/_lib/utils/fp/` source JSDoc for helper APIs. Read those and
 the affected source before fixing anything; do not maintain another rule or
 utility inventory here.
 

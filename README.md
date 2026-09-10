@@ -48,7 +48,7 @@ static pages.
 ## Quick start
 
 Use the Node.js version specified in the
-[developer reference](docs/developer-reference.md), then:
+[Site Builder Reference](docs/developer-reference.md), then:
 
 ```bash
 npm install          # install dependencies
@@ -56,7 +56,8 @@ npm run serve        # dev server with hot reload
 npm run build        # build to _site/ (includes internal link check)
 ```
 
-See the developer reference for the command inventory and verification checks.
+See the Site Builder Reference for selected site-building commands and the
+[verification guide](skills/cfa-static-site-builder/references/verification.md) for checks.
 
 The build needs no application secrets or server-side services. Dependency
 installation, uncached Iconify icons, and configured remote source images may
@@ -87,7 +88,7 @@ template misleads everyone who lands on the repository and hides the choices
 the site made. Say what the site is, how it departs from the template's
 defaults, and where its schemas and checks live — while keeping the pointers to
 the [block reference](skills/cfa-static-site-builder/references/blocks.md),
-[developer reference](docs/developer-reference.md), `CLAUDE.md`, and the
+[Site Builder Reference](docs/developer-reference.md), `CLAUDE.md`, and the
 `/blocks/` gallery that anyone editing the site will need. The skill's
 [project setup reference](skills/cfa-static-site-builder/references/project-setup.md#site-readme)
 lists what to cover, including provenance and how the site deploys.
@@ -128,8 +129,10 @@ non-workflow builds.
 The repo can also publish the same site unchanged to SharedServices, CfA's
 Okta-protected internal hosting. The `sharedservices-deploy.yaml` workflow
 builds `_site/` from the same commit as the Pages deployment — differing only
-in `SITE_URL` — then syncs it to the platform's static S3
-bucket and invalidates the shared CloudFront distribution. Okta SSO is
+in `SITE_URL` — then passes its artifact to the platform's
+[shared static deployment workflow](https://github.com/codeforamerica/shared-services-infra/blob/main/.github/workflows/shared-deploy-static.yaml).
+The shared workflow handles AWS authentication, S3 sync, and CloudFront
+invalidation. Okta SSO is
 enforced at the edge, so the site itself never handles authentication.
 Deployment is manual while piloted: run **Actions → Deploy to
 SharedServices** on `main`.
@@ -138,11 +141,10 @@ One-time setup is a DevOps task:
 
 1. Register the app by adding a spec to
    `shared-services-infra/tofu/configs/static-app/specs/` and applying it.
-2. Create the `sharedservices` environment on this repo with the variables
+2. Have DevOps configure the `development` environment through Doppler with the variables
    `AWS_REGION`, `STATIC_BUCKET`, `STATIC_PREFIX` (set to `cfa-static`),
-   `CLOUDFRONT_DISTRIBUTION_ID`, and `SITE_URL` (the app's endpoint URL,
-   with no trailing slash), plus the `AWS_ROLE_ARN`
-   secret from the static-app layer.
+   `CLOUDFRONT_DISTRIBUTION_ID` (for cache invalidation), and `SITE_URL` (the app's
+   endpoint URL, with no trailing slash), plus the `AWS_ROLE_ARN` secret.
 
 The public GitHub Pages deployment is unaffected. `app.yaml` at the repo root
 declares the platform registration. SharedServices serves each app at the
@@ -181,8 +183,11 @@ and no translations, which renders with no hreflang tags and no switcher.
 
 ## Development
 
-The [developer reference](docs/developer-reference.md) tracks runtime
-requirements, commands, and tooling configuration. For how to write useful
+The [Site Builder Reference](docs/developer-reference.md) covers the Node requirement,
+installation, selected site-building commands, CMS options, and authoring links.
+For maintainer details, read [package.json](package.json) for scripts and import
+aliases, [biome.json](biome.json) for lint configuration, and the
+[FP source JSDoc](src/_lib/utils/fp/) for helper APIs. For how to write useful
 tests rather than just pass the checks, read the authored
 [test quality criteria](test/TEST-QUALITY-CRITERIA.md).
 

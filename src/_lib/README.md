@@ -6,10 +6,13 @@ layout: ""
 # Library Map
 
 This directory contains build-time and browser JavaScript for CfA Static.
-[The root engineering guide](../../CLAUDE.md) owns handwritten policy and workflow;
-[the generated developer reference](../../docs/developer-reference.md) owns the
-runtime, command, alias, lint, FP export, and theme-token inventories. Test
-requirements live in [the canonical criteria](../../test/TEST-QUALITY-CRITERIA.md).
+[The root engineering guide](../../CLAUDE.md) owns handwritten policy and workflow.
+The [Site Builder Reference](../../docs/developer-reference.md) covers setup,
+selected site-building commands, CMS options, and authoring links. For maintainer
+details, read [package.json](../../package.json) for scripts and import aliases,
+[biome.json](../../biome.json) for lint configuration, and the
+[FP source JSDoc](utils/fp/) for helper APIs. Test requirements live in
+[the canonical criteria](../../test/TEST-QUALITY-CRITERIA.md).
 
 ## Responsibilities
 
@@ -55,7 +58,7 @@ import { memoize } from "#utils/fp/memoize.js";
 import { ROOT_DIR } from "#lib/paths.js";
 ```
 
-Consult the generated FP export index and linked JSDoc before choosing helpers.
+Consult the [FP source JSDoc](utils/fp/) before choosing helpers.
 Keep caches at module scope; the memoization module distinguishes key-based
 Map caches from reference-based WeakMap caches. For images, use the shared
 `media/image.js` shortcode pipeline instead of adding independent image markup
