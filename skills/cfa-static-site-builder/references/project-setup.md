@@ -15,8 +15,8 @@ A valid project root contains:
 
 Use the Node.js version declared by the checkout's `package.json`, npm, and a
 POSIX-compatible shell. Do not substitute Bun, Yarn, or pnpm. The checkout's
-`docs/developer-reference.md` contains generated command, CMS, theme, and
-deployment facts; prefer its current values over copied inventories.
+`docs/developer-reference.md` is the Site Builder Reference, with installation,
+selected site-building commands, CMS options, and links to authoring and theme sources.
 Installing dependencies normally requires network access.
 
 For a new site, the durable model is a GitHub fork of
@@ -152,11 +152,10 @@ that workflow and arranges human review.
 ## Deployment
 
 The bundled GitHub Pages workflow supports project sites and custom domains.
-The user must enable **Settings > Pages > Source: GitHub Actions** once. The
-current runners, build steps, and environment expressions are documented from
-source in `docs/developer-reference.md` under Deployment Workflow Facts. Inspect
-the selected workflow rather than assuming all deployment targets use the same
-runner or credentials.
+The user must enable **Settings > Pages > Source: GitHub Actions** once. See the
+[README deployment guidance](../../../README.md#deploying-to-github-pages) for
+platform setup. Inspect the selected workflow rather than assuming all deployment
+targets use the same runner or credentials.
 
 The workflow provides:
 

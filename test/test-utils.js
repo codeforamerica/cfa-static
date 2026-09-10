@@ -323,6 +323,7 @@ export {
   assertDocumentationTarget,
   extractDocumentationExamples,
   getDocumentationFiles,
+  getTableRows,
 } from "#test/test-utils/documentation.js";
 
 export {

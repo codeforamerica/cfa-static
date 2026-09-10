@@ -47,14 +47,13 @@ npm run generate-references
 ```
 
 Its three steps generate the block reference, PagesCMS config plus CMS types,
-and developer reference in order, stopping on failure. CMS artifacts use the saved
+and Site Builder Reference in order, stopping on failure. CMS artifacts use the saved
 `cms_config`; the command does not change the selected collections or features.
 Individual generator commands remain available for focused work.
 
 The block generator owns `references/blocks.md` inside this skill, not
-`BLOCKS_LAYOUT.md` or the authored `layouts.md` companion. The developer
-reference derives from package commands, Biome configuration, FP exports, Sass,
-CMS definitions, and deployment workflows.
+`BLOCKS_LAYOUT.md` or the authored `layouts.md` companion. The Site Builder
+Reference derives only from `package.json` and shared CMS definition modules.
 
 Freshness checks compare generated content without rewriting either reference.
 Precommit does not regenerate stale artifacts; regenerate and re-stage them
@@ -62,7 +61,7 @@ before retrying. Skill packaging checks validate metadata, links, and evaluation
 definitions; they do not run an agent against the evaluation scenarios or prove
 task success.
 
-Never repair generated output by hand. Change its source schema or saved
+Never repair generated output by hand. Change its source inputs or saved
 `cms_config`, regenerate, and inspect the diff.
 
 ## Build And Accessibility
@@ -120,7 +119,7 @@ schema URLs for exactly one `/project/` prefix.
 - **Missing download/image:** fix the source path and passthrough configuration.
 - **Internal link failure:** correct the source route or preserve the old route
   with a redirect.
-- **Generated freshness failure:** regenerate from the schema or saved CMS
+- **Generated freshness failure:** regenerate from the source inputs or saved CMS
   configuration.
 - **Accessibility failure:** fix the rendered semantic cause, then rerun the
   audit across the whole site.
