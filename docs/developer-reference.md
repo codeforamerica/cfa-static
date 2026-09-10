@@ -921,28 +921,11 @@ concurrency:
   group: sharedservices-deploy
   cancel-in-progress: false
 jobs:
-  deploy:
-    name: Build and deploy internal site
+  build:
+    name: Build internal site
     runs-on: ubuntu-latest
-    environment: sharedservices
+    environment: development
     steps:
-      - name: Check deployment configuration
-        env:
-          SITE_URL: ${{ vars.SITE_URL }}
-          STATIC_BUCKET: ${{ vars.STATIC_BUCKET }}
-          STATIC_PREFIX: ${{ vars.STATIC_PREFIX }}
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-        run: |
-          missing=0
-          for var in SITE_URL STATIC_BUCKET STATIC_PREFIX CLOUDFRONT_DISTRIBUTION_ID AWS_REGION AWS_ROLE_ARN; do
-            if [ -z "$(eval "echo \$$var")" ]; then
-              echo "MISSING: '$var' is not set on the 'sharedservices' environment"
-              missing=1
-            fi
-          done
-          test "$missing" -eq 0
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Setup Node
@@ -962,27 +945,23 @@ jobs:
       - name: Build site
         env:
           SITE_URL: ${{ vars.SITE_URL }}
-        run: npm run build
+        run: |
+          test -n "$SITE_URL" || { echo "SITE_URL is required in the development environment" >&2; exit 1; }
+          npm run build
       - name: Merge docs into site output
         run: cp -r docs _site/
       - name: Upload site artifact
+        id: upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: sharedservices-site
           path: _site
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-      - name: Sync site to S3
-        run: |
-          aws s3 sync _site/ "s3://${{ vars.STATIC_BUCKET }}/${{ vars.STATIC_PREFIX }}/" \
-            --delete \
-            --cache-control "public, max-age=300"
-      - name: Invalidate CloudFront
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
-            --paths "/*"
+          if-no-files-found: error
+  deploy:
+    needs: build
+    uses: codeforamerica/shared-services-infra/.github/workflows/shared-deploy-static.yaml@main
+    with:
+      artifact_ids: ${{ needs.build.outputs.artifact-id }}
+      environment: development
+    secrets: inherit
 ```
