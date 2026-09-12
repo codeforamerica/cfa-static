@@ -136,6 +136,16 @@ export const ITEMS_COMMON_FIELDS = {
 };
 
 /**
+ * Items-style fields for blocks whose items editors choose themselves
+ * (items, items-array): the presentation/filter fields plus the per-block
+ * aspect-ratio override.
+ */
+export const ITEMS_FILTERABLE_FIELDS = {
+  ...ITEMS_COMMON_FIELDS,
+  image_aspect_ratio: IMAGE_ASPECT_RATIO_FIELD,
+};
+
+/**
  * Field set for "items-style sugar" blocks — those that hardcode the
  * collection and filter (e.g. `category-products`, `child-categories`) and
  * only need to expose how items render.

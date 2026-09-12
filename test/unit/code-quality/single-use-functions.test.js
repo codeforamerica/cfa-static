@@ -11,7 +11,7 @@
  * - Callback/handler functions passed as arguments
  * - Test files are included (no exclusion)
  */
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { ALLOWED_SINGLE_USE_FUNCTIONS } from "#test/code-quality/code-quality-exceptions.js";
 import {
   assertNoViolations,
@@ -21,6 +21,10 @@ import {
 } from "#test/code-scanner.js";
 import { SRC_JS_FILES, TEST_FILES } from "#test/test-utils.js";
 import { filterMap, pipe } from "#utils/fp/array.js";
+
+// Scans every src and test file; under the full suite's parallel lanes that
+// exceeds the default timeout.
+vi.setConfig({ testTimeout: 5000 });
 
 const THIS_FILE = "test/unit/code-quality/single-use-functions.test.js";
 

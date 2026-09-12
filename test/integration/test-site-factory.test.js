@@ -245,6 +245,8 @@ describe("test-site-factory", () => {
         // Error should include stdout or stderr
         expect(error.stdout || error.stderr).toBeTruthy();
       });
-    });
+      // Spawns a real Eleventy build that reports its own failure; under the
+      // full suite's parallel lanes that exceeds the default timeout
+    }, 10_000);
   });
 });

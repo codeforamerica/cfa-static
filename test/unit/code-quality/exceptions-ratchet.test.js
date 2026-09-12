@@ -196,13 +196,14 @@ describe("exceptions-ratchet", () => {
 
     if (removed.length > 0) {
       const readyToPaste = Object.entries(exceptions)
-        .map(
-          ([name, set]) =>
-            `  ${name}: [\n${[...set]
-              .sort()
-              .map((entry) => `    ${JSON.stringify(entry)},`)
-              .join("\n")}\n  ],`,
-        )
+        .map(([name, set]) => {
+          const entries = [...set].sort();
+          return entries.length === 0
+            ? `  ${name}: [],`
+            : `  ${name}: [\n${entries
+                .map((entry) => `    ${JSON.stringify(entry)},`)
+                .join("\n")}\n  ],`;
+        })
         .join("\n");
 
       console.log("\n  Allowlist entries no longer present:");

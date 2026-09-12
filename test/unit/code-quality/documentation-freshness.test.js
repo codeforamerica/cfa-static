@@ -36,4 +36,6 @@ test("committed documentation matches source inputs without rewriting references
       content,
     );
   }
-});
+  // Re-imports the reference generator graphs under coverage instrumentation;
+  // under the full suite's parallel lanes that exceeds the default timeout
+}, 5000);
