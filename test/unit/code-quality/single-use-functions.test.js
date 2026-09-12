@@ -410,7 +410,7 @@ const z = add(5, 6);
     assertNoViolations(violations, {
       singular: "single-use unexported function",
       fixHint:
-        "Nest the function inside its caller if it's specific to it, or add to ALLOWED_SINGLE_USE_FUNCTIONS if it's intentionally kept separate",
+        "Nest the function inside its caller if it's specific to it - the ALLOWED_SINGLE_USE_FUNCTIONS baseline is deletion-only",
     });
   });
 

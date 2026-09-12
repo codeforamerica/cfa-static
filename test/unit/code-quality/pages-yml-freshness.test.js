@@ -22,6 +22,9 @@ describe("pages-yml-freshness", () => {
         "PAGES_YML_OUTPUT_PATH",
         tempDir,
       );
-      expect(regenerated).toBe(committed);
+      expect(
+        regenerated,
+        ".pages.yml is stale: run npm run generate-references and re-stage it",
+      ).toBe(committed);
     }));
 });

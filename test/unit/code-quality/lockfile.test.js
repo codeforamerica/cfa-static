@@ -10,12 +10,14 @@ const forbiddenLockfiles = [
 ];
 
 describe("lockfile", () => {
-  test("only package-lock.json should exist (this project uses npm)", () => {
-    for (const lockfile of forbiddenLockfiles) {
-      const lockfilePath = resolve(rootDir, lockfile);
-      const exists = fs.existsSync(lockfilePath);
-      expect(exists).toBe(false);
-    }
+  test("only package-lock.json exists (this project uses npm)", () => {
+    const foreignLockfiles = forbiddenLockfiles.filter((lockfile) =>
+      fs.existsSync(resolve(rootDir, lockfile)),
+    );
+    expect(
+      foreignLockfiles,
+      "this project uses npm: remove the foreign lockfile(s) and rely on package-lock.json",
+    ).toEqual([]);
 
     const npmLockPath = resolve(rootDir, "package-lock.json");
     expect(fs.existsSync(npmLockPath)).toBe(true);

@@ -154,7 +154,7 @@ const config = { key: 'value' };
     assertNoViolations(violations, {
       singular: "mutable const declaration",
       fixHint:
-        "use functional patterns (map/filter/reduce/spread), or add to ALLOWED_MUTABLE_CONST in code-quality-exceptions.js",
+        "use functional patterns (map/filter/reduce/spread) - the ALLOWED_MUTABLE_CONST baseline is deletion-only",
     });
   });
 

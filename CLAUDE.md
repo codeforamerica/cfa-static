@@ -20,24 +20,21 @@ This is the canonical handwritten engineering policy and workflow. Consult:
 4. Run focused tests while iterating, then the relevant quality gates and lint. Regenerate affected artifacts and check the diff.
 5. Run the full `npm test` once at the end before committing. Report commands, results, and any verification that could not run. Commit only when requested.
 
-Use **npm**, not bun, yarn, or pnpm; maintain `package-lock.json` when dependencies
-change. Install with `npm install`; see the generated reference for the current
-Node requirement and command definitions. Do not describe scripts from memory.
+Use **npm** for all package management. Install with `npm install`; see the
+generated reference for the current Node requirement and command definitions. Do
+not describe scripts from memory.
 
 ## Code Policy
 
-- Use Node subpath import aliases from `package.json`, not relative imports where an alias applies. Repository paths come from `ROOT_DIR` in `#lib/paths.js`, not `process.cwd()`.
-- Prefer arrow functions, `const`, curried helpers, and immutable transformations. Use `pipe` when it makes a transformation clearer; do not force composition or extract helpers solely to add indirection.
-- Use `map`/`filter` for transformations, `flatMap` for combined filtering/expansion, `reduce` for aggregation, and `Object.fromEntries` for object construction. Do not replace mutation with accumulating array/object spread: that can be quadratic and violates Biome's accumulating-spread rule.
-- Do not assume `.push()` is an allowed alternative. `test/unit/code-quality/array-push.test.js` scans source with an empty allowlist; `object-mutation.test.js` similarly gates bracket assignment. `let-usage.test.js` has different scopes, exempt directories, and specific allowlists. Read the relevant gate before choosing an implementation, including inside reducers.
+- Repository paths come from `ROOT_DIR` in `#lib/paths.js`, not `process.cwd()`.
+- Prefer arrow functions, `const`, curried helpers, and immutable transformations: `map`/`filter` for transformations, `flatMap` for combined filtering/expansion, `reduce` for aggregation, and `Object.fromEntries` for object construction. Use `pipe` when it makes a transformation clearer; do not force composition or extract helpers solely to add indirection.
+- `.push()` and other mutation-style escapes are gated by `test/unit/code-quality/` tests with distinct scopes, exempt directories, and allowlists. Read the failing gate before choosing an implementation, including inside reducers.
 - Biome and code-quality tests are complementary. The generated reference records actual Biome limits and overrides, not an invented universal scope. Do not broaden enforcement or weaken checks merely to accommodate a change.
-- Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns. Remove dead/commented-out code rather than retaining it as documentation.
+- Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns.
 
-Generic functional helpers live under `#utils/fp/`. In particular, memoization is
-imported from `#utils/fp/memoize.js`, not `#utils/memoize.js`. Create cached helpers
-at module scope so calls reuse the cache; use reference-based caching for
-collection lookups where appropriate. Consult the generated export index and
-source JSDoc for APIs rather than copying stale utility inventories.
+Generic functional helpers live under `#utils/fp/`; consult the generated export
+index and source JSDoc for APIs rather than copying stale utility inventories.
+Use reference-based caching for collection lookups where appropriate.
 
 ### Fail Fast, Never Mask
 
@@ -47,17 +44,16 @@ errors behind fallback objects, empty collections, placeholder labels, or
 propagate unless the boundary has an explicit, justified recovery contract.
 
 Normalize legitimate content defaults early in the data chain, generally in
-collections, rather than scattering defensive defaults through renderers.
-`nullish-coalescing.test.js`, `data-fallbacks.test.js`, and
-`try-catch-usage.test.js` enforce related policies with distinct scopes; the
-generic FP library is not the site-data chain. External input and browser storage
-may need boundary validation, but are not blanket exceptions to the gates.
+collections, rather than scattering defensive defaults through renderers. The
+related gates encode these boundaries in their scopes: the generic FP library is
+not the site-data chain, and external input or browser storage may need boundary
+validation without weakening the gates.
 
-Consult each gate's specific allowlist and
-`test/code-quality/code-quality-exceptions.js`. The central exceptions file is a
-deletion-only legacy baseline, not a place to approve new violations. If a check
-appears wrong, demonstrate the false positive and discuss a targeted correction;
-do not silently add exceptions or convert thrown failures to default values.
+`test/code-quality/code-quality-exceptions.js` is a deletion-only legacy baseline,
+not a place to approve new violations: an entry-count ratchet fails if any
+allowlist grows or its baseline drifts, and each gate reports stale entries. If
+a check appears wrong, demonstrate the false positive and discuss a targeted
+correction; do not add exceptions or convert thrown failures to default values.
 
 ## Testing Workflow
 
@@ -102,8 +98,8 @@ baseline. Never weaken production mutation/style gates to satisfy mutation tests
 Edit sources, never generated output by hand. After block schema changes:
 
 1. Update `src/_lib/utils/block-schema/<type>.js` and register new modules in `src/_lib/utils/block-schema.js`.
-2. Add/update `src/_includes/design-system/blocks/<type>.html` and the matching SCSS partial under `src/css/design-system/`; forward new partials from its index.
-3. Run `npm run generate-references`. Its three steps generate the block reference, PagesCMS config plus CMS types, and developer reference in order, stopping on failure. Review all four artifacts: `skills/cfa-static-site-builder/references/blocks.md`, `.pages.yml`, `src/_lib/types/pages-cms-generated.d.ts`, and `docs/developer-reference.md`. Precommit checks freshness without regenerating; regenerate and re-stage stale artifacts before retrying.
+2. Add/update `src/_includes/design-system/blocks/<type>.html` and the matching SCSS partial under `src/css/design-system/`.
+3. Run `npm run generate-references`. Its three steps generate the block reference, PagesCMS config plus CMS types, and developer reference in order, stopping on failure. Review all four artifacts: `skills/cfa-static-site-builder/references/blocks.md`, `.pages.yml`, `src/_lib/types/pages-cms-generated.d.ts`, and `docs/developer-reference.md`. The freshness gates' failure messages name the regeneration command when an artifact drifts.
 
 The block reference is wholly generated. `BLOCKS_LAYOUT.md` is a handwritten
 navigation page; the skill's `SKILL.md`, layout guidance, and other workflow

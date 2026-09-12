@@ -18,6 +18,18 @@ const DESIGN_SYSTEM_SCSS_FILES = getFiles(
 // _index.scss only contains @forward statements
 const ALLOWED_UNSCOPED_FILES = ["_index.scss"];
 
+const INDEX_FILE = "src/css/design-system/_index.scss";
+
+/** Extract the partial names that an index forwards, in declaration order.
+ * The pattern deliberately avoids quote characters inside the regex literal
+ * so source-scanning gates do not misread the quotes as string delimiters. */
+const forwardedNames = (content) =>
+  content
+    .split("\n")
+    .flatMap((line) =>
+      [...line.matchAll(/@forward\s+.([\w-]+)/g)].map((match) => match[1]),
+    );
+
 const stripCommentsAndImports = (content) => {
   const withoutComments = content
     .replace(/\/\/.*$/gm, "")
@@ -183,6 +195,49 @@ describe("design-system-scoping", () => {
     `;
 
     expect(hasDesignSystemWrapper(unscopedContent)).toBe(false);
+  });
+
+  test("extracts @forward names from index content", () => {
+    const content = `
+      // Comments and @use lines are not partial forwards
+      @use "sass:math";
+      @forward "base";
+      @forward "navigation" as *;
+      .design-system { color: red; }
+    `;
+
+    expect(forwardedNames(content)).toEqual(["base", "navigation"]);
+  });
+
+  test("every design-system partial is forwarded from _index.scss", () => {
+    const forwarded = forwardedNames(
+      readFileSync(join(rootDir, INDEX_FILE), "utf-8"),
+    );
+    const unforwarded = pipe(
+      filter((file) => file !== INDEX_FILE),
+      // Partial _<name>.scss must appear as an @forward "<name>" entry
+      filter((file) => !forwarded.includes(basename(file).slice(1, -5))),
+    )(DESIGN_SYSTEM_SCSS_FILES);
+
+    console.log(
+      `\n     Partials forwarded: ${forwarded.length} of ${
+        DESIGN_SYSTEM_SCSS_FILES.length - 1
+      }`,
+    );
+
+    if (unforwarded.length > 0) {
+      console.log(
+        "\n  ⚠️  Design-system partials not forwarded from _index.scss:",
+      );
+      for (const file of unforwarded) {
+        console.log(`     - ${file}`);
+      }
+      console.log(
+        "\n  💡 Add an @forward line for each partial to src/css/design-system/_index.scss",
+      );
+    }
+
+    expect(unforwarded).toEqual([]);
   });
 
   test("all design-system SCSS files are properly scoped", () => {
