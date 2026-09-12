@@ -438,6 +438,12 @@ const validateExceptions = (allowlist, patterns) => {
   const stale = [];
 
   for (const entry of allowlist) {
+    // Entries for deleted or renamed files are stale, not a crash
+    if (!fs.existsSync(path.join(rootDir, entry.split(":")[0]))) {
+      stale.push({ entry, reason: "File no longer exists" });
+      continue;
+    }
+
     // File-only entries (no line number) - verify file has at least one match
     if (!entry.includes(":")) {
       const source = readSource(entry);

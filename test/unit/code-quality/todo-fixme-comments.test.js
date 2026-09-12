@@ -10,6 +10,7 @@ const EXCLUDE_FILES = [
   "test/unit/code-quality/todo-fixme-comments.test.js",
   "test/unit/code-quality/commented-code.test.js",
   "test/code-quality/code-quality-exceptions.js", // Contains filename references with "todo"/"fixme"
+  "test/unit/code-quality/exceptions-ratchet.test.js", // Records the baseline verbatim, so it embeds the same filename references
 ];
 
 describe("todo-fixme-comments", () => {

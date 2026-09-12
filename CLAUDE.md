@@ -50,10 +50,11 @@ not the site-data chain, and external input or browser storage may need boundary
 validation without weakening the gates.
 
 `test/code-quality/code-quality-exceptions.js` is a deletion-only legacy baseline,
-not a place to approve new violations: an entry-count ratchet fails if any
-allowlist grows or its baseline drifts, and each gate reports stale entries. If
-a check appears wrong, demonstrate the false positive and discuss a targeted
-correction; do not add exceptions or convert thrown failures to default values.
+not a place to approve new violations: a per-entry ratchet fails on any entry the
+baseline has not recorded, and deletions must be locked into the baseline it
+prints; each gate also reports stale entries. If a check appears wrong,
+demonstrate the false positive and discuss a targeted correction; do not add
+exceptions or convert thrown failures to default values.
 
 ## Testing Workflow
 

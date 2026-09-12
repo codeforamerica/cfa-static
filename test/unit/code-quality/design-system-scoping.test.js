@@ -21,14 +21,22 @@ const ALLOWED_UNSCOPED_FILES = ["_index.scss"];
 const INDEX_FILE = "src/css/design-system/_index.scss";
 
 /** Extract the partial names that an index forwards, in declaration order.
- * The pattern deliberately avoids quote characters inside the regex literal
+ * Each @forward spec is normalized to its partial name, so quotes, relative
+ * paths, file extensions, and `as`/`show`/`hide` clauses are all accepted.
+ * The patterns deliberately avoid quote characters inside regex literals
  * so source-scanning gates do not misread the quotes as string delimiters. */
 const forwardedNames = (content) =>
-  content
-    .split("\n")
-    .flatMap((line) =>
-      [...line.matchAll(/@forward\s+.([\w-]+)/g)].map((match) => match[1]),
-    );
+  content.split("\n").flatMap((line) =>
+    [...line.matchAll(/@forward\s+([^;]+);/g)].map((match) =>
+      match[1]
+        .split(/\s+(?:as|show|hide)\s+/)[0]
+        .split("/")
+        .pop()
+        .split(".")[0]
+        .replace(/^_/, "")
+        .replace(/[^-\w]/g, ""),
+    ),
+  );
 
 const stripCommentsAndImports = (content) => {
   const withoutComments = content
@@ -202,11 +210,12 @@ describe("design-system-scoping", () => {
       // Comments and @use lines are not partial forwards
       @use "sass:math";
       @forward "base";
-      @forward "navigation" as *;
+      @forward "./prose.scss" as *;
+      @forward "navigation" show .nav;
       .design-system { color: red; }
     `;
 
-    expect(forwardedNames(content)).toEqual(["base", "navigation"]);
+    expect(forwardedNames(content)).toEqual(["base", "prose", "navigation"]);
   });
 
   test("every design-system partial is forwarded from _index.scss", () => {
