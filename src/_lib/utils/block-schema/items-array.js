@@ -1,6 +1,5 @@
 import {
-  IMAGE_ASPECT_RATIO_FIELD,
-  ITEMS_COMMON_FIELDS,
+  ITEMS_FILTERABLE_FIELDS,
   ITEMS_GRID_META,
   str,
 } from "#utils/block-schema/shared.js";
@@ -14,8 +13,7 @@ export const fields = {
     description:
       "Array of path strings. Each entry may be a file path (e.g. `src/news/example.md`) or a directory path (e.g. `src/news` or `src/news/`), in which case every item in that directory is included in place.",
   },
-  ...ITEMS_COMMON_FIELDS,
-  image_aspect_ratio: IMAGE_ASPECT_RATIO_FIELD,
+  ...ITEMS_FILTERABLE_FIELDS,
 };
 
 export const docs = {

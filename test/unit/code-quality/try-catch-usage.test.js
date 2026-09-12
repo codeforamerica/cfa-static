@@ -3,6 +3,7 @@ import { ALLOWED_TRY_CATCHES } from "#test/code-quality/code-quality-exceptions.
 import {
   assertNoViolations,
   combineFileLists,
+  expectNoStaleExceptions,
   isCommentLine,
   withAllowlist,
 } from "#test/code-scanner.js";
@@ -139,8 +140,16 @@ try {
     assertNoViolations(violations, {
       message: "non-whitelisted try/catch blocks",
       fixHint:
-        "refactor to avoid try/catch, or add to ALLOWED_TRY_CATCHES in code-quality-exceptions.js",
+        "refactor so the error propagates instead of being caught - the ALLOWED_TRY_CATCHES baseline is deletion-only",
     });
+  });
+
+  test("ALLOWED_TRY_CATCHES entries still exist and match pattern", () => {
+    expectNoStaleExceptions(
+      ALLOWED_TRY_CATCHES,
+      /\btry\s*\{/,
+      "ALLOWED_TRY_CATCHES",
+    );
   });
 
   test("Reports whitelisted try/catch blocks for tracking", () => {

@@ -32,12 +32,6 @@ import { frozenSet } from "#utils/fp/set.js";
 
 // Add file:line for specific locations, or just file path to allow all try/catch in that file
 const ALLOWED_TRY_CATCHES = frozenSet([
-  // test/test-site-factory.test.js - Testing error handling behavior
-  // Needed: test intentionally catches errors to verify error handling works correctly
-  "test/integration/test-site-factory.test.js:135",
-  "test/integration/test-site-factory.test.js:155",
-  "test/integration/test-site-factory.test.js:277",
-
   // test/ensure-deps.js - Dependency checking utility
   // Needed: checks if dependencies are installed, needs try/catch for module resolution
   "test/ensure-deps.js:16",
@@ -73,9 +67,6 @@ const ALLOWED_TRY_CATCHES = frozenSet([
 // Test files that legitimately need process.cwd() instead of rootDir.
 // Most tests should import rootDir from test-utils.js instead.
 const ALLOWED_PROCESS_CWD = frozenSet([
-  // Tests that specifically test file-utils.js which uses process.cwd() internally
-  "test/unit/utils/file-utils.test.js",
-
   // git-dates tests need to chdir into temp git repos to test git log commands
   "test/unit/utils/git-dates.test.js",
 

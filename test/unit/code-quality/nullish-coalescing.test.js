@@ -45,7 +45,7 @@ const e = other || "not nullish";
     assertNoViolations(violations, {
       singular: "nullish coalescing operator",
       fixHint:
-        "set default values in src/_lib/collections/ instead, or add to ALLOWED_NULLISH_COALESCING in code-quality-exceptions.js",
+        "set default values in src/_lib/collections/ instead - the ALLOWED_NULLISH_COALESCING baseline is deletion-only",
     });
   });
 

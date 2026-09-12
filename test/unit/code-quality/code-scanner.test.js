@@ -386,6 +386,24 @@ describe("code-scanner", () => {
       );
     });
 
+    test("reports a file-only entry whose file no longer exists as stale", () => {
+      testStaleException(
+        frozenSet(["test/this-file-was-deleted.test.js"]),
+        /import/,
+        "test/this-file-was-deleted.test.js",
+        /File no longer exists/,
+      );
+    });
+
+    test("reports a line entry whose file no longer exists as stale", () => {
+      testStaleException(
+        frozenSet(["test/this-file-was-deleted.test.js:12"]),
+        /import/,
+        "test/this-file-was-deleted.test.js:12",
+        /File no longer exists/,
+      );
+    });
+
     test("detects multiple stale entries", () => {
       const allowlist = frozenSet([
         "test/code-scanner.js:999999", // line doesn't exist

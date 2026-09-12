@@ -259,5 +259,6 @@ describe("function-length", () => {
     }
 
     expect(violations.length).toBe(0);
-  });
+    // Scans every src and scripts file; instrumented runs exceed the default timeout
+  }, 5000);
 });

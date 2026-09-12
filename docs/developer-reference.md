@@ -23,7 +23,7 @@ Every declared npm script is listed below in package order. Values are the exact
 | `npm run typecheck:strict` | `node scripts/strict-typecheck-ratchet.js` |
 | `npm run cpd:fp` | `jscpd src/_lib/utils/fp --min-tokens 12` |
 | `npm run cpd:design-system` | `jscpd src/css/design-system --min-tokens 17` |
-| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 18 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from'` |
+| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 17 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from'` |
 | `npm run cpd:ratchet` | `node scripts/cpd-ratchet.js` |
 | `npm run knip` | `knip` |
 | `npm run knip:fix` | `knip --fix` |

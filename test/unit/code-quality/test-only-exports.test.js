@@ -366,7 +366,7 @@ import { orig as alias } from "#utils/test.js";
     assertNoViolations(violations, {
       singular: "test-only export",
       fixHint:
-        "Either unexport the function (make it private), use it in production code, or add to ALLOWED_TEST_ONLY_EXPORTS",
+        "Either unexport the function (make it private) or use it in production code - the ALLOWED_TEST_ONLY_EXPORTS baseline is deletion-only",
     });
   });
 

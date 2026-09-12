@@ -1,7 +1,6 @@
 import {
   collectionField,
-  IMAGE_ASPECT_RATIO_FIELD,
-  ITEMS_COMMON_FIELDS,
+  ITEMS_FILTERABLE_FIELDS,
 } from "#utils/block-schema/shared.js";
 
 export const type = "items";
@@ -10,8 +9,7 @@ export const fields = {
   collection: collectionField(
     'Name of an Eleventy collection (e.g. `"news"`, `"guideCategories"`).',
   ),
-  ...ITEMS_COMMON_FIELDS,
-  image_aspect_ratio: IMAGE_ASPECT_RATIO_FIELD,
+  ...ITEMS_FILTERABLE_FIELDS,
 };
 
 export const docs = {

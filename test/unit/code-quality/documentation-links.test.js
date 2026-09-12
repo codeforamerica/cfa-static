@@ -36,5 +36,7 @@ describe("author documentation", () => {
     expect(() =>
       assertDocumentationLinks(rootDir, getDocumentationFiles()),
     ).not.toThrow();
-  });
+    // Validates every link in the documentation inventory; instrumented runs
+    // exceed the default timeout
+  }, 5000);
 });

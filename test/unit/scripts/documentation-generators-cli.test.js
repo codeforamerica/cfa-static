@@ -3,6 +3,11 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { captureConsole, rootDir } from "#test/test-utils.js";
 
+// Each test re-imports the reference generator graphs with fs mocks under
+// coverage instrumentation; under the full suite's parallel lanes that
+// exceeds the default timeout.
+vi.setConfig({ testTimeout: 5000 });
+
 vi.mock("node:fs", async (importOriginal) => {
   const original = await importOriginal();
   const mocked = {

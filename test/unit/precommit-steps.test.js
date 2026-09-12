@@ -9,6 +9,10 @@ import { dirname, join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { captureConsole, withTempDirAsync } from "#test/test-utils.js";
 
+// Each test re-imports the steps module graph with coverage instrumentation;
+// under the full suite's parallel lanes that exceeds the default timeout.
+vi.setConfig({ testTimeout: 5000 });
+
 const withSteps = (run) =>
   withTempDirAsync("precommit-steps", async (root) => {
     vi.resetModules();

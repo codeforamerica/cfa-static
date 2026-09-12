@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 
 /**
- * CPD ratchet check - fails when the duplication threshold could be lower.
+ * CPD ratchet check - fails when a duplication threshold could be lower.
  *
- * Reads the strict jscpd invocation out of package.json's cpd script -
- * paths, ignores and --min-tokens all come from that single source, so the
- * ratchet can never drift from the real check - and re-runs it with
- * min-tokens lowered by one. If that stricter run finds no duplication the
- * threshold can be tightened, and this check fails until package.json is
- * updated.
+ * Guards both duplication thresholds the repository records:
+ *   - the strict jscpd invocation read out of package.json's cpd script
+ *     (paths, ignores and --min-tokens all come from that single source,
+ *     so the ratchet can never drift from the real check)
+ *   - the config-driven default scan's minTokens in .jscpd.json
+ *
+ * Each threshold is re-run with its value lowered by one. A clean run
+ * at the stricter value means the threshold can be tightened, and this
+ * check fails until the recorded value is updated.
  */
 
 import { readFileSync } from "node:fs";
@@ -19,11 +22,18 @@ import { runIfMain } from "#scripts/lib/is-main-module.js";
 
 const RATCHET_OUTPUT_DIR = join(ROOT_DIR, ".jscpd-report", "ratchet");
 const RATCHET_REPORT = join(RATCHET_OUTPUT_DIR, "jscpd-report.json");
+const CONFIG_RATCHET_OUTPUT_DIR = join(
+  ROOT_DIR,
+  ".jscpd-report",
+  "ratchet-config",
+);
+const CONFIG_RATCHET_REPORT = join(
+  CONFIG_RATCHET_OUTPUT_DIR,
+  "jscpd-report.json",
+);
 
 /**
  * Extract the strict jscpd invocation's CLI args from the cpd npm script.
- * The script chains a config-driven default run and a strict run; the
- * strict one is the segment carrying --min-tokens.
  * @param {string} cpdScript
  * @returns {string[]}
  */
@@ -64,33 +74,104 @@ export const lowerMinTokens = (args) => {
   return { current, ratchetArgs };
 };
 
-/** Run the ratchet: exported so the unit tests can drive it with mocks. */
+/**
+ * Read the config-driven default scan's minTokens out of .jscpd.json.
+ * @returns {number}
+ */
+/**
+ * Validate and return a config's recorded minTokens threshold.
+ * @param {{ minTokens?: unknown }} config - parsed .jscpd.json content
+ * @returns {number}
+ */
+export const configMinTokens = (config) => {
+  const { minTokens } = config;
+  if (
+    typeof minTokens !== "number" ||
+    !Number.isInteger(minTokens) ||
+    minTokens < 2
+  ) {
+    throw new Error(
+      `.jscpd.json must record an integer minTokens above 1 - found ${JSON.stringify(minTokens)}`,
+    );
+  }
+  return minTokens;
+};
+
+/**
+ * Read the config-driven default scan's minTokens out of .jscpd.json.
+ * @returns {number}
+ */
+export const readConfigMinTokens = () =>
+  configMinTokens(
+    JSON.parse(readFileSync(join(ROOT_DIR, ".jscpd.json"), "utf-8")),
+  );
+
+/**
+ * Guard one recorded threshold: run the scan it protects with the
+ * threshold lowered by one. A clean run means the threshold can be
+ * tightened, which fails the ratchet naming where to update it; any
+ * other non-zero exit must have produced duplicates (or the run itself
+ * crashed, which loadCpdDuplicates throws on). Returns the duplicates
+ * found one notch lower for the pass message.
+ * @param {number} threshold - the recorded min-tokens value being guarded
+ * @param {string[]} ratchetArgs - jscpd args reproducing the guarded scan at threshold - 1
+ * @param {string} outputDir - report destination for this ratchet run
+ * @param {string} reportPath - JSON report path inside outputDir
+ * @param {string} fixLocation - where to update the threshold on failure
+ * @returns {object[]}
+ */
+const guardThreshold = (
+  threshold,
+  ratchetArgs,
+  outputDir,
+  reportPath,
+  fixLocation,
+) => {
+  const status = runJscpd(
+    [...ratchetArgs, "--silent", "--output", outputDir],
+    reportPath,
+  );
+
+  if (status === 0) {
+    console.error(
+      `\n❌ CPD ratchet failed: the code passes with min-tokens ${threshold - 1}`,
+    );
+    console.error(`   Update ${fixLocation} to ${threshold - 1}`);
+    process.exit(1);
+  }
+
+  return loadCpdDuplicates(reportPath);
+};
+
+/**
+ * Run the ratchet: exported so the unit tests can drive it with mocks.
+ */
 export const main = () => {
   const pkg = JSON.parse(readFileSync(join(ROOT_DIR, "package.json"), "utf-8"));
   const { current, ratchetArgs } = lowerMinTokens(
     parseCpdArgs(pkg.scripts.cpd),
   );
-
-  const status = runJscpd(
-    [...ratchetArgs, "--silent", "--output", RATCHET_OUTPUT_DIR],
+  const duplicates = guardThreshold(
+    current,
+    ratchetArgs,
+    RATCHET_OUTPUT_DIR,
     RATCHET_REPORT,
+    "--min-tokens in the package.json cpd script",
   );
-
-  if (status === 0) {
-    console.error(
-      `\n❌ CPD ratchet failed: the code passes with min-tokens ${current - 1}`,
-    );
-    console.error(
-      `   Update --min-tokens to ${current - 1} in the package.json cpd script`,
-    );
-    process.exit(1);
-  }
-
-  // A non-zero exit must mean duplication at the stricter threshold, not a
-  // crash - loadCpdDuplicates throws if the run failed without a report.
-  const duplicates = loadCpdDuplicates(RATCHET_REPORT);
   console.log(
     `\n✅ CPD ratchet passed: min-tokens ${current} is as strict as the code allows (${duplicates.length} clone(s) appear one notch lower)`,
+  );
+
+  const configTokens = readConfigMinTokens();
+  const configDuplicates = guardThreshold(
+    configTokens,
+    ["--min-tokens", String(configTokens - 1)],
+    CONFIG_RATCHET_OUTPUT_DIR,
+    CONFIG_RATCHET_REPORT,
+    "minTokens in .jscpd.json",
+  );
+  console.log(
+    `\n✅ CPD ratchet passed: config min-tokens ${configTokens} is as strict as the code allows (${configDuplicates.length} clone(s) appear one notch lower)`,
   );
 };
 

@@ -16,6 +16,9 @@ describe("type-generation-freshness", () => {
         "PAGES_CMS_TYPES_OUTPUT_PATH",
         tempDir,
       );
-      expect(regenerated).toBe(committed);
+      expect(
+        regenerated,
+        "pages-cms-generated.d.ts is stale: run npm run generate-references and re-stage it",
+      ).toBe(committed);
     }));
 });
