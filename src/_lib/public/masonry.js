@@ -2,22 +2,20 @@
 // Font metrics are read from computed styles so JS always matches CSS.
 import { varPreLine } from "uwrap";
 import { onReady } from "#public/utils/on-ready.js";
+import { memoize } from "#utils/fp/memoize.js";
 
 const GAP = 32;
 const MOBILE_BREAKPOINT = 768;
 const CARD_BORDER = 2;
 const ITEM_PADDING_INLINE = 24;
 
-const counterCache = new Map();
-
-const getCounter = (font) => {
-  if (counterCache.has(font)) return counterCache.get(font);
+// Cached per font string (module scope, so the cache persists across layout
+// calls) - canvas metrics for one font never change within a page view.
+const getCounter = memoize((font) => {
   const ctx = document.createElement("canvas").getContext("2d");
   ctx.font = font;
-  const counter = varPreLine(ctx).count;
-  counterCache.set(font, counter);
-  return counter;
-};
+  return varPreLine(ctx).count;
+});
 
 const getFont = (el) => {
   const s = getComputedStyle(el);

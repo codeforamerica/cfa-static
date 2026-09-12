@@ -75,41 +75,6 @@ const ALLOWED_PROCESS_CWD = frozenSet([
 ]);
 
 // ============================================
-// Mutable const exceptions (empty [], {}, Set, Map)
-// ============================================
-
-// Const declarations that create mutable containers (arrays, objects, Sets, Maps).
-// While const prevents reassignment, these containers can still be mutated.
-// Prefer functional patterns: map, filter, reduce, spread, etc.
-const ALLOWED_MUTABLE_CONST = frozenSet([
-  // Test utilities - entire files allowed for imperative test patterns
-  "test/test-runner-utils.js",
-  "test/code-scanner.js",
-
-  // Test files - imperative accumulation patterns for test setup/assertions
-  "test/unit/code-quality/array-push.test.js",
-  "test/unit/code-quality/comment-limits.test.js",
-  "test/unit/code-quality/let-usage.test.js",
-  "test/unit/code-quality/aliasing.test.js",
-  "test/unit/code-quality/naming-conventions.test.js",
-  "test/unit/code-quality/single-use-functions.test.js",
-  "test/unit/code-quality/test-only-exports.test.js",
-  "test/unit/code-quality/unused-classes.test.js",
-  "test/unit/code-quality/design-system-scoping.test.js",
-  "test/unit/code-quality/duplicate-methods.test.js",
-  "test/unit/test-runner-utils.test.js",
-  "test/unit/eleventy/layout-aliases.test.js",
-  "test/unit/utils/object-entries.test.js",
-  "test/unit/transforms/images.test.js",
-  "test/unit/utils/set.test.js",
-
-  // Frontend - Set used to track visible parallax elements for scroll updates
-  "src/_lib/public/design-system.js:61",
-  // Frontend - Map cache for uWrap font counters (one per unique computed font)
-  "src/_lib/public/masonry.js:11",
-]);
-
-// ============================================
 // Let declarations exceptions
 // ============================================
 
@@ -118,14 +83,13 @@ const ALLOWED_MUTABLE_CONST = frozenSet([
 // Only 'let moduleName = null;' is allowed for lazy loading without exceptions.
 const ALLOWED_LET = frozenSet([
   // Test files with mutable state tracking
+
   "test/integration/eleventy/feed.test.js",
   "test/unit/code-quality/comment-limits.test.js",
   "test/unit/code-quality/commented-code.test.js",
   "test/unit/code-quality/let-usage.test.js", // Test file has let in test cases
   "test/unit/code-quality/unused-classes.test.js",
-  "test/unit/code-quality/design-system-scoping.test.js",
   "test/integration/test-site-factory.test.js",
-  "test/code-scanner.js",
   "test/unit/transforms/images.test.js",
 ]);
 
@@ -271,23 +235,12 @@ const ALLOWED_NULLISH_COALESCING = frozenSet([
   // src/_data - user-facing data boundary (frontmatter from markdown files)
   // These are legitimate exceptions per CLAUDE.md: "User-provided input at system boundaries"
   "src/_data/eleventyComputed.js", // order, faqs, tab.body, metaComputed defaults
-
-  // src/_lib/build - build-time utilities
-  "src/_lib/build/scss.js:27", // Lazy module loading pattern
-  "src/_lib/build/theme-compiler.js:59", // Theme variables extraction fallback
-
-  // src/_lib/public - frontend JavaScript (browser-side, no collections)
-  "src/_lib/public/ui/autosizes.js:83",
-
-  // src/_lib/utils - utility functions
-  "src/_lib/utils/sorting.js:64", // eleventyNavigation.order (separate from item order)
 ]);
 
 export {
   ALLOWED_DATA_FALLBACKS,
   ALLOWED_DOM_CONSTRUCTOR,
   ALLOWED_LET,
-  ALLOWED_MUTABLE_CONST,
   ALLOWED_NULLISH_COALESCING,
   ALLOWED_PROCESS_CWD,
   ALLOWED_SINGLE_USE_FUNCTIONS,

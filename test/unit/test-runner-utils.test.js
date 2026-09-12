@@ -414,9 +414,8 @@ Failed to compile
 
     test("Handles empty results gracefully", () => {
       const emptyRunSteps = createBasicSteps();
-      const results = {};
 
-      const output = captureConsole(() => printSummary(emptyRunSteps, results));
+      const output = captureConsole(() => printSummary(emptyRunSteps, {}));
 
       expect(output).toContain("SUMMARY");
       expect(output).not.toContain("Passed");
@@ -588,7 +587,7 @@ Failed to compile
     });
 
     describe("checkRecord", () => {
-      test("pushes line and branch failures for partially covered record", () => {
+      test("collects line and branch failures for partially covered record", () => {
         const record = [
           "SF:src/foo.js",
           "DA:3,0",
@@ -600,10 +599,11 @@ Failed to compile
           "BRH:1",
           "BRF:2",
         ].join("\n");
-        const lineFailures = [];
-        const branchFailures = [];
 
-        checkRecord(record, "src/foo.js", lineFailures, branchFailures);
+        const { lineFailures, branchFailures } = checkRecord(
+          record,
+          "src/foo.js",
+        );
 
         expect(lineFailures).toEqual([
           "src/foo.js: 1/2 lines covered\n      uncovered lines: 3",
@@ -613,7 +613,7 @@ Failed to compile
         ]);
       });
 
-      test("pushes nothing when record is fully covered", () => {
+      test("collects nothing when record is fully covered", () => {
         const record = [
           "SF:src/bar.js",
           "DA:1,3",
@@ -623,10 +623,11 @@ Failed to compile
           "BRH:2",
           "BRF:2",
         ].join("\n");
-        const lineFailures = [];
-        const branchFailures = [];
 
-        checkRecord(record, "src/bar.js", lineFailures, branchFailures);
+        const { lineFailures, branchFailures } = checkRecord(
+          record,
+          "src/bar.js",
+        );
 
         expect(lineFailures).toEqual([]);
         expect(branchFailures).toEqual([]);

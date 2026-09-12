@@ -7,6 +7,7 @@ import {
   SCRIPT_JS_FILES,
   SRC_JS_FILES,
 } from "#test/test-utils.js";
+import { unique } from "#utils/fp/array.js";
 import { frozenSet } from "#utils/fp/set.js";
 
 // Configuration
@@ -36,33 +37,26 @@ const countCamelCaseWords = (str) => {
   return words.length;
 };
 
+// Match camelCase identifiers (starting with lowercase, having at least one uppercase)
+// This catches: variableNames, functionNames, methodNames
+const CAMEL_CASE_PATTERN = /\b([a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*)\b/g;
+
 /**
- * Extract all camelCase identifiers from JavaScript source code.
- * Returns an array of identifiers.
+ * Extract all camelCase identifiers from JavaScript source code,
+ * deduplicated. Returns an array of identifiers.
  */
 const extractCamelCaseIdentifiers = (source) => {
-  const identifiers = new Set();
-
-  // Remove string literals to avoid false positives
-  const noStrings = source
+  // Strip strings (to avoid scanning their contents), then comments
+  const noComments = source
     .replace(/'(?:[^'\\]|\\.)*'/g, '""')
     .replace(/"(?:[^"\\]|\\.)*"/g, '""')
-    .replace(/`(?:[^`\\]|\\.)*`/g, '""');
-
-  // Remove comments
-  const noComments = noStrings
+    .replace(/`(?:[^`\\]|\\.)*`/g, '""')
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/\/\/.*$/gm, "");
 
-  // Match camelCase identifiers (starting with lowercase, having at least one uppercase)
-  // This catches: variableNames, functionNames, methodNames
-  const camelCasePattern = /\b([a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*)\b/g;
-
-  for (const match of noComments.matchAll(camelCasePattern)) {
-    identifiers.add(match[1]);
-  }
-
-  return Array.from(identifiers);
+  return unique(
+    [...noComments.matchAll(CAMEL_CASE_PATTERN)].map((match) => match[1]),
+  );
 };
 
 /**
@@ -70,34 +64,42 @@ const extractCamelCaseIdentifiers = (source) => {
  * Returns an object with violations and their occurrence counts.
  */
 const analyzeNamingConventions = () => {
-  const violations = {};
-
-  for (const relativePath of combineFileLists([
+  // Identifier-file pairs for every too-long name in every source file
+  const occurrences = combineFileLists([
     SRC_JS_FILES(),
     SCRIPT_JS_FILES(),
-  ])) {
-    const fullPath = path.join(rootDir, relativePath);
-    const source = fs.readFileSync(fullPath, "utf-8");
-    const identifiers = extractCamelCaseIdentifiers(source);
+  ]).flatMap((relativePath) =>
+    extractCamelCaseIdentifiers(
+      fs.readFileSync(path.join(rootDir, relativePath), "utf-8"),
+    )
+      .filter(
+        (identifier) =>
+          countCamelCaseWords(identifier) > MAX_WORDS &&
+          !IGNORED_IDENTIFIERS.has(identifier),
+      )
+      .map((identifier) => ({ identifier, relativePath })),
+  );
 
-    for (const identifier of identifiers) {
-      const wordCount = countCamelCaseWords(identifier);
+  // Count occurrences and collect files per identifier
+  const collectViolation = (violations, { identifier, relativePath }) => {
+    const existing = violations[identifier];
+    return {
+      ...violations,
+      [identifier]: existing
+        ? {
+            ...existing,
+            occurrences: existing.occurrences + 1,
+            files: [...existing.files, relativePath],
+          }
+        : {
+            wordCount: countCamelCaseWords(identifier),
+            occurrences: 1,
+            files: [relativePath],
+          },
+    };
+  };
 
-      if (wordCount > MAX_WORDS && !IGNORED_IDENTIFIERS.has(identifier)) {
-        if (!violations[identifier]) {
-          violations[identifier] = {
-            wordCount,
-            occurrences: 0,
-            files: new Set(),
-          };
-        }
-        violations[identifier].occurrences++;
-        violations[identifier].files.add(relativePath);
-      }
-    }
-  }
-
-  return violations;
+  return occurrences.reduce(collectViolation, {});
 };
 
 /**

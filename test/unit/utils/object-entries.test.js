@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { everyEntry } from "#test/test-utils.js";
 import {
   filterObject,
@@ -90,12 +90,9 @@ describe("object-entries utilities", () => {
     });
 
     test("receives key and value as separate args", () => {
-      const keysAndValues = [];
-      everyEntry((k, v) => {
-        keysAndValues.push([k, v]);
-        return true;
-      })({ x: 10, y: 20 });
-      expect(keysAndValues).toEqual([
+      const onEntry = vi.fn(() => true);
+      everyEntry(onEntry)({ x: 10, y: 20 });
+      expect(onEntry.mock.calls).toEqual([
         ["x", 10],
         ["y", 20],
       ]);

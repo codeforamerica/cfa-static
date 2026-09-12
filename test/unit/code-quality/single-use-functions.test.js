@@ -21,6 +21,7 @@ import {
 } from "#test/code-scanner.js";
 import { SRC_JS_FILES, TEST_FILES } from "#test/test-utils.js";
 import { filterMap, pipe } from "#utils/fp/array.js";
+import { frozenSet } from "#utils/fp/set.js";
 
 // Scans every src and test file; under the full suite's parallel lanes that
 // exceeds the default timeout.
@@ -171,26 +172,28 @@ const countReferences = (source, functionName) => {
 const IDENTIFIER_PATTERN = /\b[a-zA-Z_$][a-zA-Z0-9_$]*\b/g;
 
 const buildReferenceCountMap = (fileData) => {
-  const functionNames = new Set();
+  const functionNames = frozenSet(
+    Object.values(fileData).flatMap((data) =>
+      data.functions.map((func) => func.name),
+    ),
+  );
 
-  for (const [, data] of fileData) {
-    for (const func of data.functions) {
-      functionNames.add(func.name);
-    }
-  }
+  // Tokenize each source once and count identifiers that are known function
+  // names. This preserves countReferences() semantics for identifier word
+  // boundaries while avoiding thousands of full-source rescans.
+  const occurrences = Object.groupBy(
+    Object.values(fileData).flatMap((data) =>
+      [...data.source.matchAll(IDENTIFIER_PATTERN)]
+        .map((match) => match[0])
+        .filter((identifier) => functionNames.has(identifier)),
+    ),
+    (identifier) => identifier,
+  );
 
-  const refCounts = new Map([...functionNames].map((name) => [name, 0]));
-
-  for (const [, data] of fileData) {
-    for (const match of data.source.matchAll(IDENTIFIER_PATTERN)) {
-      const identifier = match[0];
-      if (functionNames.has(identifier)) {
-        refCounts.set(identifier, refCounts.get(identifier) + 1);
-      }
-    }
-  }
-
-  return refCounts;
+  // Group sizes are the reference counts; names never seen stay at 0
+  return Object.fromEntries(
+    [...functionNames].map((name) => [name, occurrences[name]?.length ?? 0]),
+  );
 };
 
 /**
@@ -207,23 +210,26 @@ const analyzeSingleUseFunctions = () => {
   ).filter((file) => !exemptDirs.some((dir) => file.startsWith(dir)));
 
   // First pass: collect all function definitions and exports per file
-  const fileData = new Map();
-  for (const file of allFiles) {
-    const source = readSource(file);
-    fileData.set(file, {
-      source,
-      functions: extractFunctionDefinitions(source),
-      exports: extractExports(source),
-    });
-  }
+  const fileData = Object.fromEntries(
+    allFiles.map((file) => {
+      const source = readSource(file);
+      return [
+        file,
+        {
+          source,
+          functions: extractFunctionDefinitions(source),
+          exports: extractExports(source),
+        },
+      ];
+    }),
+  );
 
   // Second pass: build reference count map with one identifier scan per file
   const refCounts = buildReferenceCountMap(fileData);
 
   // Third pass: identify violations using functional composition
-  const allViolations = [];
-  for (const [file, data] of fileData) {
-    const fileViolations = pipe(
+  const allViolations = Object.entries(fileData).flatMap(([file, data]) =>
+    pipe(
       filterMap(
         (func) => {
           // Skip exported functions
@@ -233,7 +239,7 @@ const analyzeSingleUseFunctions = () => {
           if (func.isNested) return false;
 
           // 2 references = 1 definition + 1 call = single use
-          return refCounts.get(func.name) === 2;
+          return refCounts[func.name] === 2;
         },
         (func) => ({
           file,
@@ -242,10 +248,8 @@ const analyzeSingleUseFunctions = () => {
           reason: `Function "${func.name}" is only called once - nest it inside its caller`,
         }),
       ),
-    )(data.functions);
-
-    allViolations.push(...fileViolations);
-  }
+    )(data.functions),
+  );
 
   // Filter by allowlist (file-level only)
   const isSingleUseAllowed = (v) => ALLOWED_SINGLE_USE_FUNCTIONS.has(v.file);

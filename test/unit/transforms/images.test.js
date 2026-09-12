@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import {
   ASPECT_RATIO_ATTRIBUTE,
   extractImageOptions,
@@ -209,11 +209,9 @@ describe("images transform", () => {
       const dom = await loadDOM(
         '<html><body><img src="/images/a.jpg"><img src="/images/b.jpg"></body></html>',
       );
-      const names = [];
-      await processImages(dom.window.document, {}, async (opts) => {
-        names.push(opts.imageName);
-        return createWrapper(dom.window.document);
-      });
+      const onImage = vi.fn(async () => createWrapper(dom.window.document));
+      await processImages(dom.window.document, {}, onImage);
+      const names = onImage.mock.calls.map(([opts]) => opts.imageName);
       expect(names).toContain("/images/a.jpg");
       expect(names).toContain("/images/b.jpg");
     });

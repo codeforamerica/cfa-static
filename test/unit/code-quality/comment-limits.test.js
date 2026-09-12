@@ -85,40 +85,39 @@ const findHeaderEndLine = (lines) => {
 };
 
 const countInlineComments = (lines, headerEndLine) => {
-  const inlineComments = [];
-  let inJSDocBlock = false;
-  let inRegularBlock = false;
-
-  for (const { line, num } of lines) {
-    if (num <= headerEndLine) continue;
+  // Threads { inlineComments, inJsDocBlock, inRegularBlock } across lines
+  const processLine = (state, { line, num }) => {
+    if (num <= headerEndLine) return state;
     const trimmed = line.trim();
-    if (inJSDocBlock) {
-      if (isBlockEnd(trimmed)) inJSDocBlock = false;
-      continue;
+    const emit = (comment) => ({
+      ...state,
+      inlineComments: [...state.inlineComments, comment],
+    });
+    if (state.inJsDocBlock) {
+      return isBlockEnd(trimmed) ? { ...state, inJsDocBlock: false } : state;
     }
-    if (inRegularBlock) {
-      inlineComments.push({ lineNumber: num, line: trimmed });
-      if (isBlockEnd(trimmed)) inRegularBlock = false;
-      continue;
+    if (state.inRegularBlock) {
+      const next = emit({ lineNumber: num, line: trimmed });
+      return isBlockEnd(trimmed) ? { ...next, inRegularBlock: false } : next;
     }
     if (COMMENT_PATTERNS.jsdocStart.test(trimmed)) {
-      if (!isBlockEnd(trimmed)) inJSDocBlock = true;
-      continue;
+      return { ...state, inJsDocBlock: !isBlockEnd(trimmed) };
     }
     if (isBlockStart(trimmed)) {
-      inlineComments.push({ lineNumber: num, line: trimmed });
-      if (!isBlockEnd(trimmed)) inRegularBlock = true;
-      continue;
+      const next = emit({ lineNumber: num, line: trimmed });
+      return { ...next, inRegularBlock: !isBlockEnd(trimmed) };
     }
-    if (
-      isSingleLine(trimmed) &&
+    return isSingleLine(trimmed) &&
       !JSDOC_TYPE_PATTERNS.some((pattern) => pattern.test(trimmed))
-    ) {
-      inlineComments.push({ lineNumber: num, line: trimmed });
-    }
-  }
+      ? emit({ lineNumber: num, line: trimmed })
+      : state;
+  };
 
-  return inlineComments;
+  return lines.reduce(processLine, {
+    inlineComments: [],
+    inJsDocBlock: false,
+    inRegularBlock: false,
+  }).inlineComments;
 };
 
 const findExcessiveComments = (source) => {
@@ -196,7 +195,7 @@ function validate(name, age) {
  * Another JSDoc block.
  * @type {Object}
  */
-const config = {};
+const config = { key: "value" };
 `;
     const results = findExcessiveComments(source);
     expect(results.length).toBe(0);

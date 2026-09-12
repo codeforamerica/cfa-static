@@ -1,8 +1,5 @@
 import { describe, expect, test } from "vitest";
-import {
-  ALLOWED_LET,
-  ALLOWED_MUTABLE_CONST,
-} from "#test/code-quality/code-quality-exceptions.js";
+import { ALLOWED_LET } from "#test/code-quality/code-quality-exceptions.js";
 import {
   assertNoViolations,
   combineFileLists,
@@ -11,7 +8,6 @@ import {
   matchesAny,
 } from "#test/code-scanner.js";
 import { SRC_JS_FILES, TEST_FILES } from "#test/test-utils.js";
-import { logAllowedItems } from "#test/unit/code-quality/code-quality-utils.js";
 
 // Patterns that indicate allowed let usage (lazy loading, state management)
 const ALLOWED_LET_PATTERNS = [
@@ -61,7 +57,6 @@ const { find: findMutableConstDeclarations, analyze: mutableConstAnalysis } =
       return { reason: "Mutable const" };
     },
     files: LET_GATE_FILES(),
-    allowlist: ALLOWED_MUTABLE_CONST,
   });
 
 describe("let-usage", () => {
@@ -132,15 +127,15 @@ let mutableVar = 0;
   });
 
   test("Detects mutable const declarations in source code", () => {
-    const source = `
-const immutable = 1;
-const items = [];
-const data = {};
-const seen = new Set();
-const cache = new Map();
-const filled = [1, 2, 3];
-const config = { key: 'value' };
-    `;
+    const source = [
+      "const immutable = 1;",
+      "const items = [];",
+      "const data = {};",
+      "const seen = new Set();",
+      "const cache = new Map();",
+      "const filled = [1, 2, 3];",
+      "const config = { key: 'value' };",
+    ].join("\n");
     const results = findMutableConstDeclarations(source);
     expect(results.length).toBe(4);
     expect(results[0].reason).toBe("Empty array const");
@@ -149,27 +144,13 @@ const config = { key: 'value' };
     expect(results[3].reason).toBe("Map const");
   });
 
-  test("No mutable const declarations outside allowlist", () => {
+  test("No mutable const declarations in source files", () => {
     const { violations } = mutableConstAnalysis();
     assertNoViolations(violations, {
       singular: "mutable const declaration",
       fixHint:
-        "use functional patterns (map/filter/reduce/spread) - the ALLOWED_MUTABLE_CONST baseline is deletion-only",
+        "use functional patterns (map/filter/reduce/spread, frozenSet, Object.fromEntries)",
     });
-  });
-
-  test("Reports allowlisted mutable const usage for tracking", () => {
-    const { allowed } = mutableConstAnalysis();
-    logAllowedItems(allowed, "Allowlisted mutable const usages", true);
-  });
-
-  // Exception validation tests
-  test("ALLOWED_MUTABLE_CONST entries still exist and match pattern", () => {
-    expectNoStaleExceptions(
-      ALLOWED_MUTABLE_CONST,
-      MUTABLE_CONST_PATTERNS,
-      "ALLOWED_MUTABLE_CONST",
-    );
   });
 
   test("Reports allowlisted let usage for tracking", () => {
@@ -177,14 +158,12 @@ const config = { key: 'value' };
     console.log(`\n  Allowlisted let usages: ${allowed.length}`);
     if (allowed.length > 0) {
       console.log("  Files with let:");
-      const byFile = {};
-      for (const loc of allowed) {
-        const file = loc.file || loc.location.split(":")[0];
-        if (!byFile[file]) byFile[file] = 0;
-        byFile[file]++;
-      }
-      for (const [file, count] of Object.entries(byFile)) {
-        console.log(`    - ${file}: ${count} usage(s)`);
+      const byFile = Object.groupBy(
+        allowed,
+        (loc) => loc.file || loc.location.split(":")[0],
+      );
+      for (const [file, locs] of Object.entries(byFile)) {
+        console.log(`    - ${file}: ${locs.length} usage(s)`);
       }
     }
   });

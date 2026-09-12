@@ -51,8 +51,6 @@ const stripCommentsAndImports = (content) => {
  * @returns {string[]} - Array of unscoped selectors found
  */
 const findUnscopedSelectors = (content) => {
-  const unscopedSelectors = [];
-
   // Remove comments (both single-line and multi-line) and @use/@forward/@import statements
   const withoutImports = stripCommentsAndImports(content);
 
@@ -63,61 +61,66 @@ const findUnscopedSelectors = (content) => {
 
   // If file is empty after removing imports/comments/:root, it's fine
   if (!withoutRoot) {
-    return unscopedSelectors;
+    return [];
   }
 
   // Check if the remaining content starts with .design-system {
   // and there's nothing significant before or after the closing brace
   const designSystemPattern = /^\s*\.design-system\s*\{[\s\S]*\}\s*$/;
+  if (designSystemPattern.test(withoutRoot)) {
+    return [];
+  }
 
-  if (!designSystemPattern.test(withoutRoot)) {
-    // Find what selectors are at the top level
-    // Look for patterns that indicate a CSS rule outside .design-system
-    const lines = withoutRoot.split("\n");
-    let braceDepth = 0;
-    let currentSelector = "";
-    let inDesignSystem = false;
-
-    for (const line of lines) {
+  // Find what selectors are at the top level: track brace depth and whether
+  // we are inside a .design-system block across lines.
+  const finalState = withoutRoot.split("\n").reduce(
+    (state, line) => {
       const trimmed = line.trim();
-      if (!trimmed) continue;
+      if (!trimmed) return state;
 
       // Track if we're inside .design-system
-      if (trimmed.startsWith(".design-system")) {
-        inDesignSystem = true;
-      }
+      const inDesignSystem =
+        state.inDesignSystem || trimmed.startsWith(".design-system");
 
       // Count braces
       const openBraces = (trimmed.match(/\{/g) || []).length;
       const closeBraces = (trimmed.match(/\}/g) || []).length;
 
-      // If at top level (braceDepth === 0) and this looks like a selector
-      if (braceDepth === 0 && !inDesignSystem) {
-        // Check for selectors: .class, #id, element, [attr], :pseudo, *
-        const selectorMatch = trimmed.match(
-          /^([.#]?[a-zA-Z_*][a-zA-Z0-9_-]*|\[[^\]]+\]|:[a-z-]+)/,
-        );
-        if (selectorMatch && !trimmed.startsWith("@")) {
-          currentSelector = selectorMatch[1];
-        }
-      }
+      // If at top level and this looks like a selector, remember it:
+      // .class, #id, element, [attr], :pseudo, *
+      const atTopLevel = state.braceDepth === 0 && !inDesignSystem;
+      const selectorMatch = trimmed.match(
+        /^([.#]?[a-zA-Z_*][a-zA-Z0-9_-]*|\[[^\]]+\]|:[a-z-]+)/,
+      );
+      const currentSelector =
+        atTopLevel && selectorMatch && !trimmed.startsWith("@")
+          ? selectorMatch[1]
+          : state.currentSelector;
 
-      braceDepth += openBraces - closeBraces;
+      const braceDepth = state.braceDepth + openBraces - closeBraces;
 
       // If we just opened a brace and had a selector, it's unscoped
-      if (currentSelector && openBraces > 0 && !inDesignSystem) {
-        unscopedSelectors.push(currentSelector);
-        currentSelector = "";
-      }
+      const shouldRecord = currentSelector && openBraces > 0 && !inDesignSystem;
 
-      // Reset inDesignSystem when we close back to depth 0
-      if (braceDepth === 0) {
-        inDesignSystem = false;
-      }
-    }
-  }
+      return {
+        unscopedSelectors: shouldRecord
+          ? [...state.unscopedSelectors, currentSelector]
+          : state.unscopedSelectors,
+        braceDepth,
+        currentSelector: shouldRecord ? "" : currentSelector,
+        // Reset inDesignSystem when we close back to depth 0
+        inDesignSystem: braceDepth === 0 ? false : inDesignSystem,
+      };
+    },
+    {
+      unscopedSelectors: [],
+      braceDepth: 0,
+      currentSelector: "",
+      inDesignSystem: false,
+    },
+  );
 
-  return unscopedSelectors;
+  return finalState.unscopedSelectors;
 };
 
 /**

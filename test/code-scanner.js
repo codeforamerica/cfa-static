@@ -6,6 +6,7 @@ import { expect } from "vitest";
 import { fs, omit, path, rootDir } from "#test/test-utils.js";
 import { notMemberOf, pluralize } from "#utils/fp/array.js";
 import { frozenObject } from "#utils/fp/object.js";
+import { frozenSet } from "#utils/fp/set.js";
 
 // Standard fields returned by find functions (everything else is extra data)
 const STANDARD_HIT_FIELDS = ["lineNumber", "line"];
@@ -49,7 +50,7 @@ const isCommentLine = (line) =>
 // Brace depth tracking utilities
 // ============================================
 
-const STRING_QUOTES = new Set(['"', "'", "`"]);
+const STRING_QUOTES = frozenSet(['"', "'", "`"]);
 
 /**
  * Remove string literals from a line to avoid false positives when tracking braces.
@@ -435,13 +436,11 @@ const withAllowlist = (config) => () =>
  */
 const validateExceptions = (allowlist, patterns) => {
   const patternList = [patterns].flat();
-  const stale = [];
 
-  for (const entry of allowlist) {
+  return [...allowlist].flatMap((entry) => {
     // Entries for deleted or renamed files are stale, not a crash
     if (!fs.existsSync(path.join(rootDir, entry.split(":")[0]))) {
-      stale.push({ entry, reason: "File no longer exists" });
-      continue;
+      return [{ entry, reason: "File no longer exists" }];
     }
 
     // File-only entries (no line number) - verify file has at least one match
@@ -450,13 +449,9 @@ const validateExceptions = (allowlist, patterns) => {
       const hasMatch = source
         .split("\n")
         .some((line) => patternList.some((p) => p.test(line)));
-      if (!hasMatch) {
-        stale.push({
-          entry,
-          reason: "File contains no lines matching pattern",
-        });
-      }
-      continue;
+      return hasMatch
+        ? []
+        : [{ entry, reason: "File contains no lines matching pattern" }];
     }
 
     const [filePath, lineNumStr] = entry.split(":");
@@ -466,25 +461,26 @@ const validateExceptions = (allowlist, patterns) => {
 
     // Check if line exists
     if (lineNum > lines.length || lineNum < 1) {
-      stale.push({
-        entry,
-        reason: `Line ${lineNum} doesn't exist (file has ${lines.length} lines)`,
-      });
-      continue;
+      return [
+        {
+          entry,
+          reason: `Line ${lineNum} doesn't exist (file has ${lines.length} lines)`,
+        },
+      ];
     }
 
     // Check if line matches pattern
     const line = lines[lineNum - 1];
 
-    if (!patternList.some((p) => p.test(line))) {
-      stale.push({
-        entry,
-        reason: `Line no longer matches pattern: "${line.trim().slice(0, 50)}..."`,
-      });
-    }
-  }
-
-  return stale;
+    return patternList.some((p) => p.test(line))
+      ? []
+      : [
+          {
+            entry,
+            reason: `Line no longer matches pattern: "${line.trim().slice(0, 50)}..."`,
+          },
+        ];
+  });
 };
 
 /**
@@ -632,13 +628,13 @@ const EXPORT_DEFAULT_PATTERN =
   /^\s*export\s+default\s+(?:function\s+)?([a-zA-Z_$][a-zA-Z0-9_$]*)/;
 
 /**
- * Parse export names from export list content.
+ * Parse export names from export list content, dropping aliases.
  * Handles: "name1, name2, name3 as alias"
  * @param {string} content - Content between { and }
- * @param {Set<string>} exported - Set to add exports to
+ * @returns {string[]}
  */
-const parseExportListContent = (content, exported) => {
-  const names = content
+const parseExportNames = (content) =>
+  content
     .split(",")
     .map((n) =>
       n
@@ -647,10 +643,6 @@ const parseExportListContent = (content, exported) => {
         .trim(),
     )
     .filter((n) => n && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(n));
-  for (const name of names) {
-    exported.add(name);
-  }
-};
 
 /**
  * Extract all named exports from source code.
@@ -661,64 +653,62 @@ const parseExportListContent = (content, exported) => {
  * @returns {Set<string>} - Set of exported names
  */
 const extractExports = (source) => {
-  const exported = new Set();
-  const lines = source.split("\n");
-  let multiLineBuffer = null;
-
-  for (const line of lines) {
+  // Threads { names, pending } across lines; pending holds the accumulated
+  // content of a multi-line export list until its closing brace.
+  const processLine = (acc, line) => {
     // Skip comments
-    if (isCommentLine(line)) continue;
+    if (isCommentLine(line)) return acc;
 
     // If we're accumulating a multi-line export
-    if (multiLineBuffer !== null) {
+    if (acc.pending !== null) {
       const closeIndex = line.indexOf("}");
-      if (closeIndex !== -1) {
-        multiLineBuffer += line.slice(0, closeIndex);
-        parseExportListContent(multiLineBuffer, exported);
-        multiLineBuffer = null;
-      } else {
-        multiLineBuffer += line;
-      }
-      continue;
+      return closeIndex === -1
+        ? { ...acc, pending: acc.pending + line }
+        : {
+            names: [
+              ...acc.names,
+              ...parseExportNames(acc.pending + line.slice(0, closeIndex)),
+            ],
+            pending: null,
+          };
     }
 
     // Match function declaration exports
     const funcMatch = line.match(EXPORT_FUNCTION_PATTERN);
-    if (funcMatch) {
-      exported.add(funcMatch[1]);
-      continue;
-    }
+    if (funcMatch) return { ...acc, names: [...acc.names, funcMatch[1]] };
 
     // Match variable declaration exports
     const varMatch = line.match(EXPORT_VAR_PATTERN);
-    if (varMatch) {
-      exported.add(varMatch[1]);
-      continue;
-    }
+    if (varMatch) return { ...acc, names: [...acc.names, varMatch[1]] };
 
-    // Check for export list (single or multi-line)
+    // Collect export lists (single-line, or open a multi-line buffer)
     if (EXPORT_BRACE_START.test(line)) {
       const braceStart = line.indexOf("{");
       const braceEnd = line.indexOf("}");
-
-      if (braceEnd !== -1) {
-        // Single-line export: export { a, b, c };
-        parseExportListContent(line.slice(braceStart + 1, braceEnd), exported);
-      } else {
-        // Multi-line export starts here
-        multiLineBuffer = line.slice(braceStart + 1);
-      }
-      continue;
+      return braceEnd !== -1
+        ? {
+            ...acc,
+            names: [
+              ...acc.names,
+              ...parseExportNames(line.slice(braceStart + 1, braceEnd)),
+            ],
+          }
+        : { ...acc, pending: line.slice(braceStart + 1) };
     }
 
     // Match default exports
     const defaultMatch = line.match(EXPORT_DEFAULT_PATTERN);
-    if (defaultMatch) {
-      exported.add(defaultMatch[1]);
-    }
-  }
+    return defaultMatch
+      ? { ...acc, names: [...acc.names, defaultMatch[1]] }
+      : acc;
+  };
 
-  return exported;
+  const finalState = source.split("\n").reduce(processLine, {
+    names: [],
+    pending: null,
+  });
+
+  return frozenSet(finalState.names);
 };
 
 /**

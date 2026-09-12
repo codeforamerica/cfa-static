@@ -58,18 +58,21 @@ const applyParallaxOffset = (el) => {
 const initParallax = () => {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  const activeSet = new Set();
+  // Like the reveal, visibility state rides on the element itself as a class.
+  const parallaxEls = document.querySelectorAll(`${SCOPE} .parallax`);
   observeIntersections(
     `${SCOPE} .parallax`,
     (entered, target) => {
-      activeSet[entered ? "add" : "delete"](target);
+      target.classList.toggle("parallax-active", entered);
     },
     { rootMargin: "50px 0px" },
   );
 
   const tick = () => {
-    for (const el of activeSet) {
-      applyParallaxOffset(el);
+    for (const el of parallaxEls) {
+      if (el.classList.contains("parallax-active")) {
+        applyParallaxOffset(el);
+      }
     }
     requestAnimationFrame(tick);
   };

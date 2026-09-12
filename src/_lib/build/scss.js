@@ -4,6 +4,7 @@ import { generateThemeSwitcherContent } from "#build/theme-compiler.js";
 import getConfig from "#data/config.js";
 
 // Lazy-loaded sass module
+/** @type {typeof import("sass") | null} */
 let sass = null;
 
 // Files that should be compiled (not just imported as partials)
@@ -24,7 +25,9 @@ const createScssCompiler = (inputContent, inputPath) => {
         ? `${inputContent}\n\n${generateThemeSwitcherContent()}`
         : inputContent;
 
-    sass ??= await import("sass");
+    if (!sass) {
+      sass = await import("sass");
+    }
     const css = sass.compileString(content, {
       loadPaths: [dir],
     }).css;

@@ -8,6 +8,8 @@ import { join } from "node:path";
 import { globSync } from "tinyglobby";
 import { ROOT_DIR } from "#lib/paths.js";
 import { COVERAGE_IGNORE } from "#test/coverage-ignore.js";
+import { compact, unique } from "#utils/fp/array.js";
+import { frozenSet } from "#utils/fp/set.js";
 
 const rootDir = ROOT_DIR;
 
@@ -57,12 +59,8 @@ export const printTruncatedList =
  * @param {string} record - A single lcov record (between SF: and end_of_record)
  * @returns {number[]} Line numbers with zero hits
  */
-export const extractUncoveredLines = (record) => {
-  const matches = record.matchAll(/^DA:(\d+),0$/gm);
-  const lines = [];
-  for (const m of matches) lines.push(Number.parseInt(m[1], 10));
-  return lines;
-};
+export const extractUncoveredLines = (record) =>
+  [...record.matchAll(/^DA:(\d+),0$/gm)].map((m) => Number.parseInt(m[1], 10));
 
 /**
  * Extract uncovered branch line numbers from BRDA: entries, deduped by line.
@@ -70,19 +68,12 @@ export const extractUncoveredLines = (record) => {
  * @param {string} record - A single lcov record
  * @returns {number[]} Line numbers with at least one uncovered branch
  */
-export const extractUncoveredBranchLines = (record) => {
-  const matches = record.matchAll(/^BRDA:(\d+),\d+,\d+,(-|0)$/gm);
-  const seen = new Set();
-  const lines = [];
-  for (const m of matches) {
-    const line = Number.parseInt(m[1], 10);
-    if (!seen.has(line)) {
-      seen.add(line);
-      lines.push(line);
-    }
-  }
-  return lines;
-};
+export const extractUncoveredBranchLines = (record) =>
+  unique(
+    [...record.matchAll(/^BRDA:(\d+),\d+,\d+,(-|0)$/gm)].map((m) =>
+      Number.parseInt(m[1], 10),
+    ),
+  );
 
 /**
  * Format uncovered line numbers as an indented suffix, or "" if none.
@@ -124,30 +115,26 @@ export const checkMetric = (
 };
 
 /**
- * Check line and branch metrics on an lcov record, pushing failures into the
- * provided arrays.
+ * Check line and branch metrics on an lcov record.
  * @param {string} record - A single lcov record
  * @param {string} file - Source file path (from SF:)
- * @param {string[]} lineFailures - Mutated with line-coverage failures
- * @param {string[]} branchFailures - Mutated with branch-coverage failures
+ * @returns {{ lineFailures: string[], branchFailures: string[] }} Line- and branch-coverage failures found in the record
  */
-export const checkRecord = (record, file, lineFailures, branchFailures) => {
+export const checkRecord = (record, file) => {
   const lineSuffix = formatUncovered("lines", extractUncoveredLines(record));
   const branchSuffix = formatUncovered(
     "branches",
     extractUncoveredBranchLines(record),
   );
-  const lineFail = checkMetric(record, "LH", "LF", file, "lines", lineSuffix);
-  if (lineFail) lineFailures.push(lineFail);
-  const branchFail = checkMetric(
-    record,
-    "BRH",
-    "BRF",
-    file,
-    "branches",
-    branchSuffix,
-  );
-  if (branchFail) branchFailures.push(branchFail);
+
+  return {
+    lineFailures: compact([
+      checkMetric(record, "LH", "LF", file, "lines", lineSuffix),
+    ]),
+    branchFailures: compact([
+      checkMetric(record, "BRH", "BRF", file, "branches", branchSuffix),
+    ]),
+  };
 };
 
 /**
@@ -157,18 +144,19 @@ export const checkRecord = (record, file, lineFailures, branchFailures) => {
  * @returns {{ lineFailures: string[], branchFailures: string[] }}
  */
 export const parseLcov = (lcovText, excludes) => {
-  const excludeSet = new Set(excludes);
-  const lineFailures = [];
-  const branchFailures = [];
-  const records = lcovText.split(/^end_of_record$/m);
-  for (const record of records) {
-    const sfMatch = record.match(/^SF:(.+)$/m);
-    if (!sfMatch) continue;
-    const file = sfMatch[1].trim();
-    if (excludeSet.has(file)) continue;
-    checkRecord(record, file, lineFailures, branchFailures);
-  }
-  return { lineFailures, branchFailures };
+  const excludeSet = frozenSet(excludes);
+  const recordFailures = lcovText
+    .split(/^end_of_record$/m)
+    .flatMap((record) => {
+      const file = record.match(/^SF:(.+)$/m)?.[1].trim();
+      if (!file || excludeSet.has(file)) return [];
+      return [checkRecord(record, file)];
+    });
+
+  return {
+    lineFailures: recordFailures.flatMap((r) => r.lineFailures),
+    branchFailures: recordFailures.flatMap((r) => r.branchFailures),
+  };
 };
 
 /**
@@ -306,22 +294,25 @@ export const runStepAsync = async (step, verbose) => {
 };
 
 /**
- * Run one lane's steps sequentially, recording results by step name.
+ * Run one lane's steps sequentially, returning [name, result] entries.
  * Stops the lane at the first failure; other lanes are unaffected.
  * @param {Object[]} lane - Steps to run in order
  * @param {boolean} verbose - Whether to show full output
- * @param {Object} results - Shared results map, mutated per step
+ * @param {[string, Object][]} entries - Results recorded so far
+ * @returns {Promise<[string, Object][]>} Recorded entries
  */
-const runLane = async (lane, verbose, results) => {
-  for (const step of lane) {
-    const startedAt = Date.now();
-    const result = await runStepAsync(step, verbose);
-    results[step.name] = result;
-    const seconds = ((Date.now() - startedAt) / 1000).toFixed(1);
-    const mark = result.status === 0 ? "✓" : "✗";
-    console.log(`${mark} ${step.name} (${seconds}s)`);
-    if (result.status !== 0) return;
-  }
+const runLane = async (lane, verbose, entries = []) => {
+  const [step, ...rest] = lane;
+  if (!step) return entries;
+
+  const startedAt = Date.now();
+  const result = await runStepAsync(step, verbose);
+  const seconds = ((Date.now() - startedAt) / 1000).toFixed(1);
+  const mark = result.status === 0 ? "✓" : "✗";
+  console.log(`${mark} ${step.name} (${seconds}s)`);
+
+  const recorded = [...entries, [step.name, result]];
+  return result.status === 0 ? runLane(rest, verbose, recorded) : recorded;
 };
 
 /**
@@ -335,8 +326,10 @@ const runLane = async (lane, verbose, results) => {
  * @returns {Promise<Object>} Results map from step names to results
  */
 export const runLanes = async ({ lanes, verbose, title }) => {
-  const results = {};
-  await Promise.all(lanes.map((lane) => runLane(lane, verbose, results)));
+  const entries = (
+    await Promise.all(lanes.map((lane) => runLane(lane, verbose)))
+  ).flat();
+  const results = Object.fromEntries(entries);
   printSummary(lanes.flat(), results, title);
   return results;
 };
@@ -347,29 +340,43 @@ const isCpdCloneBlockEnd = (blockIndex, startIndex, line) =>
     line === "jscpd found duplicated code." ||
     line.startsWith("Do not use "));
 
-const extractCpdCloneBlocks = (lines) => {
-  const cloneBlocks = [];
-  const consumedLines = new Set();
-
-  for (let index = 0; index < lines.length; index++) {
-    const trimmed = lines[index].trim();
-    if (!trimmed.startsWith("❌ Clone found")) continue;
-
-    const block = [];
-    for (let blockIndex = index; blockIndex < lines.length; blockIndex++) {
-      const blockLine = lines[blockIndex];
-      const blockTrimmed = blockLine.trim();
-
-      if (isCpdCloneBlockEnd(blockIndex, index, blockTrimmed)) break;
-
-      consumedLines.add(blockIndex);
-      block.push(blockLine.trimEnd());
+/**
+ * Collect one clone block's lines, starting at the "❌ Clone found" marker.
+ * The block ends (exclusive) at the end marker per isCpdCloneBlockEnd.
+ * @param {string[]} lines - Full output lines
+ * @param {number} startIndex - Index of the block's first line
+ * @returns {string[]} Trimmed lines of the block, marker included
+ */
+const cloneBlockLines = (lines, startIndex) => {
+  const collect = (blockIndex, block) => {
+    if (blockIndex >= lines.length) return block;
+    if (isCpdCloneBlockEnd(blockIndex, startIndex, lines[blockIndex].trim())) {
+      return block;
     }
+    return collect(blockIndex + 1, [...block, lines[blockIndex].trimEnd()]);
+  };
+  return collect(startIndex, []);
+};
 
-    if (block.length > 0) cloneBlocks.push(block.join("\n"));
-  }
-
-  return { cloneBlocks, consumedLines };
+const extractCpdCloneBlocks = (lines) => {
+  const cloneStartIndexes = lines.flatMap((line, index) =>
+    line.trim().startsWith("❌ Clone found") ? [index] : [],
+  );
+  const blocks = cloneStartIndexes.map((startIndex) => ({
+    startIndex,
+    collected: cloneBlockLines(lines, startIndex),
+  }));
+  return {
+    cloneBlocks: blocks.map((block) => block.collected.join("\n")),
+    consumedLines: frozenSet(
+      blocks.flatMap((block) =>
+        Array.from(
+          { length: block.collected.length },
+          (_, offset) => block.startIndex + offset,
+        ),
+      ),
+    ),
+  };
 };
 
 const isSkippableErrorLine = (line) =>
@@ -525,18 +532,13 @@ export function printSummary(steps, results, title = "SUMMARY") {
   console.log(title);
   console.log("=".repeat(60));
 
-  const passedSteps = [];
-  const failedSteps = [];
-
-  for (const step of steps) {
-    const result = results[step.name];
-    if (!result) continue; // Skip if step wasn't run
-    if (result.status === 0) {
-      passedSteps.push(step.name);
-    } else {
-      failedSteps.push(step.name);
-    }
-  }
+  const runSteps = steps.filter((step) => results[step.name]);
+  const passedSteps = runSteps
+    .filter((step) => results[step.name].status === 0)
+    .map((step) => step.name);
+  const failedSteps = runSteps
+    .filter((step) => results[step.name].status !== 0)
+    .map((step) => step.name);
 
   const allPassed = failedSteps.length === 0;
 

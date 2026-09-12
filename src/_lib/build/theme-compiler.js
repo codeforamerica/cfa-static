@@ -56,8 +56,13 @@ const generateThemeSwitcherContent = memoize(() => {
   const themeRules = themes.map(
     /** @param {ThemeFile} theme */
     (theme) => {
-      const variables = theme.content.match(/:root\s*{([^}]+)}/)?.[1] ?? "";
-      return `html[data-theme="${theme.name}"] {${variables}}`;
+      const variablesMatch = theme.content.match(/:root\s*{([^}]+)}/);
+      if (!variablesMatch) {
+        throw new Error(
+          `Theme files must define a :root block with theme variables, but ${theme.file} has none`,
+        );
+      }
+      return `html[data-theme="${theme.name}"] {${variablesMatch[1]}}`;
     },
   );
 

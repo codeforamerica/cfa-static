@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { generateThemeSwitcherContent } from "#build/theme-compiler.js";
 
 describe("theme-compiler", () => {
@@ -64,6 +64,26 @@ describe("theme-compiler", () => {
       const metadataStart = result.indexOf("Theme metadata");
       const afterMetadata = result.slice(metadataStart);
       expect(afterMetadata.includes(":root {")).toBe(true);
+    });
+
+    test("throws naming the theme file when it has no :root block", async () => {
+      // getThemeFiles is memoized at module scope, so exercise the failure
+      // on a fresh module instance with a fake themes directory.
+      vi.resetModules();
+      vi.doMock("node:fs", () => ({
+        default: {
+          readdirSync: () => ["theme-broken.scss"],
+          readFileSync: () => "p { color: red; }",
+        },
+      }));
+      try {
+        const fresh = await import("#build/theme-compiler.js");
+        expect(() => fresh.generateThemeSwitcherContent()).toThrow(
+          /theme-broken\.scss has none/,
+        );
+      } finally {
+        vi.doUnmock("node:fs");
+      }
     });
   });
 });

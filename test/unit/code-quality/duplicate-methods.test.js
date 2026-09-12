@@ -8,6 +8,7 @@
 import { describe, expect, test } from "vitest";
 import { assertNoViolations, readSource } from "#test/code-scanner.js";
 import { ALL_JS_FILES } from "#test/test-utils.js";
+import { buildReverseIndex } from "#utils/fp/grouping.js";
 import { frozenSet } from "#utils/fp/set.js";
 
 const THIS_FILE = "test/unit/code-quality/duplicate-methods.test.js";
@@ -62,78 +63,54 @@ const ARROW_OR_EXPR_PATTERN =
  * Extract function names from source code.
  * Returns array of { name, line }
  */
-const extractFunctionNames = (source) => {
-  const functions = [];
-  const lines = source.split("\n");
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const lineNum = i + 1;
-
+const extractFunctionNames = (source) =>
+  source.split("\n").flatMap((line, index) => {
     // Skip comments
     const trimmed = line.trim();
-    if (trimmed.startsWith("//") || trimmed.startsWith("*")) continue;
+    if (trimmed.startsWith("//") || trimmed.startsWith("*")) return [];
 
     const funcMatch =
       line.match(FUNCTION_DECL_PATTERN) || line.match(ARROW_OR_EXPR_PATTERN);
 
-    if (funcMatch) {
-      functions.push({ name: funcMatch[1], line: lineNum });
-    }
-  }
-
-  return functions;
-};
+    return funcMatch ? [{ name: funcMatch[1], line: index + 1 }] : [];
+  });
 
 /**
  * Find all duplicate function names (appearing in 2+ different files).
  */
 const findDuplicateMethods = () => {
-  const allFiles = ALL_JS_FILES();
+  // Build location map: function name -> [{ file, line, name }]
+  const locationMap = buildReverseIndex(
+    ALL_JS_FILES()
+      .filter(
+        (file) =>
+          file !== THIS_FILE &&
+          ![...EXCLUDED_DIRS].some((dir) => file.startsWith(`${dir}/`)),
+      )
+      .flatMap((file) =>
+        extractFunctionNames(readSource(file)).map((func) => ({
+          name: func.name,
+          file,
+          line: func.line,
+        })),
+      ),
+    (loc) => [loc.name],
+  );
 
-  // Build location map
-  const locationMap = new Map();
-  for (const file of allFiles) {
-    if (file === THIS_FILE) continue;
-    if ([...EXCLUDED_DIRS].some((dir) => file.startsWith(`${dir}/`))) continue;
-
-    const source = readSource(file);
-    const functions = extractFunctionNames(source);
-
-    for (const func of functions) {
-      if (!locationMap.has(func.name)) {
-        locationMap.set(func.name, []);
-      }
-      locationMap.get(func.name).push({ file, line: func.line });
-    }
-  }
-  const duplicates = [];
-  const allowed = [];
-
-  for (const [name, locations] of locationMap) {
-    // Get unique files where this function appears
-    const uniqueFiles = new Set(locations.map((loc) => loc.file));
-
-    if (uniqueFiles.size >= 2) {
-      const entry = {
-        name,
-        fileCount: uniqueFiles.size,
-        locations,
-      };
-
-      if (ALLOWED_DUPLICATE_NAMES.has(name)) {
-        allowed.push(entry);
-      } else {
-        duplicates.push(entry);
-      }
-    }
-  }
-
-  // Sort by number of files (most duplicated first), then alphabetically
-  duplicates.sort((a, b) => {
-    if (b.fileCount !== a.fileCount) return b.fileCount - a.fileCount;
-    return a.name.localeCompare(b.name);
+  const duplicated = [...locationMap].flatMap(([name, locations]) => {
+    const fileCount = frozenSet(locations.map((loc) => loc.file)).size;
+    return fileCount >= 2 ? [{ name, fileCount, locations }] : [];
   });
+
+  const isAllowed = ({ name }) => ALLOWED_DUPLICATE_NAMES.has(name);
+  const allowed = duplicated.filter(isAllowed);
+  // Sort by number of files (most duplicated first), then alphabetically
+  const duplicates = duplicated
+    .filter((entry) => !isAllowed(entry))
+    .sort((a, b) => {
+      if (b.fileCount !== a.fileCount) return b.fileCount - a.fileCount;
+      return a.name.localeCompare(b.name);
+    });
 
   // Convert to violations format for reporting
   const violations = duplicates.map((dup) => ({
