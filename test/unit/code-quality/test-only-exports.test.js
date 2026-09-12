@@ -6,7 +6,7 @@
  * the public API. These exports should either:
  * - Be made private (unexported) if they're truly internal
  * - Be used in production code if they're valuable utilities
- * - Be added to ALLOWED_TEST_ONLY_EXPORTS if intentionally test-only
+ * Existing ALLOWED_TEST_ONLY_EXPORTS entries are a deletion-only legacy baseline.
  */
 import { describe, expect, test } from "vitest";
 import { ALLOWED_TEST_ONLY_EXPORTS } from "#test/code-quality/code-quality-exceptions.js";

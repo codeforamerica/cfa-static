@@ -2,6 +2,7 @@
 // Ensures all design-system SCSS files have styles scoped to .design-system
 // This prevents design-system styles from leaking to other pages
 
+import scss from "postcss-scss";
 import { describe, expect, test } from "vitest";
 import { fs, getFiles, path, rootDir } from "#test/test-utils.js";
 import { filter, flatMap, notMemberOf, pipe } from "#utils/fp/array.js";
@@ -20,23 +21,18 @@ const ALLOWED_UNSCOPED_FILES = ["_index.scss"];
 
 const INDEX_FILE = "src/css/design-system/_index.scss";
 
-/** Extract the partial names that an index forwards, in declaration order.
- * Each @forward spec is normalized to its partial name, so quotes, relative
- * paths, file extensions, and `as`/`show`/`hide` clauses are all accepted.
- * The patterns deliberately avoid quote characters inside regex literals
- * so source-scanning gates do not misread the quotes as string delimiters. */
+/** Extract active top-level @forward partial names in declaration order. */
 const forwardedNames = (content) =>
-  content.split("\n").flatMap((line) =>
-    [...line.matchAll(/@forward\s+([^;]+);/g)].map((match) =>
-      match[1]
-        .split(/\s+(?:as|show|hide)\s+/)[0]
-        .split("/")
-        .pop()
-        .split(".")[0]
-        .replace(/^_/, "")
-        .replace(/[^-\w]/g, ""),
-    ),
-  );
+  scss
+    .parse(content)
+    .nodes.filter((node) => node.type === "atrule" && node.name === "forward")
+    .map((node) => {
+      const match = node.params.match(/^(["'])(.*?)\1/s);
+      if (!match) {
+        throw node.error("Expected a quoted module URL in @forward");
+      }
+      return basename(match[2], ".scss").replace(/^_/, "");
+    });
 
 const stripCommentsAndImports = (content) => {
   const withoutComments = content
@@ -210,12 +206,68 @@ describe("design-system-scoping", () => {
       // Comments and @use lines are not partial forwards
       @use "sass:math";
       @forward "base";
-      @forward "./prose.scss" as *;
-      @forward "navigation" show .nav;
+      @forward "./prose.scss" as prose-*;
+      @forward "navigation" show nav;
       .design-system { color: red; }
     `;
 
     expect(forwardedNames(content)).toEqual(["base", "prose", "navigation"]);
+  });
+
+  test.each([
+    '// @forward "table-of-contents";',
+    '/*\n @forward "table-of-contents";\n */',
+  ])("ignores commented-out forwards: %s", (comment) => {
+    expect(forwardedNames(`${comment}\n@forward "base";`)).toEqual(["base"]);
+  });
+
+  test.each([
+    ['"_table-of-contents"', "table-of-contents"],
+    ["'_table-of-contents'", "table-of-contents"],
+    ['"./_table-of-contents.scss"', "table-of-contents"],
+    ["'./_table-of-contents.scss'", "table-of-contents"],
+    ['"../components/_prose.print.scss"', "prose.print"],
+  ])("normalizes quoted partial URL %s", (url, expected) => {
+    expect(forwardedNames(`@forward ${url};`)).toEqual([expected]);
+  });
+
+  test.each([
+    "as nav-*",
+    "show nav, $gap",
+    "hide nav, $gap",
+    "as nav-* show nav-link, $nav-gap",
+  ])("extracts forwards with a valid %s clause", (clause) => {
+    expect(forwardedNames(`@forward "navigation" ${clause};`)).toEqual([
+      "navigation",
+    ]);
+  });
+
+  test("extracts multiline forwards in declaration order", () => {
+    const content = `
+      @forward
+        "./_table-of-contents.scss"
+        as toc-*
+        show toc-link,
+          $toc-gap
+        ;
+      @forward "base";
+    `;
+
+    expect(forwardedNames(content)).toEqual(["table-of-contents", "base"]);
+  });
+
+  test("ignores forward text inside CSS strings", () => {
+    expect(
+      forwardedNames(`
+        .example { content: '@forward "table-of-contents";'; }
+      `),
+    ).toEqual([]);
+  });
+
+  test("rejects forwards without a quoted module URL", () => {
+    expect(() => forwardedNames("@forward base;")).toThrow(
+      "Expected a quoted module URL in @forward",
+    );
   });
 
   test("every design-system partial is forwarded from _index.scss", () => {

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import * as exceptions from "#test/code-quality/code-quality-exceptions.js";
+import { frozenSet } from "#utils/fp/set.js";
 
 /**
  * Per-entry ratchet for test/code-quality/code-quality-exceptions.js.
@@ -11,8 +12,8 @@ import * as exceptions from "#test/code-quality/code-quality-exceptions.js";
  * Any recorded entry that disappears fails with a ready-to-paste
  * replacement baseline so every deletion is locked in immediately.
  * Legitimate entry edits (a shifted line, a renamed export) surface as
- * both a removal and an addition and are resolved by pasting the baseline
- * the removal side prints.
+ * both a removal and an addition and require an explicitly reviewed update.
+ * The suggested replacement only removes entries; it never approves additions.
  */
 
 const RATCHET_BASELINE = {
@@ -43,7 +44,6 @@ const RATCHET_BASELINE = {
     "test/unit/code-quality/naming-conventions.test.js",
     "test/unit/code-quality/single-use-functions.test.js",
     "test/unit/code-quality/test-only-exports.test.js",
-    "test/unit/code-quality/todo-fixme-comments.test.js",
     "test/unit/code-quality/unused-classes.test.js",
     "test/unit/eleventy/layout-aliases.test.js",
     "test/unit/test-runner-utils.test.js",
@@ -145,7 +145,49 @@ const RATCHET_BASELINE = {
   ],
 };
 
+const compareExceptions = (baseline, current) => ({
+  added: Object.entries(current).flatMap(([name, set]) =>
+    [...set]
+      .filter((entry) => !baseline[name].includes(entry))
+      .map((entry) => `${name}: ${entry}`),
+  ),
+  removed: Object.entries(baseline).flatMap(([name, entries]) =>
+    entries
+      .filter((entry) => !current[name].has(entry))
+      .map((entry) => `${name}: ${entry}`),
+  ),
+  deletionOnlyBaseline: Object.fromEntries(
+    Object.entries(baseline).map(([name, entries]) => [
+      name,
+      entries.filter((entry) => current[name].has(entry)),
+    ]),
+  ),
+});
+
 describe("exceptions-ratchet", () => {
+  test.each([
+    ["unchanged entries", ["legacy"], [], [], ["legacy"]],
+    ["addition only", ["legacy", "new"], ["RULE: new"], [], ["legacy"]],
+    ["deletion only", [], [], ["RULE: legacy"], []],
+    ["replacement", ["new"], ["RULE: new"], ["RULE: legacy"], []],
+  ])("compares %s without approving additions", (_name, entries, added, removed, retained) => {
+    expect(
+      compareExceptions({ RULE: ["legacy"] }, { RULE: frozenSet(entries) }),
+    ).toEqual({ added, removed, deletionOnlyBaseline: { RULE: retained } });
+  });
+
+  test("deletion updates keep unrelated new exceptions rejected", () => {
+    const current = { FIRST: frozenSet([]), SECOND: frozenSet(["new"]) };
+    const { deletionOnlyBaseline } = compareExceptions(
+      { FIRST: ["legacy"], SECOND: [] },
+      current,
+    );
+
+    expect(compareExceptions(deletionOnlyBaseline, current).added).toEqual([
+      "SECOND: new",
+    ]);
+  });
+
   test("every exported allowlist is a Set", () => {
     const nonSets = Object.entries(exceptions)
       .filter(([, set]) => !(set instanceof Set))
@@ -161,11 +203,7 @@ describe("exceptions-ratchet", () => {
   });
 
   test("allowlists gain no entries the baseline does not record", () => {
-    const added = Object.entries(exceptions).flatMap(([name, set]) =>
-      [...set]
-        .filter((entry) => !RATCHET_BASELINE[name].includes(entry))
-        .map((entry) => `${name}: ${entry}`),
-    );
+    const { added } = compareExceptions(RATCHET_BASELINE, exceptions);
 
     if (added.length > 0) {
       console.log("\n  New code-quality exception entries:");
@@ -179,39 +217,27 @@ describe("exceptions-ratchet", () => {
         "  fix the check - never add entries for new violations. If an",
       );
       console.log(
-        "  entry merely moved (renamed file, shifted line), update the",
+        "  entry merely moved (renamed file, shifted line), request an",
       );
-      console.log("  baseline with what the removal failure prints instead.");
+      console.log("  explicit review of that baseline update instead.");
     }
 
     expect(added).toEqual([]);
   });
 
   test("entries removed since the baseline are locked in", () => {
-    const removed = Object.entries(exceptions).flatMap(([name, set]) =>
-      RATCHET_BASELINE[name]
-        .filter((entry) => !set.has(entry))
-        .map((entry) => `${name}: ${entry}`),
+    const { removed, deletionOnlyBaseline } = compareExceptions(
+      RATCHET_BASELINE,
+      exceptions,
     );
 
     if (removed.length > 0) {
-      const readyToPaste = Object.entries(exceptions)
-        .map(([name, set]) => {
-          const entries = [...set].sort();
-          return entries.length === 0
-            ? `  ${name}: [],`
-            : `  ${name}: [\n${entries
-                .map((entry) => `    ${JSON.stringify(entry)},`)
-                .join("\n")}\n  ],`;
-        })
-        .join("\n");
-
       console.log("\n  Allowlist entries no longer present:");
       for (const entry of removed) {
         console.log(`    - ${entry}`);
       }
       console.log("\n  Lock the win in - replace RATCHET_BASELINE with:\n");
-      console.log(readyToPaste);
+      console.log(JSON.stringify(deletionOnlyBaseline, null, 2));
     }
 
     expect(removed).toEqual([]);

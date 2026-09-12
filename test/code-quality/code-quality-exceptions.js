@@ -94,7 +94,6 @@ const ALLOWED_MUTABLE_CONST = frozenSet([
   "test/unit/code-quality/naming-conventions.test.js",
   "test/unit/code-quality/single-use-functions.test.js",
   "test/unit/code-quality/test-only-exports.test.js",
-  "test/unit/code-quality/todo-fixme-comments.test.js",
   "test/unit/code-quality/unused-classes.test.js",
   "test/unit/code-quality/design-system-scoping.test.js",
   "test/unit/code-quality/duplicate-methods.test.js",
