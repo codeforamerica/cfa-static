@@ -18,16 +18,6 @@ const PARENT_URL_MAP = {
 };
 
 /**
- * Append a non-linked title crumb to a crumbs array
- * @param {Array<{label: string, url: string | null}>} crumbs
- * @param {string} title
- */
-const withTitleCrumb = (crumbs, title) => [
-  ...crumbs,
-  { label: title, url: null },
-];
-
-/**
  * The URL of the collection index a page sits under, in the page's own
  * language. A named parent has a base-language index whose counterpart, if the
  * site has paired one, comes from the translation groups; anything else is the
@@ -94,7 +84,7 @@ const breadcrumbsFilter = (
     ? [home, { label: navigationParent, url: indexUrl }]
     : [home];
 
-  return withTitleCrumb(baseCrumbs, title);
+  return [...baseCrumbs, { label: title, url: null }];
 };
 
 /**

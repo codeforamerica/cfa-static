@@ -111,34 +111,56 @@ describe("image-utils", () => {
         loading: "eager",
         classes: "featured",
       });
-      expect(imgAttributes.alt).toBe("A photo");
-      expect(imgAttributes.sizes).toBe("100vw");
-      expect(imgAttributes.loading).toBe("eager");
-      expect(imgAttributes.decoding).toBe("async");
-      expect(pictureAttributes.class).toBe("featured");
+      expect(imgAttributes).toEqual({
+        alt: "A photo",
+        sizes: "100vw",
+        loading: "eager",
+        decoding: "async",
+      });
+      expect(pictureAttributes).toEqual({ class: "featured" });
     });
 
     test("uses defaults for missing img values", () => {
       const { imgAttributes } = prepareImageAttributes({});
-      expect(imgAttributes.alt).toBe("");
-      expect(imgAttributes.loading).toBe("lazy");
-      expect(imgAttributes.decoding).toBe("async");
+      expect(imgAttributes).toEqual({
+        alt: "",
+        sizes: "auto",
+        loading: "lazy",
+        decoding: "async",
+      });
     });
 
-    test("returns empty picture attributes when classes is null", () => {
-      const { pictureAttributes } = prepareImageAttributes({
-        alt: "Photo",
-        classes: null,
-      });
-      expect(pictureAttributes).toEqual({});
+    test("preserves an explicitly null alt attribute", () => {
+      expect(
+        prepareImageAttributes({ alt: null }).imgAttributes.alt,
+      ).toBeNull();
     });
 
-    test("returns empty picture attributes when classes is empty string", () => {
-      const { pictureAttributes } = prepareImageAttributes({
-        alt: "Photo",
-        classes: "  ",
+    test.each([null, ""])("defaults empty sizes and loading (%j)", (value) => {
+      const { imgAttributes } = prepareImageAttributes({
+        sizes: value,
+        loading: value,
       });
-      expect(pictureAttributes).toEqual({});
+      expect(imgAttributes).toMatchObject({ sizes: "auto", loading: "lazy" });
+    });
+
+    test.each([
+      undefined,
+      null,
+      "",
+      "  ",
+      "\t\n",
+    ])("omits blank picture classes (%j)", (classes) => {
+      expect(prepareImageAttributes({ classes }).pictureAttributes).toEqual({});
+    });
+
+    test("preserves whitespace around nonblank picture classes", () => {
+      expect(
+        prepareImageAttributes({ classes: "  hero featured  " })
+          .pictureAttributes,
+      ).toEqual({
+        class: "  hero featured  ",
+      });
     });
   });
 

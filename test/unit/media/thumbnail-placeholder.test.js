@@ -17,8 +17,16 @@ describe("thumbnail-placeholder", () => {
       expect(getPlaceholderForPath(path)).toBe(getPlaceholderForPath(path));
     });
 
-    test("handles empty input", () => {
-      expect(getPlaceholderForPath("")).toMatch(/\.svg$/);
+    test.each([
+      ["", "green"],
+      ["/products/widget/", "orange"],
+      ["/products/test-product/", "yellow"],
+      ["/caf\u00e9/\u{1f600}/", "yellow"],
+      ["/a/".repeat(100), "green"],
+    ])("preserves the placeholder assignment for %j", (path, color) => {
+      expect(getPlaceholderForPath(path)).toBe(
+        `images/placeholders/${color}.svg`,
+      );
     });
 
     test("distributes paths across placeholders", () => {

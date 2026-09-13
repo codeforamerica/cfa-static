@@ -103,14 +103,9 @@ const ALLOWED_SINGLE_USE_FUNCTIONS = frozenSet([
   "src/_lib/collections/navigation.js", // Search box builder kept separate for function length
   "src/_lib/public/masonry.js", // Card type measurers split to stay under complexity limit
   "src/_lib/public/ui/nav-dropdown.js", // DOM helpers extracted for complexity management
-  "src/_lib/media/image-external.js", // External wrapper styles helper
-  "src/_lib/media/image-utils.js", // buildImgAttributes, buildPictureAttributes - helper functions for prepareImageAttributes
   "src/_lib/eleventy/file-utils.js", // Filter callbacks extracted for strict type safety
   "src/_lib/eleventy/style-bundle.js", // Options parsing helpers for type safety
   "src/_lib/eleventy/html-transform.js", // Transform helpers kept separate to manage complexity
-  "src/_lib/transforms/external-links.js", // attrTuple for TypeScript tuple inference
-  "src/_lib/transforms/linkify.js", // Text processing helpers kept separate for clarity
-  "src/_lib/utils/dom-builder.js", // Kept separate to manage complexity
   "src/_lib/utils/block-columns.js", // Validation and distribution helpers kept separate for complexity
   "src/_data/eleventyComputed.js", // applyBlockDefaults extracted for function length
   "src/_lib/public/ui/gallery.js",
@@ -119,8 +114,6 @@ const ALLOWED_SINGLE_USE_FUNCTIONS = frozenSet([
   "src/_lib/public/ui/slider.js",
   "src/_lib/public/theme/theme-editor-lib.js",
   "src/_lib/public/design-system.js", // Parallax/marquee init helpers kept separate to manage complexity
-  "src/_lib/media/thumbnail-placeholder.js", // hashString kept named for clarity in the pipe
-  "src/_lib/eleventy/breadcrumbs.js", // withTitleCrumb kept separate for clarity
   "test/unit/code-quality/comment-limits.test.js",
   "test/unit/code-quality/duplicate-methods.test.js",
   "test/unit/code-quality/html-in-js.test.js",

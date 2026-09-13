@@ -68,39 +68,6 @@ export const parseWidths = (widths) => {
 };
 
 /**
- * Build standard image attributes object.
- * @param {Object} options - Attribute options
- * @param {string | null} [options.src] - Image source (for external images)
- * @param {string | null} [options.alt] - Alt text
- * @param {string | null} [options.sizes] - Sizes attribute
- * @param {string | null} [options.loading] - Loading attribute
- * @param {string | null} [options.classes] - CSS classes
- * @returns {Record<string, string | null>} Image attributes
- */
-const buildImgAttributes = ({
-  src = null,
-  alt = "",
-  sizes = null,
-  loading = null,
-  classes = null,
-} = {}) => ({
-  ...(src && { src }),
-  alt,
-  sizes: sizes || DEFAULT_SIZE,
-  loading: loading || "lazy",
-  decoding: "async",
-  ...(classes && { class: classes }),
-});
-
-/**
- * Build picture element attributes.
- * @param {string | null | undefined} classes - CSS classes
- * @returns {Record<string, string>} Picture attributes
- */
-const buildPictureAttributes = (classes) =>
-  classes?.trim() ? { class: classes } : {};
-
-/**
  * Build wrapper styles for images from pre-computed values.
  * Shared by both local and external image processing paths.
  * @param {Object} options
@@ -146,25 +113,6 @@ export const getPathAwareBasename = (src) => {
   return withoutExt.replace(/\//g, "-");
 };
 
-/**
- * Generate filename for resized images.
- * Used by eleventy-img for both regular images and LQIP thumbnails.
- * @param {string} _id - Image ID (unused)
- * @param {string} src - Source path
- * @param {number} width - Output width
- * @param {string} format - Output format
- * @param {{manualCacheKey?: string | number}} [options] - Eleventy Image options
- * @returns {string} Generated filename
- */
-const filenameFormat = (_id, src, width, format, options = {}) => {
-  const basename = getPathAwareBasename(src);
-  const extension = src.slice(src.lastIndexOf(".") + 1).toLowerCase();
-  const cropSuffix = options.manualCacheKey
-    ? `-${extension}-crop-${String(options.manualCacheKey).replaceAll("/", "x")}`
-    : "";
-  return `${basename}${cropSuffix}-${width}.${format}`;
-};
-
 // JPEG fallback width - only generate one JPEG size since nearly all browsers support webp
 export const JPEG_FALLBACK_WIDTH = 1300;
 
@@ -176,7 +124,23 @@ export const JPEG_FALLBACK_WIDTH = 1300;
 export const DEFAULT_IMAGE_OPTIONS = frozenObject({
   outputDir: ".image-cache",
   urlPath: "/img/",
-  filenameFormat,
+  /**
+   * Generate filenames for resized images and LQIP thumbnails.
+   * @param {string} _id - Image ID (unused)
+   * @param {string} src - Source path
+   * @param {number} width - Output width
+   * @param {string} format - Output format
+   * @param {{manualCacheKey?: string | number}} [options] - Eleventy Image options
+   * @returns {string} Generated filename
+   */
+  filenameFormat: (_id, src, width, format, options = {}) => {
+    const basename = getPathAwareBasename(src);
+    const extension = src.slice(src.lastIndexOf(".") + 1).toLowerCase();
+    const cropSuffix = options.manualCacheKey
+      ? `-${extension}-crop-${String(options.manualCacheKey).replaceAll("/", "x")}`
+      : "";
+    return `${basename}${cropSuffix}-${width}.${format}`;
+  },
 });
 
 /**
@@ -188,7 +152,17 @@ export const DEFAULT_IMAGE_OPTIONS = frozenObject({
  * @param {string | null} [options.classes] - CSS classes
  * @returns {{ imgAttributes: Record<string, string | null>, pictureAttributes: Record<string, string> }}
  */
-export const prepareImageAttributes = ({ alt, sizes, loading, classes }) => ({
-  imgAttributes: buildImgAttributes({ alt, sizes, loading }),
-  pictureAttributes: buildPictureAttributes(classes),
+export const prepareImageAttributes = ({
+  alt = "",
+  sizes,
+  loading,
+  classes,
+}) => ({
+  imgAttributes: {
+    alt,
+    sizes: sizes || DEFAULT_SIZE,
+    loading: loading || "lazy",
+    decoding: "async",
+  },
+  pictureAttributes: classes?.trim() ? { class: classes } : {},
 });

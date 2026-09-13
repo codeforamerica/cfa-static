@@ -42,6 +42,16 @@ describe("dom-builder", () => {
     expect(html).not.toContain("data-test=");
   });
 
+  test("Omits attribute spacing when all values are nullish", async () => {
+    expect(await createHtml("div", { id: null, title: undefined })).toBe(
+      "<div></div>",
+    );
+  });
+
+  test("Preserves empty attribute values", async () => {
+    expect(await createHtml("input", { value: "" })).toBe('<input value="">');
+  });
+
   test("Creates HTML with string children (innerHTML)", async () => {
     const html = await createHtml("p", {}, "Hello <strong>world</strong>");
 
@@ -138,6 +148,21 @@ describe("dom-builder", () => {
       ownerDocument: doc,
       id: "test",
     })(element);
+  });
+
+  test("Returns only the first element, ignoring preceding text and comments", async () => {
+    const element = await parseHtml(
+      "text<!-- comment --><span>First</span><div>Second</div>",
+    );
+    expect(element.outerHTML).toBe("<span>First</span>");
+  });
+
+  test.each([
+    "",
+    "plain text",
+    "<!-- comment -->",
+  ])("Returns null when %j has no element", async (html) => {
+    expect(await parseHtml(html)).toBeNull();
   });
 
   // ============================================
