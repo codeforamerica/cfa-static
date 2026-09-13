@@ -162,7 +162,15 @@ const createPosthtmlPlugin = (processAndWrapImage) => {
 
 /**
  * Configure the unified HTML transform for Eleventy
- * @param {import("@11ty/eleventy").UserConfig} eleventyConfig
+ * @param {import("@awesome.me/buildawesome/UserConfig").default & {
+ *   htmlTransformer: {
+ *     addPosthtmlPlugin(
+ *       extensions: string | string[],
+ *       plugin: unknown,
+ *       options?: { name?: string; priority?: number },
+ *     ): void;
+ *   };
+ * }} eleventyConfig
  * @param {import("#lib/types").ProcessImageFn} processAndWrapImage - Image processing function
  */
 const configureHtmlTransform = (eleventyConfig, processAndWrapImage) => {

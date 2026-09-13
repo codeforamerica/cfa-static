@@ -29,7 +29,7 @@ node \
   --cpu-prof \
   --cpu-prof-dir "$PROFILE_DIR" \
   --cpu-prof-name "build.cpuprofile" \
-  node_modules/@11ty/eleventy/cmd.cjs
+  node_modules/@awesome.me/buildawesome/cmd.js
 
 echo ""
 echo "Generating report..."

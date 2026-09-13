@@ -8,7 +8,7 @@ Handwritten policy and workflow: [CLAUDE.md](../CLAUDE.md). Architecture: [libra
 
 ## Runtime And Commands
 
-Source: [`package.json`](../package.json). Node requirement: `>=22`. Package manager: npm; install with `npm install`.
+Source: [`package.json`](../package.json). Node requirement: `>=22.15`. Package manager: npm; install with `npm install`.
 
 Every declared npm script is listed below in package order. Values are the exact script definitions, not expanded lifecycle hooks or inferred descriptions. Pass extra arguments after `--`.
 

@@ -26,7 +26,7 @@ export const createFieldIndexer = (field) =>
  * @param {string} tag - Eleventy tag to filter by
  * @param {string} hideField - Boolean data field; items where it is true are excluded
  * @param {(a: any, b: any) => number} sortFn - Sort comparator
- * @returns {(collectionApi: import("@11ty/eleventy").CollectionApi) => any[]}
+ * @returns {(collectionApi: import("#lib/types").EleventyCollectionApi) => any[]}
  */
 export const createTagCollection = (tag, hideField, sortFn) => (api) =>
   api

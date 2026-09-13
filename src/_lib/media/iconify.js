@@ -141,7 +141,7 @@ const socialIcon = async (platform, baseDir) => {
  *
  * Icons are cached to src/assets/icons/iconify/ and can be committed to git.
  *
- * @param {import("@11ty/eleventy").UserConfig} eleventyConfig - Eleventy configuration object
+ * @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig - Eleventy configuration object
  */
 export const configureIconify = (eleventyConfig) => {
   eleventyConfig.addAsyncFilter("icon", getIcon);

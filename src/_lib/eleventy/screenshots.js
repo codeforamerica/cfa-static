@@ -15,7 +15,7 @@ const extractPagePaths = (collection) =>
 
 /**
  * @param {{ urls: string[] }} pageUrlsRef
- * @returns {(collectionApi: import("@11ty/eleventy").CollectionApi) => unknown[]}
+ * @returns {(collectionApi: import("#lib/types").EleventyCollectionApi) => unknown[]}
  */
 export const buildCollectionHandler = (pageUrlsRef) => (collectionApi) => {
   const screenshotConfig = getScreenshotConfig();
@@ -80,7 +80,7 @@ const captureScreenshots = async (pageUrls, screenshotConfig, outputDir) => {
  * Eleventy wrapper for screenshot utilities.
  * Wraps #media/screenshot.js for Eleventy integration. Captures the
  * collected page URLs via captureScreenshots after the build.
- * @param {import("@11ty/eleventy").UserConfig} eleventyConfig
+ * @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig
  */
 export const configureScreenshots = (eleventyConfig) => {
   const pageUrlsRef = { urls: [] };
