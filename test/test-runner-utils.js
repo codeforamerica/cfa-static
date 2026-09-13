@@ -257,15 +257,6 @@ export const integrationTestsStep = {
 const drainStepOutput = async (stream) =>
   Buffer.concat(await Array.fromAsync(stream)).toString();
 
-/** Print captured output in verbose mode and shape the step result */
-const finishStepResult = (status, stdout, stderr, verbose) => {
-  if (verbose) {
-    if (stdout) process.stdout.write(stdout);
-    if (stderr) process.stderr.write(stderr);
-  }
-  return { status, stdout, stderr };
-};
-
 /**
  * Run a single step asynchronously so independent steps can overlap.
  * Output is always captured so errors can be extracted for the summary;
@@ -290,7 +281,11 @@ export const runStepAsync = async (step, verbose) => {
     new Promise((resolve) => child.on("close", resolve)),
   ]);
 
-  return finishStepResult(status, stdout, stderr, verbose);
+  if (verbose) {
+    if (stdout) process.stdout.write(stdout);
+    if (stderr) process.stderr.write(stderr);
+  }
+  return { status, stdout, stderr };
 };
 
 /**
@@ -334,24 +329,24 @@ export const runLanes = async ({ lanes, verbose, title }) => {
   return results;
 };
 
-const isCpdCloneBlockEnd = (blockIndex, startIndex, line) =>
-  blockIndex > startIndex &&
-  (!line ||
-    line === "jscpd found duplicated code." ||
-    line.startsWith("Do not use "));
-
 /**
  * Collect one clone block's lines, starting at the "❌ Clone found" marker.
- * The block ends (exclusive) at the end marker per isCpdCloneBlockEnd.
+ * Stops before a blank line or the tool's summary/guidance.
  * @param {string[]} lines - Full output lines
  * @param {number} startIndex - Index of the block's first line
  * @returns {string[]} Trimmed lines of the block, marker included
  */
 const cloneBlockLines = (lines, startIndex) => {
   const remaining = lines.slice(startIndex);
-  const end = remaining.findIndex((line, offset) =>
-    isCpdCloneBlockEnd(offset, 0, line.trim()),
-  );
+  const end = remaining.findIndex((line, offset) => {
+    const trimmed = line.trim();
+    return (
+      offset > 0 &&
+      (!trimmed ||
+        trimmed === "jscpd found duplicated code." ||
+        trimmed.startsWith("Do not use "))
+    );
+  });
   return remaining
     .slice(0, end === -1 ? remaining.length : end)
     .map((line) => line.trimEnd());

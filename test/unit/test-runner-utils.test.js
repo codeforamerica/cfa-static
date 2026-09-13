@@ -18,6 +18,7 @@ import {
   unitTestsStep,
 } from "#test/test-runner-utils.js";
 import {
+  bracketAsync,
   captureConsole,
   captureConsoleLogAsync,
   withMockedProcessExit,
@@ -90,6 +91,34 @@ describe("test-runner-utils", () => {
   // extractErrorsFromOutput Tests
   // ============================================
   describe("extractErrorsFromOutput", () => {
+    test.each([
+      "   ",
+      "  jscpd found duplicated code.  ",
+      "  Do not use duplicated code  ",
+    ])("ends clone blocks before %j", (terminator) => {
+      const output = [
+        "normal output",
+        "  ❌ Clone found  ",
+        "    src/first.js: 1-5  ",
+        "    src/second.js: 2-6  ",
+        terminator,
+        "Error: separate failure",
+      ].join("\n");
+
+      expect(extractErrorsFromOutput(output)).toEqual([
+        "  ❌ Clone found\n    src/first.js: 1-5\n    src/second.js: 2-6",
+        "Error: separate failure",
+      ]);
+    });
+
+    test("keeps an unterminated clone block through the end of output", () => {
+      expect(
+        extractErrorsFromOutput(
+          "❌ Clone found\n  src/first.js: 1-5\n  src/second.js: 2-6",
+        ),
+      ).toEqual(["❌ Clone found\n  src/first.js: 1-5\n  src/second.js: 2-6"]);
+    });
+
     test("Extracts lines starting with error indicators", () => {
       const output = `
 Some normal output
@@ -744,6 +773,40 @@ describe("step definitions", () => {
 });
 
 describe("runStepAsync", () => {
+  // Real child processes can take longer than the default test timeout.
+  test.each([
+    [false, "process.exit(0)", "", ""],
+    [true, "process.exit(0)", "", ""],
+    [
+      false,
+      "process.stdout.write('out'); process.stderr.write('err')",
+      "out",
+      "err",
+    ],
+  ])(
+    "does not forward output with verbose=%s for %s",
+    async (verbose, script, stdout, stderr) => {
+      await bracketAsync(
+        () => [
+          vi.spyOn(process.stdout, "write").mockImplementation(() => true),
+          vi.spyOn(process.stderr, "write").mockImplementation(() => true),
+        ],
+        (spies) => {
+          for (const spy of spies) spy.mockRestore();
+        },
+      )(null, async ([stdoutSpy, stderrSpy]) => {
+        const result = await runStepAsync(
+          createNodeScriptStep("silent-step", script),
+          verbose,
+        );
+        expect(result).toEqual({ status: 0, stdout, stderr });
+        expect(stdoutSpy).not.toHaveBeenCalled();
+        expect(stderrSpy).not.toHaveBeenCalled();
+      });
+    },
+    30_000,
+  );
+
   test("captures output and exit status", async () => {
     const step = createNodeScriptStep(
       "async-step",

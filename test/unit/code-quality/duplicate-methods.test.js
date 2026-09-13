@@ -162,6 +162,59 @@ describe("duplicate-methods", () => {
     ).toEqual({ violations: [], allowed: [], duplicates: [] });
   });
 
+  test("orders duplicates by distinct file count then name", () => {
+    const sources = {
+      "src/first.js":
+        "function zebraDuplicate() {}\nfunction alphaDuplicate() {}\nfunction commonDuplicate() {}",
+      "src/second.js":
+        "function zebraDuplicate() {}\nfunction alphaDuplicate() {}\nfunction commonDuplicate() {}",
+      "src/third.js": "function commonDuplicate() {}",
+    };
+    const { violations } = findDuplicateMethods(
+      Object.keys(sources),
+      (file) => sources[file],
+    );
+    expect(violations).toEqual([
+      {
+        file: "src/first.js",
+        line: 3,
+        code: "commonDuplicate (3 files)",
+        reason: "src/first.js:3, src/second.js:3, src/third.js:1",
+      },
+      {
+        file: "src/first.js",
+        line: 2,
+        code: "alphaDuplicate (2 files)",
+        reason: "src/first.js:2, src/second.js:2",
+      },
+      {
+        file: "src/first.js",
+        line: 1,
+        code: "zebraDuplicate (2 files)",
+        reason: "src/first.js:1, src/second.js:1",
+      },
+    ]);
+  });
+
+  test("tracks allowed names without reporting them as violations", () => {
+    const { allowed, duplicates, violations } = findDuplicateMethods(
+      ["src/first.js", "src/second.js"],
+      () => "function init() {}",
+    );
+    expect(allowed).toEqual([
+      {
+        name: "init",
+        fileCount: 2,
+        locations: [
+          { name: "init", file: "src/first.js", line: 1 },
+          { name: "init", file: "src/second.js", line: 1 },
+        ],
+      },
+    ]);
+    expect(duplicates).toEqual([]);
+    expect(violations).toEqual([]);
+  });
+
   test("extractFunctionNames finds function declarations", () => {
     const source = `
 function hello() {}

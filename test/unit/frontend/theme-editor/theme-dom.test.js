@@ -199,7 +199,7 @@ describe("collectActiveClasses", () => {
     expect(document.body.classList.contains("header-dark")).toBe(false);
   });
 
-  test("returns empty array when no option is selected", () => {
+  test("clears managed classes when the empty option is selected", () => {
     const formEl = mountForm(
       "test-form",
       `<select id="header-style">
@@ -207,7 +207,8 @@ describe("collectActiveClasses", () => {
          <option value="header-dark">Dark</option>
        </select>`,
     );
+    document.body.className = "header-dark unrelated";
     expect(collectActiveClasses(formEl)(formEl("header-style"))).toEqual([]);
-    expect(document.body.classList.length).toBe(0);
+    expect(document.body.className).toBe("unrelated");
   });
 });

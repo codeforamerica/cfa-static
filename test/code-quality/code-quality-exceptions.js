@@ -102,20 +102,14 @@ const ALLOWED_LET = frozenSet([
 const ALLOWED_SINGLE_USE_FUNCTIONS = frozenSet([
   "src/_lib/collections/navigation.js", // Search box builder kept separate for function length
   "src/_lib/public/masonry.js", // Card type measurers split to stay under complexity limit
-  "src/_lib/public/ui/nav-dropdown.js", // DOM helpers extracted for complexity management
   "src/_lib/eleventy/file-utils.js", // Filter callbacks extracted for strict type safety
   "src/_lib/eleventy/style-bundle.js", // Options parsing helpers for type safety
   "src/_lib/eleventy/html-transform.js", // Transform helpers kept separate to manage complexity
   "src/_lib/utils/block-columns.js", // Validation and distribution helpers kept separate for complexity
-  "src/_data/eleventyComputed.js", // applyBlockDefaults extracted for function length
   "src/_lib/public/ui/gallery.js",
   "src/_lib/public/ui/image-popup.js", // Popup state updaters split to stay under complexity limit
-  "src/_lib/public/ui/search.js",
-  "src/_lib/public/ui/slider.js",
-  "src/_lib/public/theme/theme-editor-lib.js",
   "src/_lib/public/design-system.js", // Parallax/marquee init helpers kept separate to manage complexity
   "test/unit/code-quality/comment-limits.test.js",
-  "test/unit/code-quality/duplicate-methods.test.js",
   "test/unit/code-quality/html-in-js.test.js",
   // Step-output parsing helpers kept separate for clarity. Surfaced by the
   // Node port: the scanner previously bailed on this file over a regex

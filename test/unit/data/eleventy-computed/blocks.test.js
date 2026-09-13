@@ -21,6 +21,16 @@ describe("eleventyComputed.blocks", () => {
     });
   });
 
+  test("applies defaults without mutating source blocks", async () => {
+    const block = Object.freeze({ type: "stats", items: [] });
+    const blocks = Object.freeze([block]);
+    const result = await eleventyComputed.blocks({ blocks, page, name });
+    expect(result).toEqual([
+      { type: "stats", items: [], reveal: true, dark: false },
+    ]);
+    expect(result[0]).not.toBe(block);
+  });
+
   test("throws on unknown block types", async () => {
     await expect(
       runSingle({ type: "unknown-type", content: "test" }),

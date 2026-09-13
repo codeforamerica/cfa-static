@@ -14,13 +14,6 @@ import {
 import { collectItemErrors } from "#utils/validate-item.js";
 
 /**
- * @param {import("#lib/types").EleventyComputedData} data - Page data
- * @param {string} tag - Tag to check for
- * @returns {boolean} Whether data has the given tag
- */
-const hasTag = (data, tag) => (data.tags || []).includes(tag);
-
-/**
  * Default values for block types. Applied at build time so templates
  * don't need to handle defaults.
  * @type {Record<string, Record<string, unknown>>}
@@ -38,20 +31,6 @@ const BLOCK_DEFAULTS = {
   "code-block": { reveal: true },
   "icon-links": { reveal: true },
   downloads: { reveal: true },
-};
-
-/** @param {Record<string, unknown>} block */
-const applyBlockDefaults = (block) => {
-  const blockType = String(block.type);
-  const merged = Object.assign(
-    { dark: false },
-    BLOCK_DEFAULTS[blockType],
-    block,
-  );
-  if (blockType.startsWith("split-") && !block.reveal_content) {
-    merged.reveal_content = block.reverse ? "right" : "left";
-  }
-  return merged;
 };
 
 export default {
@@ -161,7 +140,7 @@ export default {
    */
   meta: (data) => {
     if (data.no_index) return undefined;
-    if (hasTag(data, "news")) return buildPostMeta(data);
+    if ((data.tags || []).includes("news")) return buildPostMeta(data);
     if (data.schema_type === "organization") return buildOrganizationMeta(data);
     return buildBaseMeta(data);
   },
@@ -169,6 +148,8 @@ export default {
   /**
    * Validates and applies default values to blocks. Works for any content
    * with blocks.
+   * A page flagged `block_gallery` builds its blocks from the canonical
+   * per-type examples instead of frontmatter - see #utils/block-gallery.js.
    * @param {import("#lib/types").EleventyComputedData} data - Page data
    * @returns {Promise<Array<Record<string, unknown>>|undefined>} Blocks with defaults applied
    * @throws {Error} If any block contains unknown keys
@@ -176,8 +157,6 @@ export default {
   blocks: async (data) => {
     const context = ` in ${data.page.inputPath}`;
     const itemErrors = collectItemErrors(data, context);
-    // A page flagged `block_gallery` builds its blocks from the canonical
-    // per-type examples instead of frontmatter - see #utils/block-gallery.js.
     const sourceBlocks = data.block_gallery
       ? buildGalleryBlocks()
       : data.blocks;
@@ -190,6 +169,19 @@ export default {
       ...collectBlockErrors(sourceBlocks, context),
     ];
     if (allErrors.length > 0) throw new Error(allErrors.join("\n"));
-    return sourceBlocks.map(applyBlockDefaults);
+    return sourceBlocks.map(
+      /** @param {Record<string, unknown>} block */ (block) => {
+        const blockType = String(block.type);
+        const merged = Object.assign(
+          { dark: false },
+          BLOCK_DEFAULTS[blockType],
+          block,
+        );
+        if (blockType.startsWith("split-") && !block.reveal_content) {
+          merged.reveal_content = block.reverse ? "right" : "left";
+        }
+        return merged;
+      },
+    );
   },
 };
