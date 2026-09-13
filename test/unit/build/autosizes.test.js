@@ -1,9 +1,25 @@
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
-import { describe, expect, test } from "vitest";
-import { rootDir } from "#test/test-utils.js";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { noop, rootDir } from "#test/test-utils.js";
 import { loadDOM } from "#utils/lazy-dom.js";
+
+const fixtureWindows = vi.fn(noop);
+
+beforeEach(() => vi.useFakeTimers());
+
+afterEach(async () => {
+  try {
+    await Promise.all(
+      fixtureWindows.mock.calls.map(([window]) => window.happyDOM.close()),
+    );
+  } finally {
+    fixtureWindows.mockClear();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  }
+});
 
 // ============================================
 // Load actual autosizes.js source
@@ -54,7 +70,7 @@ const execScript = (window, script) => {
  * @param {boolean} options.hasPerfObserver - Whether PerformanceObserver exists
  * @param {boolean} options.supportsPaint - Whether paint timing is supported
  * @param {Object} options.imgAttrs - Image attributes { src, sizes, loading, srcset }
- * @returns {Promise<{ window, img }>} The happy-dom window and created image element
+ * @returns {Promise<{ window, img, fireFCP }>} Fixture with explicit paint delivery
  */
 const createAutosizesTestEnv = async (options = {}) => {
   const {
@@ -69,6 +85,9 @@ const createAutosizesTestEnv = async (options = {}) => {
       disableJavaScriptEvaluation: false,
     },
   });
+  fixtureWindows(window);
+  // The VM binds this separate Window's timer, not Vitest's global timer.
+  vi.spyOn(window, "setTimeout").mockImplementation(globalThis.setTimeout);
 
   Object.defineProperty(window.document, "readyState", {
     value: "complete",
@@ -80,31 +99,28 @@ const createAutosizesTestEnv = async (options = {}) => {
     configurable: true,
   });
 
+  const observePaint = vi.fn(noop);
   if (hasPerfObserver) {
-    const perfObserverScript = `
-window.PerformanceObserver = class {
-  static supportedEntryTypes = ${supportsPaint ? '["paint"]' : "[]"};
-  constructor(callback) {
-    this.callback = callback;
-    this.observing = false;
-  }
-  observe() {
-    this.observing = true;
-    setTimeout(() => {
-      if (this.observing) {
-        this.callback({
-          getEntriesByName: (name) => name === "first-contentful-paint" ? [{ name }] : []
-        }, this);
+    window.PerformanceObserver = class {
+      static supportedEntryTypes = supportsPaint ? ["paint"] : [];
+      constructor(callback) {
+        this.observe = () => observePaint(callback, this);
+        this.disconnect = noop;
       }
-    }, 0);
+    };
   }
-  disconnect() {
-    this.observing = false;
-  }
-};
-`;
-    execScript(window, perfObserverScript);
-  }
+
+  const fireFCP = () => {
+    expect(observePaint).toHaveBeenCalledTimes(1);
+    const [callback, observer] = observePaint.mock.calls[0];
+    callback(
+      {
+        getEntriesByName: (name) =>
+          name === "first-contentful-paint" ? [{ name }] : [],
+      },
+      observer,
+    );
+  };
 
   const img = window.document.createElement("img");
   markNotLoaded(img);
@@ -113,7 +129,7 @@ window.PerformanceObserver = class {
   }
   window.document.getElementById("container").appendChild(img);
 
-  return { window, img };
+  return { window, img, fireFCP };
 };
 
 /**
@@ -153,12 +169,12 @@ const SRC_SRCSET_ATTRS = {
 
 /**
  * Setup test environment with imgAttrs and run autosizes.
- * Returns a Promise resolving to { window, img } for assertions.
+ * Returns the fixture and explicit paint driver for assertions.
  */
 const setupAndRun = async (imgAttrs) => {
-  const { window, img } = await createAutosizesTestEnv({ imgAttrs });
-  runAutosizes(window, img);
-  return { window, img };
+  const env = await createAutosizesTestEnv({ imgAttrs });
+  runAutosizes(env.window, env.img);
+  return env;
 };
 
 const runAndCheckDeferred = (window, img, expectedSrc) => {
@@ -170,6 +186,12 @@ const runAndCheckDeferred = (window, img, expectedSrc) => {
 const runAndExpectSrc = (window, img, expected) => {
   runAutosizes(window, img);
   expect(img.hasAttribute("src")).toBe(expected);
+};
+
+const expectAttributePresence = (element, attributes, present) => {
+  for (const attribute of attributes) {
+    expect(element.hasAttribute(attribute), attribute).toBe(present);
+  }
 };
 
 describe("autosizes", () => {
@@ -303,10 +325,12 @@ describe("autosizes", () => {
 
     test("Moves both src and srcset to data attributes", async () => {
       const { img } = await setupAndRun(SRC_SRCSET_ATTRS);
-      expect(img.hasAttribute("src")).toBe(false);
-      expect(img.hasAttribute("srcset")).toBe(false);
-      expect(img.hasAttribute("data-auto-sizes-src")).toBe(true);
-      expect(img.hasAttribute("data-auto-sizes-srcset")).toBe(true);
+      expectAttributePresence(img, ["src", "srcset"], false);
+      expectAttributePresence(
+        img,
+        ["data-auto-sizes-src", "data-auto-sizes-srcset"],
+        true,
+      );
     });
   });
 
@@ -315,23 +339,35 @@ describe("autosizes", () => {
       const fcp = await setupAndRun(SRC_SRCSET_ATTRS);
       expect(fcp.img.hasAttribute("src")).toBe(false);
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      vi.runOnlyPendingTimers();
+      expectAttributePresence(fcp.img, ["src", "srcset"], false);
 
+      fcp.fireFCP();
+      expectAttributePresence(fcp.img, ["src", "srcset"], false);
+      vi.runOnlyPendingTimers();
       expect(fcp.img.getAttribute("src")).toBe("/image.jpg");
       expect(fcp.img.getAttribute("srcset")).toBe("/image-300.jpg 300w");
     });
 
     test("Cleans up data-auto-sizes-* attributes after restoration", async () => {
-      const { window, img } = await createAutosizesTestEnv();
+      const { window, img, fireFCP } = await createAutosizesTestEnv({
+        imgAttrs: SRC_SRCSET_ATTRS,
+      });
       runAutosizes(window, img);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      expect(img.hasAttribute("data-auto-sizes-src")).toBe(false);
+      const deferredAttributes = [
+        "data-auto-sizes-src",
+        "data-auto-sizes-srcset",
+      ];
+      expectAttributePresence(img, deferredAttributes, true);
+      fireFCP();
+      vi.runOnlyPendingTimers();
+      expectAttributePresence(img, deferredAttributes, false);
     });
   });
 
   describe("Picture source handling", () => {
     const setupPictureTest = async (sourceSrcset) => {
-      const { window, img } = await createAutosizesTestEnv({
+      const { window, img, fireFCP } = await createAutosizesTestEnv({
         imgAttrs: { ...SRC_SRCSET_ATTRS },
       });
       const picture = window.document.createElement("picture");
@@ -342,14 +378,14 @@ describe("autosizes", () => {
       picture.appendChild(source);
       img.parentElement.replaceChild(picture, img);
       picture.appendChild(img);
-      return { window, img, source };
+      return { window, img, source, fireFCP };
     };
 
     const setupAndRunPicture = async (srcset) => {
-      const { window, img, source } = await setupPictureTest(srcset);
+      const { window, img, source, fireFCP } = await setupPictureTest(srcset);
       runAutosizes(window, img);
       expect(source.hasAttribute("srcset")).toBe(false);
-      return { source };
+      return { source, fireFCP };
     };
 
     test("Strips srcset from source elements inside picture before FCP", async () => {
@@ -360,10 +396,11 @@ describe("autosizes", () => {
 
     test("Restores source srcset after FCP", async () => {
       const srcset = "/img-300.webp 300w";
-      const { source } = await setupAndRunPicture(srcset);
+      const { source, fireFCP } = await setupAndRunPicture(srcset);
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
+      fireFCP();
+      expect(source.hasAttribute("srcset")).toBe(false);
+      vi.runOnlyPendingTimers();
       expect(source.getAttribute("srcset")).toBe(srcset);
       expect(source.hasAttribute("data-auto-sizes-srcset")).toBe(false);
     });

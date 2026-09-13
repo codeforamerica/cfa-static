@@ -1,6 +1,6 @@
 /**
  * Code scanner utilities for code quality tests.
- * Written in a functional, immutable style.
+ * Uses one-pass scans with bounded local state.
  */
 import { expect } from "vitest";
 import { fs, omit, path, rootDir } from "#test/test-utils.js";
@@ -55,32 +55,27 @@ const STRING_QUOTES = frozenSet(['"', "'", "`"]);
 /**
  * Remove string literals from a line to avoid false positives when tracking braces.
  * Handles double-quoted, single-quoted, and template strings.
- * Uses recursive processing for immutability.
  *
  * @param {string} line - Source code line
  * @returns {string} Line with string contents removed
  */
 const removeStrings = (line) => {
-  const processChar = (chars, acc = "") => {
-    if (chars.length === 0) return acc;
-
-    const [char, ...rest] = chars;
-    if (!STRING_QUOTES.has(char)) return processChar(rest, acc + char);
-
-    // Found string start - skip to closing quote
-    const skipString = (remaining, quote) => {
-      if (remaining.length === 0) return [];
-      const [c, ...more] = remaining;
-      if (c === quote) return more;
-      if (c === "\\" && more.length > 0)
-        return skipString(more.slice(1), quote);
-      return skipString(more, quote);
-    };
-
-    return processChar(skipString(rest, char), acc);
+  const unquotedChars = function* () {
+    const state = { quote: null, escaped: false };
+    for (const char of line) {
+      if (state.escaped) {
+        state.escaped = false;
+      } else if (state.quote !== null) {
+        if (char === "\\") state.escaped = true;
+        else if (char === state.quote) state.quote = null;
+      } else if (STRING_QUOTES.has(char)) {
+        state.quote = char;
+      } else {
+        yield char;
+      }
+    }
   };
-
-  return processChar([...line]);
+  return [...unquotedChars()].join("");
 };
 
 /**
@@ -117,45 +112,32 @@ const createBraceDepthScanner = (config) => {
   const { pattern, skipLine = () => false, extractData = () => ({}) } = config;
 
   return (source) => {
-    const processLines = (lines, state) => {
-      if (lines.length === 0) return state.results;
-
-      const [{ line, lineNum }, ...rest] = lines;
-      const depthChange = getBraceDepthChange(line);
-      const newDepth = Math.max(0, state.depth + depthChange);
-
-      // Skip if skipLine predicate returns true
-      if (skipLine(line)) {
-        return processLines(rest, { ...state, depth: newDepth });
+    const scanMatches = function* () {
+      const state = { depth: 0 };
+      for (const { line, num } of toLines(source)) {
+        const depth = state.depth;
+        const withoutStrings = removeStrings(line);
+        state.depth = Math.max(
+          0,
+          depth +
+            countChar("{")(withoutStrings) -
+            countChar("}")(withoutStrings),
+        );
+        if (skipLine(line) || depth === 0 || !pattern.test(withoutStrings)) {
+          continue;
+        }
+        const extraData = extractData(line, num, depth);
+        if (extraData !== null) {
+          yield {
+            lineNumber: num,
+            line: line.trim(),
+            braceDepth: depth,
+            ...extraData,
+          };
+        }
       }
-
-      // Check for pattern match at current depth (before updating)
-      const lineWithoutStrings = removeStrings(line);
-      const isMatch = state.depth > 0 && pattern.test(lineWithoutStrings);
-
-      const extraData = isMatch
-        ? extractData(line, lineNum, state.depth)
-        : null;
-      const newResults =
-        isMatch && extraData !== null
-          ? [
-              ...state.results,
-              {
-                lineNumber: lineNum,
-                line: line.trim(),
-                braceDepth: state.depth,
-                ...extraData,
-              },
-            ]
-          : state.results;
-
-      return processLines(rest, { results: newResults, depth: newDepth });
     };
-
-    const numberedLines = source
-      .split("\n")
-      .map((line, i) => ({ line, lineNum: i + 1 }));
-    return processLines(numberedLines, { results: [], depth: 0 });
+    return [...scanMatches()];
   };
 };
 
@@ -653,62 +635,44 @@ const parseExportNames = (content) =>
  * @returns {Set<string>} - Set of exported names
  */
 const extractExports = (source) => {
-  // Threads { names, pending } across lines; pending holds the accumulated
-  // content of a multi-line export list until its closing brace.
-  const processLine = (acc, line) => {
-    // Skip comments
-    if (isCommentLine(line)) return acc;
+  const lines = source.split("\n");
+  const exportedNames = function* () {
+    const state = { pendingStart: null };
+    for (const [index, line] of lines.entries()) {
+      if (isCommentLine(line)) continue;
 
-    // If we're accumulating a multi-line export
-    if (acc.pending !== null) {
-      const closeIndex = line.indexOf("}");
-      return closeIndex === -1
-        ? { ...acc, pending: acc.pending + line }
-        : {
-            names: [
-              ...acc.names,
-              ...parseExportNames(acc.pending + line.slice(0, closeIndex)),
-            ],
-            pending: null,
-          };
+      if (state.pendingStart !== null) {
+        const closeIndex = line.indexOf("}");
+        if (closeIndex === -1) continue;
+        const opening = lines[state.pendingStart];
+        const content = [
+          opening.slice(opening.indexOf("{") + 1),
+          ...lines
+            .slice(state.pendingStart + 1, index)
+            .filter((part) => !isCommentLine(part)),
+          line.slice(0, closeIndex),
+        ].join("");
+        yield* parseExportNames(content);
+        state.pendingStart = null;
+        continue;
+      }
+
+      const declaration =
+        line.match(EXPORT_FUNCTION_PATTERN) || line.match(EXPORT_VAR_PATTERN);
+      if (declaration) {
+        yield declaration[1];
+      } else if (EXPORT_BRACE_START.test(line)) {
+        const braceEnd = line.indexOf("}");
+        if (braceEnd === -1) state.pendingStart = index;
+        else
+          yield* parseExportNames(line.slice(line.indexOf("{") + 1, braceEnd));
+      } else {
+        const defaultMatch = line.match(EXPORT_DEFAULT_PATTERN);
+        if (defaultMatch) yield defaultMatch[1];
+      }
     }
-
-    // Match function declaration exports
-    const funcMatch = line.match(EXPORT_FUNCTION_PATTERN);
-    if (funcMatch) return { ...acc, names: [...acc.names, funcMatch[1]] };
-
-    // Match variable declaration exports
-    const varMatch = line.match(EXPORT_VAR_PATTERN);
-    if (varMatch) return { ...acc, names: [...acc.names, varMatch[1]] };
-
-    // Collect export lists (single-line, or open a multi-line buffer)
-    if (EXPORT_BRACE_START.test(line)) {
-      const braceStart = line.indexOf("{");
-      const braceEnd = line.indexOf("}");
-      return braceEnd !== -1
-        ? {
-            ...acc,
-            names: [
-              ...acc.names,
-              ...parseExportNames(line.slice(braceStart + 1, braceEnd)),
-            ],
-          }
-        : { ...acc, pending: line.slice(braceStart + 1) };
-    }
-
-    // Match default exports
-    const defaultMatch = line.match(EXPORT_DEFAULT_PATTERN);
-    return defaultMatch
-      ? { ...acc, names: [...acc.names, defaultMatch[1]] }
-      : acc;
   };
-
-  const finalState = source.split("\n").reduce(processLine, {
-    names: [],
-    pending: null,
-  });
-
-  return frozenSet(finalState.names);
+  return frozenSet(exportedNames());
 };
 
 /**

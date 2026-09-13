@@ -8,7 +8,6 @@
 import { describe, expect, test } from "vitest";
 import { assertNoViolations, readSource } from "#test/code-scanner.js";
 import { ALL_JS_FILES } from "#test/test-utils.js";
-import { buildReverseIndex } from "#utils/fp/grouping.js";
 import { frozenSet } from "#utils/fp/set.js";
 
 const THIS_FILE = "test/unit/code-quality/duplicate-methods.test.js";
@@ -78,23 +77,26 @@ const extractFunctionNames = (source) =>
 /**
  * Find all duplicate function names (appearing in 2+ different files).
  */
-const findDuplicateMethods = () => {
+const findDuplicateMethods = (
+  files = ALL_JS_FILES(),
+  loadSource = readSource,
+) => {
   // Build location map: function name -> [{ file, line, name }]
-  const locationMap = buildReverseIndex(
-    ALL_JS_FILES()
+  const locationMap = Map.groupBy(
+    files
       .filter(
         (file) =>
           file !== THIS_FILE &&
           ![...EXCLUDED_DIRS].some((dir) => file.startsWith(`${dir}/`)),
       )
       .flatMap((file) =>
-        extractFunctionNames(readSource(file)).map((func) => ({
+        extractFunctionNames(loadSource(file)).map((func) => ({
           name: func.name,
           file,
           line: func.line,
         })),
       ),
-    (loc) => [loc.name],
+    (loc) => loc.name,
   );
 
   const duplicated = [...locationMap].flatMap(([name, locations]) => {
@@ -128,6 +130,38 @@ const findDuplicateMethods = () => {
 // ============================================
 
 describe("duplicate-methods", () => {
+  test("groups duplicate locations while counting distinct files", () => {
+    const sources = {
+      "src/first.js":
+        "function repeatedMethod() {}\nfunction repeatedMethod() {}",
+      "test/second.js": "const repeatedMethod = () => 1;",
+    };
+    const { duplicates } = findDuplicateMethods(
+      Object.keys(sources),
+      (file) => sources[file],
+    );
+    expect(duplicates).toEqual([
+      {
+        name: "repeatedMethod",
+        fileCount: 2,
+        locations: [
+          { name: "repeatedMethod", file: "src/first.js", line: 1 },
+          { name: "repeatedMethod", file: "src/first.js", line: 2 },
+          { name: "repeatedMethod", file: "test/second.js", line: 1 },
+        ],
+      },
+    ]);
+  });
+
+  test("does not report repeated definitions confined to one file", () => {
+    expect(
+      findDuplicateMethods(
+        ["src/local.js"],
+        () => "function localMethod() {}\nfunction localMethod() {}",
+      ),
+    ).toEqual({ violations: [], allowed: [], duplicates: [] });
+  });
+
   test("extractFunctionNames finds function declarations", () => {
     const source = `
 function hello() {}

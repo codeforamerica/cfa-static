@@ -73,10 +73,15 @@ const findUnscopedSelectors = (content) => {
 
   // Find what selectors are at the top level: track brace depth and whether
   // we are inside a .design-system block across lines.
-  const finalState = withoutRoot.split("\n").reduce(
-    (state, line) => {
+  const unscopedSelectors = function* () {
+    const state = {
+      braceDepth: 0,
+      currentSelector: "",
+      inDesignSystem: false,
+    };
+    for (const line of withoutRoot.split("\n")) {
       const trimmed = line.trim();
-      if (!trimmed) return state;
+      if (!trimmed) continue;
 
       // Track if we're inside .design-system
       const inDesignSystem =
@@ -102,25 +107,15 @@ const findUnscopedSelectors = (content) => {
       // If we just opened a brace and had a selector, it's unscoped
       const shouldRecord = currentSelector && openBraces > 0 && !inDesignSystem;
 
-      return {
-        unscopedSelectors: shouldRecord
-          ? [...state.unscopedSelectors, currentSelector]
-          : state.unscopedSelectors,
-        braceDepth,
-        currentSelector: shouldRecord ? "" : currentSelector,
-        // Reset inDesignSystem when we close back to depth 0
-        inDesignSystem: braceDepth === 0 ? false : inDesignSystem,
-      };
-    },
-    {
-      unscopedSelectors: [],
-      braceDepth: 0,
-      currentSelector: "",
-      inDesignSystem: false,
-    },
-  );
+      if (shouldRecord) yield currentSelector;
+      state.braceDepth = braceDepth;
+      state.currentSelector = shouldRecord ? "" : currentSelector;
+      // Reset inDesignSystem when we close back to depth 0
+      state.inDesignSystem = braceDepth === 0 ? false : inDesignSystem;
+    }
+  };
 
-  return finalState.unscopedSelectors;
+  return [...unscopedSelectors()];
 };
 
 /**
@@ -156,6 +151,18 @@ const hasDesignSystemWrapper = (content) => {
 };
 
 describe("design-system-scoping", () => {
+  test("resumes unscoped selector detection after a scoped block closes", () => {
+    const content = `.before { color: red; }
+.design-system {
+  .inside { color: green; }
+}
+.after
+{
+  .nested { color: blue; }
+}`;
+    expect(findUnscopedSelectors(content)).toEqual([".before", ".after"]);
+  });
+
   test("extracts unscoped selectors correctly", () => {
     const unscopedContent = `
       @use "../variables" as *;

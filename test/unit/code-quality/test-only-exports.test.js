@@ -17,7 +17,6 @@ import {
 } from "#test/code-scanner.js";
 import { SCRIPT_JS_FILES, SRC_JS_FILES, TEST_FILES } from "#test/test-utils.js";
 import { unique } from "#utils/fp/array.js";
-import { groupBy } from "#utils/fp/grouping.js";
 
 const THIS_FILE = "test/unit/code-quality/test-only-exports.test.js";
 
@@ -137,10 +136,10 @@ const extractImports = (source) =>
  * @param {string[]} files - Files to scan for imports
  * @returns {Map<string, {key: string, file: string}[]>} - Map of "file:export" to importing entries
  */
-const buildImportUsageMap = (files) =>
-  groupBy(
+const buildImportUsageMap = (files, loadSource = readSource) =>
+  Map.groupBy(
     files.flatMap((file) =>
-      extractImports(readSource(file)).flatMap(({ names, resolvedPath }) =>
+      extractImports(loadSource(file)).flatMap(({ names, resolvedPath }) =>
         (resolvedPath ? names : []).map((name) => ({
           key: `${resolvedPath}:${name}`,
           file,
@@ -155,6 +154,31 @@ const buildImportUsageMap = (files) =>
 // ============================================
 
 describe("test-only-exports", () => {
+  test("groups import usages by source export without losing locations", () => {
+    const sources = {
+      "test/first.js":
+        'import { shared } from "#utils/shared.js";\nimport { other } from "#utils/shared.js";',
+      "test/second.js": 'import { shared } from "#utils/shared.js";',
+    };
+    const usage = buildImportUsageMap(
+      Object.keys(sources),
+      (file) => sources[file],
+    );
+    expect([...usage]).toEqual([
+      [
+        "src/_lib/utils/shared.js:shared",
+        [
+          { key: "src/_lib/utils/shared.js:shared", file: "test/first.js" },
+          { key: "src/_lib/utils/shared.js:shared", file: "test/second.js" },
+        ],
+      ],
+      [
+        "src/_lib/utils/shared.js:other",
+        [{ key: "src/_lib/utils/shared.js:other", file: "test/first.js" }],
+      ],
+    ]);
+  });
+
   describe("extractExports", () => {
     test("finds export function declarations", () => {
       const source = `

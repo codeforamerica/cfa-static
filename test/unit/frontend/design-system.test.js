@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { initSliders } from "#public/utils/slider-core.js";
 
 let readyCallback = null;
 const originalMatchMedia = window.matchMedia;
 const originalRaf = window.requestAnimationFrame;
+const originalCancelRaf = window.cancelAnimationFrame;
 
 vi.mock("#public/utils/slider-core.js", () => ({
   initSliders: vi.fn(),
@@ -72,11 +74,12 @@ const parallaxObserver = () => fixtureObserver("50px 0px");
 const revealObserver = () => fixtureObserver("0px 0px -50px 0px");
 
 let rafQueue = null;
+let rafId = null;
 
 const runFrame = () => {
   const callbacks = rafQueue;
   rafQueue = [];
-  for (const callback of callbacks) {
+  for (const { callback } of callbacks) {
     callback();
   }
 };
@@ -93,13 +96,20 @@ const clickAnchor = (id) =>
     );
 
 beforeEach(() => {
+  initSliders.mockClear();
   document.body.innerHTML = "";
   setReducedMotion(false);
   intersectionObservers = [];
   rafQueue = [];
+  rafId = 0;
   window.IntersectionObserver = FakeIntersectionObserver;
   window.requestAnimationFrame = (callback) => {
-    rafQueue.push(callback);
+    const id = rafId++;
+    rafQueue.push({ id, callback });
+    return id;
+  };
+  window.cancelAnimationFrame = (id) => {
+    rafQueue = rafQueue.filter((frame) => frame.id !== id);
   };
 });
 
@@ -107,6 +117,9 @@ afterEach(() => {
   window.IntersectionObserver = originalIntersectionObserver;
   window.matchMedia = originalMatchMedia;
   window.requestAnimationFrame = originalRaf;
+  window.cancelAnimationFrame = originalCancelRaf;
+  vi.restoreAllMocks();
+  document.body.innerHTML = "";
   history.pushState(null, "", "/");
 });
 
@@ -165,6 +178,7 @@ describe("parallax", () => {
     expect(observer.targets).toEqual([scene.a, scene.b]);
 
     signalIntersection(observer, true, scene.a);
+    signalIntersection(observer, false, scene.b);
     runFrame();
 
     // With a zero rect, progress is (innerHeight - 0)/(innerHeight + 0) = 1,
@@ -188,6 +202,91 @@ describe("parallax", () => {
     runFrame();
 
     expect(scene.a.firstElementChild.style.transform).toBe("translateY(42%)");
+    expect(rafQueue).toHaveLength(0);
+  });
+
+  test("uses current geometry on each frame after reentry without duplicate updates", () => {
+    const { a, b } = parallaxScene();
+    const measureA = vi.spyOn(a, "getBoundingClientRect").mockReturnValue({
+      top: window.innerHeight,
+      height: window.innerHeight,
+    });
+    const measureB = vi.spyOn(b, "getBoundingClientRect");
+    readyCallback();
+    const observer = parallaxObserver();
+    signalIntersection(observer, false, a);
+    runFrame();
+    expect(measureA).not.toHaveBeenCalled();
+
+    signalIntersection(observer, true, a);
+    signalIntersection(observer, true, a);
+    runFrame();
+    expect(a.firstElementChild.style.transform).toBe("translateY(-10%)");
+    expect(measureA).toHaveBeenCalledTimes(1);
+
+    signalIntersection(observer, false, a);
+    measureA.mockReturnValue({ top: 0, height: window.innerHeight });
+    runFrame();
+    expect(measureA).toHaveBeenCalledTimes(1);
+
+    signalIntersection(observer, true, a);
+    runFrame();
+    expect(a.firstElementChild.style.transform).toBe("translateY(0%)");
+    expect(measureA).toHaveBeenCalledTimes(2);
+
+    measureA.mockReturnValue({
+      top: 0,
+      height: window.innerHeight * 3,
+    });
+    runFrame();
+    expect(a.firstElementChild.style.transform).toBe("translateY(-5%)");
+    expect(measureA).toHaveBeenCalledTimes(3);
+    expect(measureB).not.toHaveBeenCalled();
+  });
+
+  test("keeps other visible elements animating when one leaves", () => {
+    const { a, b } = parallaxScene();
+    const measureA = vi.spyOn(a, "getBoundingClientRect");
+    const measureB = vi.spyOn(b, "getBoundingClientRect");
+    readyCallback();
+    const observer = parallaxObserver();
+    signalIntersection(observer, true, a);
+    signalIntersection(observer, true, b);
+    runFrame();
+    expect(measureA).toHaveBeenCalledTimes(1);
+    expect(measureB).toHaveBeenCalledTimes(1);
+
+    signalIntersection(observer, false, a);
+    measureB.mockReturnValue({ top: window.innerHeight, height: 0 });
+    runFrame();
+    expect(measureA).toHaveBeenCalledTimes(1);
+    expect(measureB).toHaveBeenCalledTimes(2);
+    expect(b.firstElementChild.style.transform).toBe("translateY(-10%)");
+  });
+
+  test("does not animate premarked or newly inserted unobserved elements", () => {
+    const { a } = parallaxScene();
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      '<div class="parallax parallax-active" id="outside"><div></div></div>',
+    );
+    readyCallback();
+    document
+      .querySelector(".design-system")
+      .insertAdjacentHTML(
+        "beforeend",
+        '<div class="parallax parallax-active" id="late"><div></div></div>',
+      );
+    signalIntersection(parallaxObserver(), true, a);
+    runFrame();
+
+    expect(a.firstElementChild.style.transform).toBe("translateY(10%)");
+    expect(
+      document.querySelector("#outside").firstElementChild.style.transform,
+    ).toBe("");
+    expect(
+      document.querySelector("#late").firstElementChild.style.transform,
+    ).toBe("");
   });
 
   test("does not start an animation under reduced motion", () => {
@@ -294,13 +393,12 @@ describe("smooth scroll anchors", () => {
 });
 
 describe("init wiring", () => {
-  test("initialises the design-system sliders", async () => {
+  test("initialises the design-system sliders", () => {
     mount("<div></div>");
-    const { initSliders } = await import("#public/utils/slider-core.js");
 
     readyCallback();
 
-    expect(initSliders).toHaveBeenCalledWith(
+    expect(initSliders).toHaveBeenCalledExactlyOnceWith(
       ".design-system .slider-container",
       {
         itemSelector: ":scope > *",

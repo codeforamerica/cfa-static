@@ -85,54 +85,56 @@ const findHeaderEndLine = (lines) => {
 };
 
 const countInlineComments = (lines, headerEndLine) => {
-  // Threads { inlineComments, inJsDocBlock, inRegularBlock } across lines
+  // Only the count and first excess location are needed for the report.
   const processLine = (state, { line, num }) => {
     if (num <= headerEndLine) return state;
     const trimmed = line.trim();
-    const emit = (comment) => ({
+    const emit = () => ({
       ...state,
-      inlineComments: [...state.inlineComments, comment],
+      count: state.count + 1,
+      firstExcessLine:
+        state.count === MAX_INLINE_COMMENTS ? num : state.firstExcessLine,
     });
     if (state.inJsDocBlock) {
       return isBlockEnd(trimmed) ? { ...state, inJsDocBlock: false } : state;
     }
     if (state.inRegularBlock) {
-      const next = emit({ lineNumber: num, line: trimmed });
+      const next = emit();
       return isBlockEnd(trimmed) ? { ...next, inRegularBlock: false } : next;
     }
     if (COMMENT_PATTERNS.jsdocStart.test(trimmed)) {
       return { ...state, inJsDocBlock: !isBlockEnd(trimmed) };
     }
     if (isBlockStart(trimmed)) {
-      const next = emit({ lineNumber: num, line: trimmed });
+      const next = emit();
       return { ...next, inRegularBlock: !isBlockEnd(trimmed) };
     }
     return isSingleLine(trimmed) &&
       !JSDOC_TYPE_PATTERNS.some((pattern) => pattern.test(trimmed))
-      ? emit({ lineNumber: num, line: trimmed })
+      ? emit()
       : state;
   };
 
   return lines.reduce(processLine, {
-    inlineComments: [],
+    count: 0,
+    firstExcessLine: null,
     inJsDocBlock: false,
     inRegularBlock: false,
-  }).inlineComments;
+  });
 };
 
 const findExcessiveComments = (source) => {
   const lines = toLines(source);
   const headerEndLine = findHeaderEndLine(lines);
-  const inlineComments = countInlineComments(lines, headerEndLine);
+  const { count, firstExcessLine } = countInlineComments(lines, headerEndLine);
 
-  if (inlineComments.length <= MAX_INLINE_COMMENTS) return [];
+  if (count <= MAX_INLINE_COMMENTS) return [];
 
-  const firstExcess = inlineComments[MAX_INLINE_COMMENTS];
   return [
     {
-      lineNumber: firstExcess.lineNumber,
-      line: `${inlineComments.length} inline comments (limit: ${MAX_INLINE_COMMENTS})`,
-      count: inlineComments.length,
+      lineNumber: firstExcessLine,
+      line: `${count} inline comments (limit: ${MAX_INLINE_COMMENTS})`,
+      count,
     },
   ];
 };
@@ -146,6 +148,18 @@ const expectExcessiveComments = (source, expectedCount) => {
 const THIS_FILE = "test/unit/code-quality/comment-limits.test.js";
 
 describe("comment-limits", () => {
+  test("reports the first excess line while counting all later comments", () => {
+    const count = MAX_INLINE_COMMENTS + 10000;
+    const source = `const value = 1;\n${"// inline\n".repeat(count)}`;
+    expect(findExcessiveComments(source)).toEqual([
+      {
+        lineNumber: MAX_INLINE_COMMENTS + 2,
+        line: `${count} inline comments (limit: ${MAX_INLINE_COMMENTS})`,
+        count,
+      },
+    ]);
+  });
+
   test("Allows header comment block at file start", () => {
     const source = `/**
  * This is a long header comment that explains the file.

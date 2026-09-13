@@ -1,12 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { combineFileLists } from "#test/code-scanner.js";
-import {
-  fs,
-  path,
-  rootDir,
-  SCRIPT_JS_FILES,
-  SRC_JS_FILES,
-} from "#test/test-utils.js";
+import { combineFileLists, readSource } from "#test/code-scanner.js";
+import { SCRIPT_JS_FILES, SRC_JS_FILES } from "#test/test-utils.js";
 import { unique } from "#utils/fp/array.js";
 import { frozenSet } from "#utils/fp/set.js";
 
@@ -63,15 +57,13 @@ const extractCamelCaseIdentifiers = (source) => {
  * Analyze the codebase for verbose camelCase names.
  * Returns an object with violations and their occurrence counts.
  */
-const analyzeNamingConventions = () => {
+const analyzeNamingConventions = (
+  files = combineFileLists([SRC_JS_FILES(), SCRIPT_JS_FILES()]),
+  loadSource = readSource,
+) => {
   // Identifier-file pairs for every too-long name in every source file
-  const occurrences = combineFileLists([
-    SRC_JS_FILES(),
-    SCRIPT_JS_FILES(),
-  ]).flatMap((relativePath) =>
-    extractCamelCaseIdentifiers(
-      fs.readFileSync(path.join(rootDir, relativePath), "utf-8"),
-    )
+  const occurrences = files.flatMap((relativePath) =>
+    extractCamelCaseIdentifiers(loadSource(relativePath))
       .filter(
         (identifier) =>
           countCamelCaseWords(identifier) > MAX_WORDS &&
@@ -80,26 +72,18 @@ const analyzeNamingConventions = () => {
       .map((identifier) => ({ identifier, relativePath })),
   );
 
-  // Count occurrences and collect files per identifier
-  const collectViolation = (violations, { identifier, relativePath }) => {
-    const existing = violations[identifier];
-    return {
-      ...violations,
-      [identifier]: existing
-        ? {
-            ...existing,
-            occurrences: existing.occurrences + 1,
-            files: [...existing.files, relativePath],
-          }
-        : {
-            wordCount: countCamelCaseWords(identifier),
-            occurrences: 1,
-            files: [relativePath],
-          },
-    };
-  };
-
-  return occurrences.reduce(collectViolation, {});
+  return Object.fromEntries(
+    [...Map.groupBy(occurrences, ({ identifier }) => identifier)].map(
+      ([identifier, entries]) => [
+        identifier,
+        {
+          wordCount: countCamelCaseWords(identifier),
+          occurrences: entries.length,
+          files: entries.map(({ relativePath }) => relativePath),
+        },
+      ],
+    ),
+  );
 };
 
 /**
@@ -137,6 +121,22 @@ const formatNamingViolations = (violations) => {
 };
 
 describe("naming-conventions", () => {
+  test("groups verbose identifiers once per file in discovery order", () => {
+    const sources = {
+      "src/first.js": "getActiveUserById(); getActiveUserById();",
+      "scripts/second.js": "getActiveUserById(); getUserById();",
+    };
+    expect(
+      analyzeNamingConventions(Object.keys(sources), (file) => sources[file]),
+    ).toEqual({
+      getActiveUserById: {
+        wordCount: 5,
+        occurrences: 2,
+        files: ["src/first.js", "scripts/second.js"],
+      },
+    });
+  });
+
   test("countCamelCaseWords counts simple cases correctly", () => {
     expect(countCamelCaseWords("get")).toBe(1);
     expect(countCamelCaseWords("getUser")).toBe(2);

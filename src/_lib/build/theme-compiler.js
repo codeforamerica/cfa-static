@@ -13,6 +13,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import scss from "postcss-scss";
 import {
   exclude,
   filter,
@@ -56,13 +57,22 @@ const generateThemeSwitcherContent = memoize(() => {
   const themeRules = themes.map(
     /** @param {ThemeFile} theme */
     (theme) => {
-      const variablesMatch = theme.content.match(/:root\s*{([^}]+)}/);
-      if (!variablesMatch) {
+      const root = scss
+        .parse(theme.content, { from: theme.file })
+        .nodes.find(
+          (node) => node.type === "rule" && node.selector === ":root",
+        );
+      if (
+        root?.type !== "rule" ||
+        !root.nodes.some((node) => node.type !== "comment")
+      ) {
         throw new Error(
-          `Theme files must define a :root block with theme variables, but ${theme.file} has none`,
+          `Theme file ${theme.file} must define a non-empty :root block with theme variables`,
         );
       }
-      return `html[data-theme="${theme.name}"] {${variablesMatch[1]}}`;
+      return root
+        .clone({ selector: `html[data-theme="${theme.name}"]` })
+        .toString(scss.stringify);
     },
   );
 

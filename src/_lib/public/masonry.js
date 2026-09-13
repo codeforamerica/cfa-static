@@ -9,8 +9,7 @@ const MOBILE_BREAKPOINT = 768;
 const CARD_BORDER = 2;
 const ITEM_PADDING_INLINE = 24;
 
-// Cached per font string (module scope, so the cache persists across layout
-// calls) - canvas metrics for one font never change within a page view.
+// Cached per font string across layout calls.
 const getCounter = memoize((font) => {
   const ctx = document.createElement("canvas").getContext("2d");
   ctx.font = font;

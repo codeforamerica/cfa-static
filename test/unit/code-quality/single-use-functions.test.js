@@ -115,20 +115,16 @@ const processLineForFuncDef = (state, line, index) => {
     charState,
   );
 
-  // Add function if found
-  if (funcMatch) {
-    const newFunction = {
-      name: funcMatch[1],
-      line: lineNum,
-      isNested: state.braceDepth > 0,
-    };
-    return {
-      ...processedState,
-      functions: [...processedState.functions, newFunction],
-    };
-  }
-
-  return processedState;
+  return {
+    ...processedState,
+    definition: funcMatch
+      ? {
+          name: funcMatch[1],
+          line: lineNum,
+          isNested: state.braceDepth > 0,
+        }
+      : null,
+  };
 };
 
 /**
@@ -136,29 +132,22 @@ const processLineForFuncDef = (state, line, index) => {
  * Returns array of { name, line, isNested }
  */
 const extractFunctionDefinitions = (source) => {
-  const initialState = {
-    braceDepth: 0,
-    inString: false,
-    stringChar: null,
-    inMultilineComment: false,
-    skipNext: false,
-    functions: [],
+  const definitions = function* () {
+    const state = {
+      current: {
+        braceDepth: 0,
+        inString: false,
+        stringChar: null,
+        inMultilineComment: false,
+        skipNext: false,
+      },
+    };
+    for (const [index, line] of source.split("\n").entries()) {
+      state.current = processLineForFuncDef(state.current, line, index);
+      if (state.current.definition) yield state.current.definition;
+    }
   };
-
-  const lines = source.split("\n");
-  const finalState = lines.reduce(processLineForFuncDef, initialState);
-  return finalState.functions;
-};
-
-/**
- * Count occurrences of a function name in source code.
- * Looks for the name as a word boundary (not part of larger identifier).
- */
-const countReferences = (source, functionName) => {
-  // Match function name as standalone identifier (word boundaries)
-  const pattern = new RegExp(`\\b${functionName}\\b`, "g");
-  const matches = source.match(pattern);
-  return matches ? matches.length : 0;
+  return [...definitions()];
 };
 
 /**
@@ -166,8 +155,7 @@ const countReferences = (source, functionName) => {
  *
  * Rather than running one regular expression per function name per file, tokenize
  * each source file once and increment counts for identifiers that are known
- * function names. This preserves countReferences() semantics for identifier word
- * boundaries while avoiding thousands of full-source rescans.
+ * function names, avoiding thousands of full-source rescans.
  */
 const IDENTIFIER_PATTERN = /\b[a-zA-Z_$][a-zA-Z0-9_$]*\b/g;
 
@@ -178,41 +166,36 @@ const buildReferenceCountMap = (fileData) => {
     ),
   );
 
-  // Tokenize each source once and count identifiers that are known function
-  // names. This preserves countReferences() semantics for identifier word
-  // boundaries while avoiding thousands of full-source rescans.
-  const occurrences = Object.groupBy(
-    Object.values(fileData).flatMap((data) =>
-      [...data.source.matchAll(IDENTIFIER_PATTERN)]
-        .map((match) => match[0])
-        .filter((identifier) => functionNames.has(identifier)),
-    ),
-    (identifier) => identifier,
+  const counts = Object.fromEntries(
+    [...functionNames].map((name) => [name, 0]),
   );
-
-  // Group sizes are the reference counts; names never seen stay at 0
-  return Object.fromEntries(
-    [...functionNames].map((name) => [name, occurrences[name]?.length ?? 0]),
-  );
+  for (const { source } of Object.values(fileData)) {
+    for (const [identifier] of source.matchAll(IDENTIFIER_PATTERN)) {
+      if (functionNames.has(identifier)) counts[identifier] += 1;
+    }
+  }
+  return counts;
 };
 
 /**
  * Analyze all files for single-use unexported functions.
  * Optimized using pipe() and reference count map to avoid O(n³) complexity.
  */
-const analyzeSingleUseFunctions = () => {
+const analyzeSingleUseFunctions = (
+  files = combineFileLists([SRC_JS_FILES(), TEST_FILES()], [THIS_FILE]),
+  loadSource = readSource,
+) => {
   // Organisation-style rule: kept to runtime src/ and test/ code - the
   // generic fp utilities and the shared test infrastructure are exempt.
   const exemptDirs = ["src/_lib/utils/fp/", "test/test-utils/"];
-  const allFiles = combineFileLists(
-    [SRC_JS_FILES(), TEST_FILES()],
-    [THIS_FILE],
-  ).filter((file) => !exemptDirs.some((dir) => file.startsWith(dir)));
+  const allFiles = files.filter(
+    (file) => !exemptDirs.some((dir) => file.startsWith(dir)),
+  );
 
   // First pass: collect all function definitions and exports per file
   const fileData = Object.fromEntries(
     allFiles.map((file) => {
-      const source = readSource(file);
+      const source = loadSource(file);
       return [
         file,
         {
@@ -383,32 +366,69 @@ export default main;
     });
   });
 
-  describe("countReferences", () => {
-    test("counts function references correctly", () => {
-      const source = `
-const helper = () => {};
-const result = helper();
-`;
-      expect(countReferences(source, "helper")).toBe(2);
+  describe("analyzeSingleUseFunctions", () => {
+    test("reports a definition with one call in another file", () => {
+      const sources = {
+        "src/definition.js": "const referencedOnce = () => 1;",
+        "test/caller.js": "referencedOnce();",
+      };
+      expect(
+        analyzeSingleUseFunctions(
+          Object.keys(sources),
+          (file) => sources[file],
+        ),
+      ).toEqual({
+        violations: [
+          {
+            file: "src/definition.js",
+            line: 1,
+            code: "referencedOnce",
+            reason:
+              'Function "referencedOnce" is only called once - nest it inside its caller',
+          },
+        ],
+        allowed: [],
+      });
     });
 
-    test("does not count partial matches", () => {
-      const source = `
-const helper = () => {};
-const helperTwo = () => {};
-const myhelper = () => {};
-`;
-      expect(countReferences(source, "helper")).toBe(1);
+    test("does not count longer identifiers as references", () => {
+      const source =
+        "const boundaryReference = () => 1;\nboundaryReference();\nboundaryReferenceExtra();\nmyboundaryReference();";
+      const { violations } = analyzeSingleUseFunctions(
+        ["src/boundary.js"],
+        () => source,
+      );
+      expect(violations.map(({ code }) => code)).toEqual(["boundaryReference"]);
     });
 
-    test("counts multiple calls", () => {
-      const source = `
-function add(a, b) { return a + b; }
-const x = add(1, 2);
-const y = add(3, 4);
-const z = add(5, 6);
-`;
-      expect(countReferences(source, "add")).toBe(4);
+    test.each([
+      "constructor",
+      "__proto__",
+    ])("counts a function named %s without prototype collisions", (name) => {
+      const source = `const ${name} = () => 1;\n${name}();`;
+      const { violations } = analyzeSingleUseFunctions(
+        ["src/prototype-name.js"],
+        () => source,
+      );
+      expect(violations.map(({ code }) => code)).toEqual([name]);
+    });
+
+    test.each([
+      0, 2, 10000,
+    ])("does not flag a function with %i calls", (calls) => {
+      const source = `const repeatedReference = () => 1;\n${"repeatedReference();\n".repeat(calls)}`;
+      expect(
+        analyzeSingleUseFunctions(["src/repeated.js"], () => source),
+      ).toEqual({ violations: [], allowed: [] });
+    });
+
+    test.each([
+      "const publicReference = () => 1;\nexport { publicReference };",
+      "const containingReference = () => {\nconst nestedReference = () => 1;\nreturn nestedReference();\n};",
+    ])("excludes exported or nested definitions: %s", (source) => {
+      expect(
+        analyzeSingleUseFunctions(["src/excluded.js"], () => source),
+      ).toEqual({ violations: [], allowed: [] });
     });
   });
 

@@ -10,6 +10,7 @@ import { orderThenString } from "#utils/fp/sorting.js";
 
 /** @typedef {import("../types/navigation.d.ts").NavigationEntry} NavigationEntry */
 /** @typedef {(children: NavigationEntry[]) => Promise<string>} RenderChildren */
+/** @typedef {{ data: { eleventyNavigation: { order?: number, key?: string }, name: string } }} NavigationItem */
 
 const NAV_THUMBNAIL_WIDTHS = ["64", "128", "480", "600"];
 const NAV_THUMBNAIL_ASPECT = "1/1";
@@ -18,10 +19,9 @@ const SEARCH_ICON_ID = "hugeicons:search-02";
 
 /**
  * Collection comparator for navigation pages: by eleventyNavigation order
- * (pages without an order go last), then by key, then by page name.
+ * (defaulting to 999), then by key with page name as the fallback for a falsy key.
  * The default order lives with the collection, where content defaults belong.
- * @param {{ data: { eleventyNavigation: { order?: number, key?: string }, name?: string } }} item
- * @returns {number}
+ * @type {(a: NavigationItem, b: NavigationItem) => number}
  */
 const sortNavigationItems = orderThenString(
   (item) => item.data.eleventyNavigation.order ?? 999,

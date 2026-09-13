@@ -58,26 +58,27 @@ const applyParallaxOffset = (el) => {
 const initParallax = () => {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  // Like the reveal, visibility state rides on the element itself as a class.
-  const parallaxEls = document.querySelectorAll(`${SCOPE} .parallax`);
+  // Fixed lookup for initially observed elements; only visible elements own a RAF.
+  const animations = new WeakMap(
+    Array.from(document.querySelectorAll(`${SCOPE} .parallax`), (el) => {
+      let frame = null;
+      const tick = () => {
+        applyParallaxOffset(el);
+        frame = requestAnimationFrame(tick);
+      };
+      const setVisible = (entered) => {
+        el.classList.toggle("parallax-active", entered);
+        if (frame !== null) cancelAnimationFrame(frame);
+        frame = entered ? requestAnimationFrame(tick) : null;
+      };
+      return [el, setVisible];
+    }),
+  );
   observeIntersections(
     `${SCOPE} .parallax`,
-    (entered, target) => {
-      target.classList.toggle("parallax-active", entered);
-    },
+    (entered, target) => animations.get(target)(entered),
     { rootMargin: "50px 0px" },
   );
-
-  const tick = () => {
-    for (const el of parallaxEls) {
-      if (el.classList.contains("parallax-active")) {
-        applyParallaxOffset(el);
-      }
-    }
-    requestAnimationFrame(tick);
-  };
-
-  requestAnimationFrame(tick);
 };
 
 const cloneAsHidden = (el, parent) => {

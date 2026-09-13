@@ -348,14 +348,13 @@ const isCpdCloneBlockEnd = (blockIndex, startIndex, line) =>
  * @returns {string[]} Trimmed lines of the block, marker included
  */
 const cloneBlockLines = (lines, startIndex) => {
-  const collect = (blockIndex, block) => {
-    if (blockIndex >= lines.length) return block;
-    if (isCpdCloneBlockEnd(blockIndex, startIndex, lines[blockIndex].trim())) {
-      return block;
-    }
-    return collect(blockIndex + 1, [...block, lines[blockIndex].trimEnd()]);
-  };
-  return collect(startIndex, []);
+  const remaining = lines.slice(startIndex);
+  const end = remaining.findIndex((line, offset) =>
+    isCpdCloneBlockEnd(offset, 0, line.trim()),
+  );
+  return remaining
+    .slice(0, end === -1 ? remaining.length : end)
+    .map((line) => line.trimEnd());
 };
 
 const extractCpdCloneBlocks = (lines) => {
