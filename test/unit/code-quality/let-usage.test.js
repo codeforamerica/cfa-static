@@ -1,10 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { ALLOWED_LET } from "#test/code-quality/code-quality-exceptions.js";
 import {
   assertNoViolations,
   combineFileLists,
   createCodeChecker,
-  expectNoStaleExceptions,
   matchesAny,
 } from "#test/code-scanner.js";
 import { SRC_JS_FILES, TEST_FILES } from "#test/test-utils.js";
@@ -42,7 +40,6 @@ const { find: findMutableVarDeclarations, analyze: mutableVarAnalysis } =
       return { reason: "Mutable variable declaration" };
     },
     files: LET_GATE_FILES(),
-    allowlist: ALLOWED_LET,
   });
 
 // Complete checker for mutable const declarations
@@ -155,9 +152,5 @@ describe("let-usage", () => {
       fixHint:
         "use functional patterns (map/filter/reduce/spread, frozenSet, Object.fromEntries)",
     });
-  });
-
-  test("ALLOWED_LET entries still exist and match pattern", () => {
-    expectNoStaleExceptions(ALLOWED_LET, /^\s*let\s+\w+/, "ALLOWED_LET");
   });
 });

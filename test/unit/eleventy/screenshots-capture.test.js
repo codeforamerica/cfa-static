@@ -2,9 +2,7 @@ import { join } from "node:path";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import {
   buildCollectionHandler,
-  captureScreenshots,
   configureScreenshots,
-  logScreenshotErrors,
 } from "#eleventy/screenshots.js";
 import { createMockEleventyConfig, rootDir } from "#test/test-utils.js";
 
@@ -61,46 +59,18 @@ describe("buildCollectionHandler", () => {
   });
 });
 
-describe("logScreenshotErrors", () => {
-  test("stays silent for an empty error list", () => {
-    const errorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
-
-    logScreenshotErrors([]);
-
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
-  });
-
-  test("reports each failed page", () => {
-    const errorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
-
-    logScreenshotErrors([{ pagePath: "/a/", error: "boom" }]);
-
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Screenshot errors: 1"),
-    );
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("/a/"));
-    errorSpy.mockRestore();
-  });
-});
-
-describe("captureScreenshots", () => {
+describe("capture pipeline via eleventy.after", () => {
   test("serves the output dir, captures pages, and stops the server", async () => {
     const server = armCapture([{ path: "one.png" }]);
 
-    await captureScreenshots(
-      ["/one/", "/two/", "/three/"],
-      {
-        port: 8123,
-        limit: 2,
-        outputDir: "/absolute/shots",
-      },
-      "_site",
-    );
+    await runAfterHandler({
+      enabled: true,
+      autoCapture: true,
+      port: 8123,
+      limit: 2,
+      outputDir: "/absolute/shots",
+      collections: ["pages"],
+    });
 
     expect(startServerMock).toHaveBeenCalledWith("_site", 8123);
     expect(screenshotMultipleMock).toHaveBeenCalledWith(
@@ -116,19 +86,66 @@ describe("captureScreenshots", () => {
   test("resolves a relative output dir against the working directory", async () => {
     armCapture();
 
-    await captureScreenshots(["/one/"], {}, "_site");
+    await runAfterHandler({
+      enabled: true,
+      autoCapture: true,
+      pages: ["/one/"],
+    });
 
     expect(startServerMock).toHaveBeenCalledWith("_site", 8080);
     const options = screenshotMultipleMock.mock.calls.at(-1)[1];
     expect(options.outputDir).toBe(join(rootDir, "screenshots"));
   });
+
+  test("stays silent about errors when every capture succeeds", async () => {
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    armCapture([{ path: "ok.png" }]);
+
+    await runAfterHandler({
+      enabled: true,
+      autoCapture: true,
+      pages: ["/one/"],
+    });
+
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  test("reports each failed page", async () => {
+    const errorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    armCapture([], [{ pagePath: "/a/", error: "boom" }]);
+
+    await runAfterHandler({
+      enabled: true,
+      autoCapture: true,
+      pages: ["/a/"],
+    });
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Screenshot errors: 1"),
+    );
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("/a/"));
+    errorSpy.mockRestore();
+  });
 });
 
-/** Configure the plugin with the given screenshots config, fire eleventy.after */
+/**
+ * Configure the plugin with the given screenshots config, populate the
+ * screenshot collection, and fire the eleventy.after callback.
+ */
 const runAfterHandler = async (screenshots) => {
   getConfigMock.mockReturnValue({ screenshots });
   const mockConfig = createMockEleventyConfig();
   configureScreenshots(mockConfig);
+  const collectionApi = {
+    getFilteredByTag: vi.fn(() => ITEMS),
+    getAll: vi.fn(() => ITEMS),
+  };
+  mockConfig.collections._screenshotPages(collectionApi);
   const afterHandler = mockConfig.eventHandlers["eleventy.after"];
   await afterHandler({ dir: { output: "_site" } });
   return mockConfig;

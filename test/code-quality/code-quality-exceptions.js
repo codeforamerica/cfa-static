@@ -72,20 +72,6 @@ const ALLOWED_PROCESS_CWD = frozenSet([
 ]);
 
 // ============================================
-// Let declarations exceptions
-// ============================================
-
-// Files that use 'let' for mutable variables.
-// Prefer functional patterns (map/filter/reduce) or const with immutable updates.
-// Only 'let moduleName = null;' is allowed for lazy loading without exceptions.
-const ALLOWED_LET = frozenSet([
-  // Test files with mutable state tracking
-
-  "test/unit/code-quality/comment-limits.test.js",
-  "test/unit/code-quality/commented-code.test.js",
-]);
-
-// ============================================
 // Single-use unexported function exceptions
 // ============================================
 
@@ -95,7 +81,6 @@ const ALLOWED_SINGLE_USE_FUNCTIONS = frozenSet([
   "src/_lib/collections/navigation.js", // Search box builder kept separate for function length
   "src/_lib/public/masonry.js", // Card type measurers split to stay under complexity limit
   "src/_lib/eleventy/file-utils.js", // Filter callbacks extracted for strict type safety
-  "src/_lib/eleventy/style-bundle.js", // Options parsing helpers for type safety
   "src/_lib/eleventy/html-transform.js", // Transform helpers kept separate to manage complexity
   "src/_lib/utils/block-columns.js", // Validation and distribution helpers kept separate for complexity
   "src/_lib/public/ui/gallery.js",
@@ -135,35 +120,18 @@ const ALLOWED_TEST_ONLY_EXPORTS = frozenSet([
   "src/_lib/utils/fp/sorting.js:descending", // Toolkit API surface
 
   // Browser-automation internals: consumed inside their own modules by the
-  // exported orchestrators (startServer, screenshot, configureScreenshots),
-  // exported so unit tests can exercise each piece directly.
-  "src/_lib/media/browser-utils.js:buildOutputPath",
-  "src/_lib/media/browser-utils.js:createOutputPathBuilder",
-  "src/_lib/media/browser-utils.js:createOperationContext",
-  "src/_lib/media/browser-utils.js:pathErrorInfo",
+  // exported orchestrators (startServer, screenshot, configureScreenshots).
   "src/_lib/media/browser-utils.js:waitForServer",
-  "src/_lib/media/screenshot.js:takeScreenshotWithPlaywright",
-  "src/_lib/eleventy/screenshots.js:captureScreenshots",
-  "src/_lib/eleventy/screenshots.js:logScreenshotErrors",
-
-  // Registered through the PostHTML plugin wrapper so URL rewriting runs last.
-  "src/_lib/eleventy/html-transform.js:createHtmlTransform",
 
   // DOM init functions - auto-called via onReady in production, but exported for unit tests
   // (ES modules execute at import time before tests can set up DOM)
   "src/_lib/public/ui/search.js:initSearch",
-  "src/_lib/public/ui/search.js:renderResult",
   "src/_lib/public/ui/search.js:createSearchController",
   "src/_lib/public/ui/search.js:loadPagefind",
-  "src/_lib/public/ui/search.js:readQueryParam",
-  "src/_lib/public/ui/search.js:handleSubmit",
   "src/_lib/public/ui/nav-dropdown.js:initNavDropdown",
   "src/_lib/public/ui/gallery.js:initGallery",
   "src/_lib/public/ui/gallery.js:resolveStartIndex", // Throwing guard tested directly (happy-dom swallows listener errors)
   "src/_lib/public/ui/image-popup.js:initImagePopup",
-
-  // Validation helpers - throwing wrappers tested directly
-  "src/_lib/utils/validate-item.js:validateItem",
 ]);
 
 // ============================================
@@ -201,7 +169,6 @@ const ALLOWED_NULLISH_COALESCING = frozenSet([
 export {
   ALLOWED_DATA_FALLBACKS,
   ALLOWED_DOM_CONSTRUCTOR,
-  ALLOWED_LET,
   ALLOWED_NULLISH_COALESCING,
   ALLOWED_PROCESS_CWD,
   ALLOWED_SINGLE_USE_FUNCTIONS,

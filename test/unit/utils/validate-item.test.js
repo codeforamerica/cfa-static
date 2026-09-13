@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { collectItemErrors, validateItem } from "#utils/validate-item.js";
+import { collectItemErrors } from "#utils/validate-item.js";
 
 describe("collectItemErrors", () => {
   test("returns empty array when name is present", () => {
@@ -55,59 +55,5 @@ describe("collectItemErrors", () => {
         blocks: [{ type: "markdown" }],
       }),
     ).toEqual([]);
-  });
-});
-
-describe("validateItem", () => {
-  test("does not throw when item has name and valid blocks", () => {
-    expect(() =>
-      validateItem({
-        name: "Valid Item",
-        tags: ["pages"],
-        blocks: [{ type: "markdown", content: "Hello" }],
-      }),
-    ).not.toThrow();
-  });
-
-  test("does not throw for untagged utility templates without name", () => {
-    expect(() => validateItem({ subtitle: "utility page" })).not.toThrow();
-  });
-
-  test("throws when tagged item is missing name", () => {
-    expect(() =>
-      validateItem({ tags: ["pages"], subtitle: "No name" }, " in test.md"),
-    ).toThrow('missing required "name" field');
-  });
-
-  test("throws when nested block item is missing name", () => {
-    expect(() =>
-      validateItem({
-        name: "My Page",
-        tags: ["pages"],
-        blocks: [{ type: "features", items: [{ icon: "star" }] }],
-      }),
-    ).toThrow('"features"');
-  });
-
-  test("throws every missing nested field from the shared schema", () => {
-    expect(() =>
-      validateItem({
-        name: "My Page",
-        tags: ["pages"],
-        blocks: [{ type: "downloads", items: [{}] }],
-      }),
-    ).toThrow(/required "file"[\s\S]*required "label"/);
-  });
-
-  test("throws all errors at once when multiple names are missing", () => {
-    expect(() =>
-      validateItem({
-        tags: ["pages"],
-        blocks: [
-          { type: "features", items: [{ description: "no name" }] },
-          { type: "image-cards", items: [{ image: "/a.jpg" }] },
-        ],
-      }),
-    ).toThrow(/Item is missing required[\s\S]*"features"[\s\S]*"image-cards"/);
   });
 });

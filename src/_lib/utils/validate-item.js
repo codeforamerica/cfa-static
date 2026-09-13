@@ -1,12 +1,11 @@
 /**
  * Item-level validation.
  *
- * Checks that collection items have a `name` field. `validateItem` also runs
- * the shared block-schema validator so direct callers receive every item and
- * block error together.
+ * Checks that collection items have a `name` field. Callers combine these
+ * errors with the shared block-schema validator's output when they need
+ * every item and block error together, as `src/_data/eleventyComputed.js`
+ * does.
  */
-
-import { collectBlockErrors } from "#utils/block-schema.js";
 
 /**
  * Collect item-level name errors without throwing.
@@ -24,20 +23,4 @@ export const collectItemErrors = (data, context = "") => {
       : [];
 
   return nameError;
-};
-
-/**
- * Validates an item's name and every block against the shared block schemas.
- * Collects every error before throwing so the user sees them all at once.
- *
- * @param {Record<string, unknown>} data - Item data
- * @param {string} context - Context for error messages (e.g., file path)
- * @throws {Error} If any required `name` field is missing
- */
-export const validateItem = (data, context = "") => {
-  const blockErrors = Array.isArray(data.blocks)
-    ? collectBlockErrors(data.blocks, context)
-    : [];
-  const errors = [...collectItemErrors(data, context), ...blockErrors];
-  if (errors.length > 0) throw new Error(errors.join("\n"));
 };

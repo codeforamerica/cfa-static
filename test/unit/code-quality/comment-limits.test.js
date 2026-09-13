@@ -58,30 +58,37 @@ const isBlockStart = (line) => COMMENT_PATTERNS.blockStart.test(line);
 const isSingleLine = (line) => COMMENT_PATTERNS.singleLine.test(line);
 
 const findHeaderEndLine = (lines) => {
-  let headerEndLine = 0;
-  let inBlockComment = false;
+  const initialState = { headerEndLine: 0, inBlockComment: false, done: false };
 
-  for (const { line, num } of lines) {
+  const processLine = (state, { line, num }) => {
+    if (state.done) return state;
     const trimmed = line.trim();
-    if (trimmed === "") continue;
-    if (inBlockComment) {
-      headerEndLine = num;
-      if (isBlockEnd(trimmed)) inBlockComment = false;
-      continue;
+    if (trimmed === "") return state;
+    if (state.inBlockComment) {
+      return {
+        headerEndLine: num,
+        inBlockComment: !isBlockEnd(trimmed),
+        done: false,
+      };
     }
     if (isBlockStart(trimmed)) {
-      headerEndLine = num;
-      if (!isBlockEnd(trimmed)) inBlockComment = true;
-      continue;
+      return {
+        headerEndLine: num,
+        inBlockComment: !isBlockEnd(trimmed),
+        done: false,
+      };
     }
     if (isSingleLine(trimmed)) {
-      headerEndLine = num;
-      continue;
+      return { headerEndLine: num, inBlockComment: false, done: false };
     }
-    break;
-  }
+    return {
+      headerEndLine: state.headerEndLine,
+      inBlockComment: state.inBlockComment,
+      done: true,
+    };
+  };
 
-  return headerEndLine;
+  return lines.reduce(processLine, initialState).headerEndLine;
 };
 
 const countInlineComments = (lines, headerEndLine) => {

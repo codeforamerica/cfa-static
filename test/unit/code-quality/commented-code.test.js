@@ -61,13 +61,14 @@ const findCommentedCode = (source, _relativePath) => {
   const rawLines = lines.map((l) => l.line);
 
   // Build template literal state in O(n) - tracks if each line is inside a template literal
-  let backtickCount = 0;
-  const insideTemplateLiteral = rawLines.map((line) => {
-    const isInside = backtickCount % 2 === 1;
-    const matches = line.match(/(?<!\\)`/g);
-    if (matches) backtickCount += matches.length;
-    return isInside;
-  });
+  const insideTemplateLiteral = rawLines.reduce(
+    (state, line) => ({
+      backtickCount:
+        state.backtickCount + (line.match(/(?<!\\)`/g) || []).length,
+      flags: [...state.flags, state.backtickCount % 2 === 1],
+    }),
+    { backtickCount: 0, flags: [] },
+  ).flags;
 
   // Check if a comment is documentation (comment before a regex pattern)
   const isDocumentation = (nextLine) => nextLine && /^\s*\/[^/]/.test(nextLine);
