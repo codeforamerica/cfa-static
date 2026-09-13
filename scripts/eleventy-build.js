@@ -39,7 +39,7 @@ validateSiteData();
 
 const eleventy = spawn(
   process.execPath,
-  [join(ROOT_DIR, "node_modules/@11ty/eleventy/cmd.cjs"), ...args],
+  [join(ROOT_DIR, "node_modules/@awesome.me/buildawesome/cmd.js"), ...args],
   {
     cwd: ROOT_DIR,
     stdio: ["inherit", "pipe", "pipe"],

@@ -193,7 +193,7 @@ const computeLocalImageHtml = async ({
   });
 };
 
-/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
+/** @param {import("#lib/types").UserConfig} eleventyConfig */
 const configureImages = async (eleventyConfig) => {
   const imageFiles = ["src/images/*.jpg"].flatMap((pattern) =>
     globSync(pattern, { cwd: "." }),

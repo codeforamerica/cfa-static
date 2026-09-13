@@ -138,18 +138,21 @@ const toNavigation = async (pages, activeKey = "", searchLabel = "") => {
 };
 
 /**
- * @param {import("11ty.ts").EleventyConfig} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  * @returns {Promise<void>}
  */
 const configureNavigation = async (eleventyConfig) => {
   const nav = await import("@11ty/eleventy-navigation");
   eleventyConfig.addPlugin(nav.default);
   eleventyConfig.addAsyncFilter("toNavigation", toNavigation);
-  eleventyConfig.addCollection("navigationLinks", (collectionApi) =>
-    pipe(
-      filter((item) => item.data.eleventyNavigation),
-      sort(sortNavigationItems),
-    )(collectionApi.getAll()),
+  eleventyConfig.addCollection(
+    "navigationLinks",
+    /** @param {import("#lib/types").EleventyCollectionApi} collectionApi */
+    (collectionApi) =>
+      pipe(
+        filter((item) => item.data.eleventyNavigation),
+        sort(sortNavigationItems),
+      )(collectionApi.getAll()),
   );
 };
 

@@ -56,7 +56,7 @@ export const reportUnusedImages = (unusedImages) => {
   log(`\nFound ${formatUnused(unusedImages.length)} in /src/images/`);
 };
 
-/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
+/** @param {import("#lib/types").UserConfig} eleventyConfig */
 export const configureUnusedImages = (eleventyConfig) => {
   eleventyConfig.on(
     "eleventy.after",

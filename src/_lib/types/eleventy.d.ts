@@ -332,7 +332,10 @@ export type EleventyCollectionItemData = BaseItemData &
       MenuItemData &
       MenuCategoryItemData &
       GuideCategoryItemData
-  >;
+  > & {
+    /** Any other frontmatter keys Eleventy passes through untouched. */
+    [key: string]: unknown;
+  };
 
 /**
  * Generic Eleventy collection item.

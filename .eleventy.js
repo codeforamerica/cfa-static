@@ -1,4 +1,4 @@
-import { EleventyHtmlBasePlugin, RenderPlugin } from "@11ty/eleventy";
+import { EleventyHtmlBasePlugin, RenderPlugin } from "@awesome.me/buildawesome";
 import schemaPlugin from "@quasibit/eleventy-plugin-schema";
 import config from "#data/config.json" with { type: "json" };
 
@@ -49,7 +49,7 @@ const CONFIGURATORS = [
   configureJsBundler,
 ];
 
-/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
+/** @param {import("#lib/types").UserConfig} eleventyConfig */
 export default async function (eleventyConfig) {
   eleventyConfig.addWatchTarget("./src/**/*");
   eleventyConfig.setLayoutsDirectory("_layouts");

@@ -64,7 +64,7 @@ const getBodyClasses = (
   return classes.filter(Boolean).join(" ");
 };
 
-/** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
+/** @param {import("#lib/types").UserConfig} eleventyConfig */
 export const configureStyleBundle = (eleventyConfig) => {
   eleventyConfig.addFilter("getBodyClasses", getBodyClasses);
   eleventyConfig.addGlobalData("has_right_content", detectRightContent);

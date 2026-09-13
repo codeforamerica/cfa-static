@@ -116,7 +116,7 @@ const findViolations = (srcDir, registeredNames) =>
  * unregistered collections. Template typos like `collections.produts`
  * will fail the build immediately.
  *
- * @param {import("@11ty/eleventy").UserConfig} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  */
 export const configureCollectionValidation = (
   eleventyConfig,
