@@ -116,7 +116,7 @@ const findViolations = (srcDir, registeredNames) =>
  * unregistered collections. Template typos like `collections.produts`
  * will fail the build immediately.
  *
- * @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  */
 export const configureCollectionValidation = (
   eleventyConfig,

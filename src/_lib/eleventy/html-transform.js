@@ -162,7 +162,7 @@ const createPosthtmlPlugin = (processAndWrapImage) => {
 
 /**
  * Configure the unified HTML transform for Eleventy
- * @param {import("@awesome.me/buildawesome/UserConfig").default & {
+ * @param {import("#lib/types").UserConfig & {
  *   htmlTransformer: {
  *     addPosthtmlPlugin(
  *       extensions: string | string[],

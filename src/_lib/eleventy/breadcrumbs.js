@@ -130,7 +130,7 @@ const withSchemaLanguage = (meta, pageLanguage) => ({
 
 /**
  * Configure breadcrumbs in Eleventy
- * @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  */
 const configureBreadcrumbs = (eleventyConfig) => {
   eleventyConfig.addFilter("breadcrumbsFilter", breadcrumbsFilter);

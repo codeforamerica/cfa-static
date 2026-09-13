@@ -128,7 +128,7 @@ export const getItemsByPath = (collection, paths) => {
  * If the slug is not found, the build will fail with an error indicating
  * the problematic slug - this catches data errors early.
  *
- * @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  */
 export const configureCollectionLookup = (eleventyConfig) => {
   eleventyConfig.addFilter("getBySlug", getBySlug);

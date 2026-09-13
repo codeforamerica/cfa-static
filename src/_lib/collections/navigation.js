@@ -138,7 +138,7 @@ const toNavigation = async (pages, activeKey = "", searchLabel = "") => {
 };
 
 /**
- * @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  * @returns {Promise<void>}
  */
 const configureNavigation = async (eleventyConfig) => {

@@ -46,7 +46,7 @@ const SCSS_EXTENSION = {
   },
 };
 
-/** @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig */
+/** @param {import("#lib/types").UserConfig} eleventyConfig */
 const configureScss = (eleventyConfig) => {
   // Explicitly watch CSS directory to trigger rebuilds when partials change
   eleventyConfig.addWatchTarget("./src/css/");

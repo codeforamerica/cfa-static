@@ -49,7 +49,7 @@ const CONFIGURATORS = [
   configureJsBundler,
 ];
 
-/** @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig */
+/** @param {import("#lib/types").UserConfig} eleventyConfig */
 export default async function (eleventyConfig) {
   eleventyConfig.addWatchTarget("./src/**/*");
   eleventyConfig.setLayoutsDirectory("_layouts");

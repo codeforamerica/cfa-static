@@ -80,7 +80,7 @@ const captureScreenshots = async (pageUrls, screenshotConfig, outputDir) => {
  * Eleventy wrapper for screenshot utilities.
  * Wraps #media/screenshot.js for Eleventy integration. Captures the
  * collected page URLs via captureScreenshots after the build.
- * @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig
+ * @param {import("#lib/types").UserConfig} eleventyConfig
  */
 export const configureScreenshots = (eleventyConfig) => {
   const pageUrlsRef = { urls: [] };

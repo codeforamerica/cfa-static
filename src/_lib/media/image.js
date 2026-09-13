@@ -193,7 +193,7 @@ const computeLocalImageHtml = async ({
   });
 };
 
-/** @param {import("@awesome.me/buildawesome/UserConfig").default} eleventyConfig */
+/** @param {import("#lib/types").UserConfig} eleventyConfig */
 const configureImages = async (eleventyConfig) => {
   const imageFiles = ["src/images/*.jpg"].flatMap((pattern) =>
     globSync(pattern, { cwd: "." }),
