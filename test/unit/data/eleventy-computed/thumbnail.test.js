@@ -1,11 +1,6 @@
 import { describe, expect, test } from "vitest";
 import eleventyComputed from "#data/eleventyComputed.js";
-import { PLACEHOLDER_COLORS } from "#media/thumbnail-placeholder.js";
-
-/** Matches any placeholder path written by thumbnail-placeholder.js. */
-const PLACEHOLDER_PATH = new RegExp(
-  `^images/placeholders/(${PLACEHOLDER_COLORS.join("|")})\\.svg$`,
-);
+import { getPlaceholderForPath } from "#media/thumbnail-placeholder.js";
 
 const pageAt = (url = "/some-page/") => ({ url });
 
@@ -24,7 +19,7 @@ describe("eleventyComputed.thumbnail", () => {
       tags: ["pages"],
       page: pageAt("/pages/test-page/"),
     });
-    expect(result).toMatch(PLACEHOLDER_PATH);
+    expect(result).toBe(getPlaceholderForPath("/pages/test-page/"));
   });
 
   test("returns null when placeholder_images disabled and no thumbnail", () => {
@@ -38,7 +33,7 @@ describe("eleventyComputed.thumbnail", () => {
 
   test("returns placeholder for items without any tags", () => {
     const result = eleventyComputed.thumbnail({ page: pageAt("/page/") });
-    expect(result).toMatch(PLACEHOLDER_PATH);
+    expect(result).toBe(getPlaceholderForPath("/page/"));
   });
 
   test("returns null when page.url is missing, even with placeholders enabled", () => {

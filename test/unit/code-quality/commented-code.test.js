@@ -145,6 +145,23 @@ const real = 1;
     expect(results.length).toBe(0);
   });
 
+  test("resumes detection after templates without treating escaped backticks as boundaries", () => {
+    const source = [
+      "const inline = `closed`;",
+      "// const before = 1;",
+      "const fixture = `",
+      "// const ignored = 2;",
+      "escaped \\` tick",
+      '// console.log("ignored");',
+      "`;",
+      "// const after = 3;",
+    ].join("\n");
+    expect(findCommentedCode(source, "test.js")).toEqual([
+      { lineNumber: 2, line: "// const before = 1;" },
+      { lineNumber: 8, line: "// const after = 3;" },
+    ]);
+  });
+
   test("Does not flag regular documentation comments", () => {
     const source = `
 // This is a comment about the code

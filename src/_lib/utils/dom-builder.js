@@ -18,15 +18,6 @@ const getSharedDocument = memoize(async () => {
 });
 
 /**
- * Convert an element to its HTML string representation
- * @param {HTMLElement} element - The element to serialize
- * @returns {string} The outer HTML of the element
- */
-const elementToHtml = (element) => {
-  return element.outerHTML;
-};
-
-/**
  * Create an element and return its HTML string.
  * Uses fast string concatenation (no DOM loading required).
  * @param {string} tagName - The tag name
@@ -63,4 +54,4 @@ const parseHtml = async (html, document = null) => {
   return template.content.firstElementChild;
 };
 
-export { createHtml, elementToHtml, getSharedDocument, parseHtml };
+export { createHtml, parseHtml };

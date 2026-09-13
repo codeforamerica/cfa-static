@@ -61,12 +61,14 @@ const { find: findMutableConstDeclarations, analyze: mutableConstAnalysis } =
 
 describe("let-usage", () => {
   test("Detects let declarations in source code", () => {
-    const source = `
-const immutable = 1;
-let mutable = 2;
-let counter = 0;
-for (let i = 0; i < 10; i++) {}
-    `;
+    const source = [
+      "",
+      "const immutable = 1;",
+      "let mutable = 2;",
+      "let counter = 0;",
+      "for (let i = 0; i < 10; i++) {}",
+      "    ",
+    ].join("\n");
     const results = findMutableVarDeclarations(source);
     // Only 2: for loop let is not at line start, so not detected
     expect(results.length).toBe(2);
@@ -86,10 +88,12 @@ for (let i = 0; i < 10; i++) {}
   });
 
   test("Skips allowed patterns in source analysis", () => {
-    const source = `
-let lazyModule = null;
-let mutableVar = 0;
-    `;
+    const source = [
+      "",
+      "let lazyModule = null;",
+      "let mutableVar = 0;",
+      "    ",
+    ].join("\n");
     const results = findMutableVarDeclarations(source);
     expect(results.length).toBe(1);
     expect(results[0].line).toBe("let mutableVar = 0;");
@@ -151,21 +155,6 @@ let mutableVar = 0;
       fixHint:
         "use functional patterns (map/filter/reduce/spread, frozenSet, Object.fromEntries)",
     });
-  });
-
-  test("Reports allowlisted let usage for tracking", () => {
-    const { allowed } = mutableVarAnalysis();
-    console.log(`\n  Allowlisted let usages: ${allowed.length}`);
-    if (allowed.length > 0) {
-      console.log("  Files with let:");
-      const byFile = Object.groupBy(
-        allowed,
-        (loc) => loc.file || loc.location.split(":")[0],
-      );
-      for (const [file, locs] of Object.entries(byFile)) {
-        console.log(`    - ${file}: ${locs.length} usage(s)`);
-      }
-    }
   });
 
   test("ALLOWED_LET entries still exist and match pattern", () => {

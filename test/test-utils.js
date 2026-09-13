@@ -173,13 +173,13 @@ const ALL_JS_FILES = memoizedFiles(/^(src\/|test\/|scripts\/|bin\/).*\.js$/);
 // ============================================
 
 /**
- * Compile SCSS content to CSS (test utility).
- * Moved here from production code since it's only used in tests.
+ * Compile SCSS through the registered Eleventy extension (test utility).
  */
 const compileScss = async (inputContent, inputPath) => {
-  const { createScssCompiler } = await import("#build/scss.js");
-  const compiler = createScssCompiler(inputContent, inputPath);
-  return await compiler({});
+  const { configureScss } = await import("#build/scss.js");
+  const config = createMockEleventyConfig();
+  configureScss(config);
+  return await config.extensions.scss.compile(inputContent, inputPath)({});
 };
 
 // HTML wrapper for creating complete documents in transform tests

@@ -139,26 +139,29 @@ describe("images transform", () => {
       return div;
     };
 
-    const expectSkipped = async (html) => {
+    const runWithImageSpy = async (html) => {
       const dom = await loadDOM(html);
-      let called = false;
-      await processImages(dom.window.document, {}, async () => {
-        called = true;
-        return createWrapper(dom.window.document);
-      });
-      expect(called).toBe(false);
+      const onImage = vi.fn(async () => createWrapper(dom.window.document));
+      await processImages(dom.window.document, {}, onImage);
+      return { dom, onImage };
+    };
+
+    const expectSkipped = async (html) => {
+      const { dom, onImage } = await runWithImageSpy(html);
+      expect(onImage).not.toHaveBeenCalled();
       return dom;
     };
 
     const processAndCapture = async (html) => {
       const dom = await loadDOM(html);
-      let captured = null;
-      await processImages(dom.window.document, {}, async (opts) => {
-        captured = opts;
+      const onImage = vi.fn(async (_opts) => {
         const div = createWrapper(dom.window.document);
         div.innerHTML = "<picture>processed</picture>";
         return div;
       });
+      await processImages(dom.window.document, {}, onImage);
+      expect(onImage).toHaveBeenCalledTimes(1);
+      const [[captured]] = onImage.mock.calls;
       return { captured, dom };
     };
 
@@ -206,11 +209,9 @@ describe("images transform", () => {
     });
 
     test("processes multiple images", async () => {
-      const dom = await loadDOM(
+      const { onImage } = await runWithImageSpy(
         '<html><body><img src="/images/a.jpg"><img src="/images/b.jpg"></body></html>',
       );
-      const onImage = vi.fn(async () => createWrapper(dom.window.document));
-      await processImages(dom.window.document, {}, onImage);
       const names = onImage.mock.calls.map(([opts]) => opts.imageName);
       expect(names).toContain("/images/a.jpg");
       expect(names).toContain("/images/b.jpg");

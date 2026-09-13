@@ -1,8 +1,6 @@
 import { describe, expect, test } from "vitest";
-import {
-  getPlaceholderForPath,
-  PLACEHOLDER_COLORS,
-} from "#media/thumbnail-placeholder.js";
+import { getPlaceholderForPath } from "#media/thumbnail-placeholder.js";
+import { fs, path, srcDir } from "#test/test-utils.js";
 import { unique } from "#utils/fp/array.js";
 
 describe("thumbnail-placeholder", () => {
@@ -35,12 +33,18 @@ describe("thumbnail-placeholder", () => {
       expect(placeholders.length).toBeGreaterThan(1);
     });
 
-    test("uses defined colors", () => {
-      const result = getPlaceholderForPath("/any/path/");
-      const colorPattern = new RegExp(
-        `^images/placeholders/(${PLACEHOLDER_COLORS.join("|")})\\.svg$`,
-      );
-      expect(result).toMatch(colorPattern);
+    test("assigns every shipped placeholder asset", () => {
+      const results = unique(
+        Array.from({ length: 100 }, (_, i) =>
+          getPlaceholderForPath(`/item/${i}/`),
+        ),
+      ).toSorted();
+      const assets = fs
+        .readdirSync(path.join(srcDir, "images/placeholders"))
+        .filter((file) => file.endsWith(".svg"))
+        .map((file) => `images/placeholders/${file}`)
+        .toSorted();
+      expect(results).toEqual(assets);
     });
   });
 });

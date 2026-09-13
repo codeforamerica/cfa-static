@@ -190,14 +190,16 @@ describe("unused-classes", () => {
   });
 
   test("Extracts classes from JS template literals", () => {
-    const js = `
-      const html = \`<div class="cart-item">
-        <span class="item-name item-bold"></span>
-      </div>\`;
-      icon.classList.add("active");
-      let classes = "base-class";
-      classes += " extra";
-    `;
+    const js = [
+      "",
+      '      const html = `<div class="cart-item">',
+      '        <span class="item-name item-bold"></span>',
+      "      </div>`;",
+      '      icon.classList.add("active");',
+      '      let classes = "base-class";',
+      '      classes += " extra";',
+      "    ",
+    ].join("\n");
     const classes = extractClassesFromJs(js);
     expect(classes.has("cart-item")).toBe(true);
     expect(classes.has("item-name")).toBe(true);

@@ -19,4 +19,4 @@ const getPlaceholderForPath = (itemPath) => {
   return `images/placeholders/${color}.svg`;
 };
 
-export { getPlaceholderForPath, PLACEHOLDER_COLORS };
+export { getPlaceholderForPath };

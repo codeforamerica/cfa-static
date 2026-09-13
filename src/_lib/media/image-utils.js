@@ -89,30 +89,6 @@ export const buildImageWrapperStyles = ({
     !skipMaxWidth && maxWidth && `max-width: min(${maxWidth}px, 100%)`,
   ]).join("; ");
 
-/**
- * Converts a file path to a unique, filename-safe basename.
- * Strips common prefixes (./src/, src/) and the images/ directory,
- * then strips everything up to and including .image-cache/ if present anywhere.
- * Finally converts remaining path segments to hyphen-separated format.
- *
- * E.g., "./src/images/products/photo.jpg" -> "products-photo"
- *       "./src/images/photo.jpg" -> "photo"
- *       "./src/assets/icons/logo.png" -> "assets-icons-logo"
- *       ".image-cache/photo-crop-abc123.jpeg" -> "photo-crop-abc123"
- *       "/abs/path/.image-cache/photo.jpeg" -> "photo"
- * @param {string} src - File path
- * @returns {string} Filename-safe basename
- */
-export const getPathAwareBasename = (src) => {
-  const normalized = src
-    .replace(/\\/g, "/")
-    .replace(/^\.?\/?(src\/)?/, "")
-    .replace(/^images\//, "")
-    .replace(/^.*[/]?\.?image-cache\//, "");
-  const withoutExt = normalized.replace(/\.[^.]+$/, "");
-  return withoutExt.replace(/\//g, "-");
-};
-
 // JPEG fallback width - only generate one JPEG size since nearly all browsers support webp
 export const JPEG_FALLBACK_WIDTH = 1300;
 
@@ -126,6 +102,7 @@ export const DEFAULT_IMAGE_OPTIONS = frozenObject({
   urlPath: "/img/",
   /**
    * Generate filenames for resized images and LQIP thumbnails.
+   * Strip src/images and cache prefixes; preserve subdirectories as hyphens.
    * @param {string} _id - Image ID (unused)
    * @param {string} src - Source path
    * @param {number} width - Output width
@@ -134,7 +111,13 @@ export const DEFAULT_IMAGE_OPTIONS = frozenObject({
    * @returns {string} Generated filename
    */
   filenameFormat: (_id, src, width, format, options = {}) => {
-    const basename = getPathAwareBasename(src);
+    const basename = src
+      .replace(/\\/g, "/")
+      .replace(/^\.?\/?(src\/)?/, "")
+      .replace(/^images\//, "")
+      .replace(/^.*[/]?\.?image-cache\//, "")
+      .replace(/\.[^.]+$/, "")
+      .replace(/\//g, "-");
     const extension = src.slice(src.lastIndexOf(".") + 1).toLowerCase();
     const cropSuffix = options.manualCacheKey
       ? `-${extension}-crop-${String(options.manualCacheKey).replaceAll("/", "x")}`

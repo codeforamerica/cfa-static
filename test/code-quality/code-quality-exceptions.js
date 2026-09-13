@@ -67,9 +67,6 @@ const ALLOWED_TRY_CATCHES = frozenSet([
 // Test files that legitimately need process.cwd() instead of rootDir.
 // Most tests should import rootDir from test-utils.js instead.
 const ALLOWED_PROCESS_CWD = frozenSet([
-  // git-dates tests need to chdir into temp git repos to test git log commands
-  "test/unit/utils/git-dates.test.js",
-
   // withChdirAsync must save and restore the real process.cwd()
   "test/test-utils/resource.js",
 ]);
@@ -84,13 +81,8 @@ const ALLOWED_PROCESS_CWD = frozenSet([
 const ALLOWED_LET = frozenSet([
   // Test files with mutable state tracking
 
-  "test/integration/eleventy/feed.test.js",
   "test/unit/code-quality/comment-limits.test.js",
   "test/unit/code-quality/commented-code.test.js",
-  "test/unit/code-quality/let-usage.test.js", // Test file has let in test cases
-  "test/unit/code-quality/unused-classes.test.js",
-  "test/integration/test-site-factory.test.js",
-  "test/unit/transforms/images.test.js",
 ]);
 
 // ============================================
@@ -131,21 +123,15 @@ const ALLOWED_TEST_ONLY_EXPORTS = frozenSet([
   // Generic fp utilities kept as a small standard library; some
   // functions are currently exercised only from test code
   "src/_lib/utils/fp/object.js:omit",
-  "src/_lib/utils/fp/set.js:frozenSetFrom", // Available for iterable sources
   "src/_lib/utils/fp/set.js:setHas", // Curried predicate for filter/some/every
-  "src/_lib/utils/fp/set.js:setLacks", // Negated predicate for exclusion
   "src/_lib/utils/fp/grouping.js:groupBy", // Used by memoize.js and scripts/ via relative imports
-  "src/_lib/utils/fp/grouping.js:buildReverseIndex", // Used by memoize.js via relative import
   "src/_lib/utils/fp/grouping.js:buildFirstOccurrenceLookup", // Toolkit API surface
   "src/_lib/utils/fp/grouping.js:groupValuesBy", // Toolkit API surface
   "src/_lib/utils/fp/memoize.js:memoizeByRef", // Toolkit API surface
   "src/_lib/utils/fp/object.js:mapBoth", // Toolkit API surface
   "src/_lib/utils/fp/object.js:pickTruthy", // Toolkit API surface
-  "src/_lib/utils/fp/array.js:reduce", // Used by fp/grouping.js via relative import
   "src/_lib/utils/fp/array.js:findDuplicate", // Toolkit API surface
-  "src/_lib/utils/fp/array.js:pick", // Toolkit API surface
   "src/_lib/utils/fp/array.js:uniqueBy", // Toolkit API surface
-  "src/_lib/utils/fp/sorting.js:compareBy", // Toolkit API surface
   "src/_lib/utils/fp/sorting.js:descending", // Toolkit API surface
 
   // Browser-automation internals: consumed inside their own modules by the
@@ -160,15 +146,8 @@ const ALLOWED_TEST_ONLY_EXPORTS = frozenSet([
   "src/_lib/eleventy/screenshots.js:captureScreenshots",
   "src/_lib/eleventy/screenshots.js:logScreenshotErrors",
 
-  // Build utilities - tested directly for build pipeline verification
-  "src/_lib/build/scss.js:createScssCompiler",
   // Registered through the PostHTML plugin wrapper so URL rewriting runs last.
   "src/_lib/eleventy/html-transform.js:createHtmlTransform",
-
-  // Media processing - tested for image handling
-  "src/_lib/media/image-frontmatter.js:isValidImage", // Used by getFirstValidImage, tested directly for edge cases
-  "src/_lib/media/image-utils.js:getPathAwareBasename",
-  "src/_lib/media/thumbnail-placeholder.js:PLACEHOLDER_COLORS",
 
   // DOM init functions - auto-called via onReady in production, but exported for unit tests
   // (ES modules execute at import time before tests can set up DOM)
@@ -183,12 +162,7 @@ const ALLOWED_TEST_ONLY_EXPORTS = frozenSet([
   "src/_lib/public/ui/gallery.js:resolveStartIndex", // Throwing guard tested directly (happy-dom swallows listener errors)
   "src/_lib/public/ui/image-popup.js:initImagePopup",
 
-  // Utility functions - tested for shared logic
-  "src/_lib/utils/dom-builder.js:elementToHtml",
-  "src/_lib/utils/dom-builder.js:getSharedDocument",
-
   // Validation helpers - throwing wrappers tested directly
-  "src/_lib/utils/block-schema.js:validateBlocks",
   "src/_lib/utils/validate-item.js:validateItem",
 ]);
 

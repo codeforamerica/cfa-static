@@ -1,11 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { expectObjectProps } from "#test/test-utils.js";
-import {
-  createHtml,
-  elementToHtml,
-  getSharedDocument,
-  parseHtml,
-} from "#utils/dom-builder.js";
+import { createHtml, parseHtml } from "#utils/dom-builder.js";
 
 describe("dom-builder", () => {
   // ============================================
@@ -98,23 +93,21 @@ describe("dom-builder", () => {
   });
 
   // ============================================
-  // elementToHtml Tests
+  // parseHtml round-trip tests
   // ============================================
 
-  test("Converts element to HTML string", async () => {
+  test("Preserves attributes and content when parsing", async () => {
     const element = await parseHtml('<div class="test">Content</div>');
-    const html = elementToHtml(element);
 
-    expect(html).toBe('<div class="test">Content</div>');
+    expect(element.outerHTML).toBe('<div class="test">Content</div>');
   });
 
-  test("Converts complex element to HTML string", async () => {
+  test("Preserves nested markup when parsing", async () => {
     const element = await parseHtml(
       '<div id="parent" class="wrapper"><span>Nested</span></div>',
     );
-    const html = elementToHtml(element);
 
-    expect(html).toBe(
+    expect(element.outerHTML).toBe(
       '<div id="parent" class="wrapper"><span>Nested</span></div>',
     );
   });
@@ -141,7 +134,7 @@ describe("dom-builder", () => {
   });
 
   test("Parses HTML with provided document", async () => {
-    const doc = await getSharedDocument();
+    const doc = document;
     const element = await parseHtml('<span id="test">Test</span>', doc);
 
     expectObjectProps({
@@ -165,21 +158,18 @@ describe("dom-builder", () => {
     expect(await parseHtml(html)).toBeNull();
   });
 
-  // ============================================
-  // getSharedDocument Tests
-  // ============================================
+  test("Reuses the default document without sharing parsed elements", async () => {
+    const [first, second] = await Promise.all([
+      parseHtml("<div>First</div>"),
+      parseHtml("<div>Second</div>"),
+    ]);
+    const third = await parseHtml("<span>Third</span>");
 
-  test("Returns same document on multiple calls", async () => {
-    const doc1 = await getSharedDocument();
-    const doc2 = await getSharedDocument();
-
-    expect(doc1).toBe(doc2);
-  });
-
-  test("Shared document can create elements", async () => {
-    const doc = await getSharedDocument();
-    const element = doc.createElement("div");
-
-    expect(element.tagName.toLowerCase()).toBe("div");
+    expect(first.ownerDocument).toBe(second.ownerDocument);
+    expect(third.ownerDocument).toBe(first.ownerDocument);
+    expect(first).not.toBe(second);
+    expect(first.outerHTML).toBe("<div>First</div>");
+    expect(second.outerHTML).toBe("<div>Second</div>");
+    expect(third.outerHTML).toBe("<span>Third</span>");
   });
 });

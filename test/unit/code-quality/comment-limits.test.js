@@ -148,6 +148,19 @@ const expectExcessiveComments = (source, expectedCount) => {
 const THIS_FILE = "test/unit/code-quality/comment-limits.test.js";
 
 describe("comment-limits", () => {
+  test.each([
+    ["empty source", "", 0],
+    ["code before comments", "const value = 1;\n// Not a header", 0],
+    ["single-line block", "/* Header */\nconst value = 1;\n// Inline", 1],
+    [
+      "mixed headers with blank lines",
+      "\n/* Header\n\n * continued\n */\n// More header\n\nconst value = 1;\n// Inline",
+      6,
+    ],
+  ])("finds the header boundary for %s", (_name, source, expectedEnd) => {
+    expect(findHeaderEndLine(toLines(source))).toBe(expectedEnd);
+  });
+
   test("reports the first excess line while counting all later comments", () => {
     const count = MAX_INLINE_COMMENTS + 10000;
     const source = `const value = 1;\n${"// inline\n".repeat(count)}`;
