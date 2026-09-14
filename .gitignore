@@ -170,6 +170,7 @@ src/assets/icons/iconify/test/
 
 .claude
 .codex
+.opencode
 
 # cpd.test.js writes its report fixture here
 test/unit/scripts/.cpd-report-fixture/
