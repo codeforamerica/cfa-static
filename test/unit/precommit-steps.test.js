@@ -52,6 +52,7 @@ test("precommit preserves quality gates without regenerating artifacts before fr
       ["npm", "run", "typecheck"],
       ["npm", "run", "typecheck:strict"],
       ["npm", "run", "cpd:fp"],
+      ["npm", "run", "cpd:data"],
       ["npm", "run", "cpd:design-system"],
       ["npm", "run", "cpd"],
       ["npm", "run", "cpd:ratchet"],

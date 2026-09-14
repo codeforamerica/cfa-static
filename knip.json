@@ -16,6 +16,7 @@
 	"ignore": [],
 	"ignoreDependencies": [
 		"@biomejs/biome",
+		"jscpd",
 		"pagefind",
 		"postcss-scss",
 		"zod"

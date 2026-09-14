@@ -1,5 +1,8 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
+@use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
+// jscpd:ignore-end
 
 // =============================================================================
 // LINK COLUMNS (for link-columns block)
@@ -36,13 +39,7 @@
     }
 
     a {
-      color: var(--color-link);
-      text-decoration: none;
-
-      &:hover,
-      &:focus {
-        text-decoration: underline;
-      }
+      @include link-plain;
     }
   }
 }

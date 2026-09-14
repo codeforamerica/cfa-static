@@ -13,14 +13,12 @@ Parameters:
   - block.reveal: If true, adds data-reveal animation (default: true).
 {%- endcomment -%}
 
-{%- assign reveal = block.reveal | default: true -%}
-
 {%- include "design-system/block-intro.html" -%}
 
 <ul class="downloads" role="list">
   {%- for item in block.items -%}
     {%- assign info = item.file | fileInfo -%}
-    <li{% if reveal %} data-reveal{% endif %}>
+    <li{% if block.reveal | default: true %} data-reveal{% endif %}>
       <a href="{{ item.file }}" class="downloads__link" download>
         <span class="downloads__icon" aria-hidden="true">{%- include "design-system/icon.html", icon: info.icon -%}</span>
         <span class="downloads__body">

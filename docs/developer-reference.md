@@ -21,9 +21,10 @@ Every declared npm script is listed below in package order. Values are the exact
 | `npm run test:integration` | `vitest run test/integration` |
 | `npm run typecheck` | `tsc --noEmit --incremental --tsBuildInfoFile tsconfig.tsbuildinfo` |
 | `npm run typecheck:strict` | `node scripts/strict-typecheck-ratchet.js` |
-| `npm run cpd:fp` | `jscpd src/_lib/utils/fp --min-tokens 12` |
-| `npm run cpd:design-system` | `jscpd src/css/design-system --min-tokens 17` |
-| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 17 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from'` |
+| `npm run cpd:fp` | `node scripts/cpd.js src/_lib/utils/fp --min-tokens 12 --max-gap-lines 3` |
+| `npm run cpd:design-system` | `node scripts/cpd.js src/css/design-system --min-tokens 17 --max-gap-lines 3` |
+| `npm run cpd:data` | `node scripts/cpd.js src/_data --min-tokens 32 --max-gap-lines 3 --ignore-identifiers --ignore-literals --similarity 0.85` |
+| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 17 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from' --max-gap-lines 3` |
 | `npm run cpd:ratchet` | `node scripts/cpd-ratchet.js` |
 | `npm run knip` | `knip` |
 | `npm run knip:fix` | `knip --fix` |
@@ -241,12 +242,12 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [`dedupeAsync`](../src/_lib/utils/fp/memoize.js#L165) | Deduplicate concurrent async calls by key. |
-| [`groupByWithCache`](../src/_lib/utils/fp/memoize.js#L136) | Create a grouper that builds and caches a reverse index for arrays. |
-| [`indexBy`](../src/_lib/utils/fp/memoize.js#L104) | No adjacent JSDoc summary; see source. |
-| [`jsonKey`](../src/_lib/utils/fp/memoize.js#L145) | Generate a cache key from function arguments by JSON stringifying them. Useful for memoizing functions that take object arguments. |
-| [`memoize`](../src/_lib/utils/fp/memoize.js#L23) | Memoize a function with optional custom cache key. |
-| [`memoizeByRef`](../src/_lib/utils/fp/memoize.js#L45) | Create a cached function using WeakMap for object identity caching. The result is cached per array reference, allowing garbage collection. |
+| [`dedupeAsync`](../src/_lib/utils/fp/memoize.js#L175) | Deduplicate concurrent async calls by key. |
+| [`groupByWithCache`](../src/_lib/utils/fp/memoize.js#L146) | Create a grouper that builds and caches a reverse index for arrays. |
+| [`indexBy`](../src/_lib/utils/fp/memoize.js#L114) | No adjacent JSDoc summary; see source. |
+| [`jsonKey`](../src/_lib/utils/fp/memoize.js#L155) | Generate a cache key from function arguments by JSON stringifying them. Useful for memoizing functions that take object arguments. |
+| [`memoize`](../src/_lib/utils/fp/memoize.js#L38) | Memoize a function with optional custom cache key. |
+| [`memoizeByRef`](../src/_lib/utils/fp/memoize.js#L57) | Create a cached function using WeakMap for object identity caching. The result is cached per array reference, allowing garbage collection. |
 
 ### `#utils/fp/object.js`
 

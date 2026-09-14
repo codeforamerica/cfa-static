@@ -19,6 +19,7 @@ import { join } from "node:path";
 import { ROOT_DIR } from "#lib/paths.js";
 import { loadCpdDuplicates, runJscpd } from "#scripts/cpd.js";
 import { runIfMain } from "#scripts/lib/is-main-module.js";
+import { printRatchetPassed } from "#scripts/lib/ratchet.js";
 
 const RATCHET_OUTPUT_DIR = join(ROOT_DIR, ".jscpd-report", "ratchet");
 const RATCHET_REPORT = join(RATCHET_OUTPUT_DIR, "jscpd-report.json");
@@ -154,8 +155,8 @@ export const main = () => {
     RATCHET_REPORT,
     "--min-tokens in the package.json cpd script",
   );
-  console.log(
-    `\n✅ CPD ratchet passed: min-tokens ${current} is as strict as the code allows (${duplicates.length} clone(s) appear one notch lower)`,
+  printRatchetPassed(
+    `CPD ratchet passed: min-tokens ${current} is as strict as the code allows (${duplicates.length} clone(s) appear one notch lower)`,
   );
 
   const configTokens = readConfigMinTokens();
@@ -166,9 +167,8 @@ export const main = () => {
     CONFIG_RATCHET_REPORT,
     "minTokens in .jscpd.json",
   );
-  console.log(
-    `\n✅ CPD ratchet passed: config min-tokens ${configTokens} is as strict as the code allows (${configDuplicates.length} clone(s) appear one notch lower)`,
-  );
+  const configPassMessage = `CPD ratchet passed: config min-tokens ${configTokens} is as strict as the code allows (${configDuplicates.length} clone(s) appear one notch lower)`;
+  printRatchetPassed(configPassMessage);
 };
 
 await runIfMain(import.meta.url, main);

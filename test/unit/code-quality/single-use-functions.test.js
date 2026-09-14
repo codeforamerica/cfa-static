@@ -248,6 +248,17 @@ const analyzeSingleUseFunctions = (
 // ============================================
 
 describe("single-use-functions", () => {
+  /** Parse a source snippet and assert the extracted definitions' names. */
+  const expectFunctionsNamed = (source, names) => {
+    const functions = extractFunctionDefinitions(source);
+    expect(functions.map((f) => f.name)).toEqual(names);
+    return functions;
+  };
+
+  /** Curry a name lookup over extracted function definitions. */
+  const findFunctionNamed = (name) => (functions) =>
+    functions.find((fn) => fn.name === name);
+
   describe("extractFunctionDefinitions", () => {
     test("finds function declarations", () => {
       const source = `
@@ -255,10 +266,8 @@ function hello() {
   return "world";
 }
 `;
-      const functions = extractFunctionDefinitions(source);
-      expect(functions.length).toBe(1);
-      expect(functions[0].name).toBe("hello");
-      expect(functions[0].isNested).toBe(false);
+      const [fn] = expectFunctionsNamed(source, ["hello"]);
+      expect(fn.isNested).toBe(false);
     });
 
     test("finds arrow functions", () => {
@@ -267,9 +276,7 @@ const greet = (name) => {
   return "Hello " + name;
 };
 `;
-      const functions = extractFunctionDefinitions(source);
-      expect(functions.length).toBe(1);
-      expect(functions[0].name).toBe("greet");
+      expectFunctionsNamed(source, ["greet"]);
     });
 
     test("finds async functions", () => {
@@ -282,12 +289,7 @@ const getData = async () => {
   return data;
 };
 `;
-      const functions = extractFunctionDefinitions(source);
-      expect(functions.length).toBe(2);
-      expect(functions.map((f) => f.name).sort()).toEqual([
-        "fetchData",
-        "getData",
-      ]);
+      expectFunctionsNamed(source, ["fetchData", "getData"]);
     });
 
     test("detects nested functions", () => {
@@ -299,70 +301,13 @@ function outer() {
   return inner();
 }
 `;
-      const functions = extractFunctionDefinitions(source);
-      expect(functions.length).toBe(2);
+      const functions = expectFunctionsNamed(source, ["outer", "inner"]);
 
-      const outer = functions.find((f) => f.name === "outer");
-      const inner = functions.find((f) => f.name === "inner");
+      const outer = findFunctionNamed("outer")(functions);
+      const inner = findFunctionNamed("inner")(functions);
 
       expect(outer.isNested).toBe(false);
       expect(inner.isNested).toBe(true);
-    });
-  });
-
-  describe("extractExports", () => {
-    test("finds export function declarations", () => {
-      const source = `
-export function helper() {}
-export async function asyncHelper() {}
-`;
-      const exports = extractExports(source);
-      expect(exports.has("helper")).toBe(true);
-      expect(exports.has("asyncHelper")).toBe(true);
-    });
-
-    test("finds export const/let/var", () => {
-      const source = `
-export const foo = () => {};
-export let bar = function() {};
-export var baz = 42;
-`;
-      const exports = extractExports(source);
-      expect(exports.has("foo")).toBe(true);
-      expect(exports.has("bar")).toBe(true);
-      expect(exports.has("baz")).toBe(true);
-    });
-
-    test("finds export list", () => {
-      const source = `
-function funcAlpha() {}
-function funcBeta() {}
-const funcGamma = () => {};
-
-export { funcAlpha, funcBeta, funcGamma };
-`;
-      const exports = extractExports(source);
-      expect(exports.has("funcAlpha")).toBe(true);
-      expect(exports.has("funcBeta")).toBe(true);
-      expect(exports.has("funcGamma")).toBe(true);
-    });
-
-    test("handles export with aliases", () => {
-      const source = `
-function originalFunc() {}
-export { originalFunc as renamed };
-`;
-      const exports = extractExports(source);
-      expect(exports.has("originalFunc")).toBe(true);
-    });
-
-    test("finds export default", () => {
-      const source = `
-function main() {}
-export default main;
-`;
-      const exports = extractExports(source);
-      expect(exports.has("main")).toBe(true);
     });
   });
 

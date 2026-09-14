@@ -1,0 +1,15 @@
+{%- comment -%}
+Block body: the markdown content in .prose plus its optional button.
+Shared by the CTA block and split-article so the content+button render
+lives in one place.
+
+Expects:
+  - block.content: Markdown content rendered as .prose
+  - block.button: Optional button object { text, href, variant, size }
+  - content_button_size: include-scope "sm"/"lg" override (optional)
+{%- endcomment -%}
+<div class="prose">{{ block.content | renderContent: "md" }}</div>
+{%- if block.button -%}
+  {%- assign content_button_variant = block.button.variant | default: "secondary" -%}
+  {%- include "design-system/button.html", text: block.button.text, href: block.button.href, variant: content_button_variant, btn_size: content_button_size -%}
+{%- endif -%}

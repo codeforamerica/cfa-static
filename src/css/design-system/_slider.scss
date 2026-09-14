@@ -1,6 +1,8 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
+// jscpd:ignore-end
 
 // =============================================================================
 // SLIDER (Horizontal Scrolling Cards)
@@ -49,9 +51,7 @@
       background: var(--color-text-muted);
     }
 
-    @include breakpoint.reduced-motion {
-      scroll-behavior: auto;
-    }
+    @include reduced-motion-scroll;
 
     > * {
       scroll-snap-align: start;

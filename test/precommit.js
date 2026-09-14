@@ -8,7 +8,7 @@
  * Also probes for merge conflicts against the default remote branch before
  * running, and offers to `git push` after a successful manual run.
  *
- * Installed as the git pre-commit hook by flake.nix (runs `npm run precommit`),
+ * Installed as the git pre-commit hook by devenv (runs `npm run precommit`),
  * and available ad-hoc as the `pc` shell command.
  */
 

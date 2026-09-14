@@ -31,6 +31,7 @@ const mainLanes = [
   [
     COMMON_STEPS.cpdDesignSystem,
     COMMON_STEPS.cpdFp,
+    COMMON_STEPS.cpdData,
     COMMON_STEPS.cpd,
     COMMON_STEPS.cpdRatchet,
   ],

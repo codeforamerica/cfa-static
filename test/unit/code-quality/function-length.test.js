@@ -136,7 +136,7 @@ describe("function-length", () => {
       "}",
     ]);
     const functions = extractFunctions(source);
-    expect(functions.length).toBe(2);
+    expect(functions).toHaveLength(2);
 
     const outer = functions.find((f) => f.name === "outer");
     const inner = functions.find((f) => f.name === "inner");

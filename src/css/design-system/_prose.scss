@@ -1,5 +1,7 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
+// jscpd:ignore-end
 
 // Rich text content container. Inherits stack layout (flex-col with gap).
 
@@ -41,13 +43,12 @@
     table {
       overflow: hidden;
       border-spacing: 0;
-      border: $border-light;
-      border-radius: $radius-md;
+
+      @include box-border;
     }
 
     thead {
-      color: var(--color-contrast-text);
-      background: var(--color-link);
+      @include primary-panel;
     }
 
     th {
@@ -62,7 +63,7 @@
     }
 
     tbody tr:nth-child(even) {
-      background: var(--body-background-alt);
+      @include alt-bg;
     }
   }
 }

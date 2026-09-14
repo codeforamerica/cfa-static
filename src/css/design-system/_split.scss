@@ -1,12 +1,22 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
+// jscpd:ignore-end
 
 // =============================================================================
 // SPLIT SECTIONS (contained width)
 // =============================================================================
 
 .design-system {
+  // Colored panel button tokens: the base color doubles as the hover
+  // background for both the dark and primary panel variants.
+  @mixin split-btn-colors($base, $hover-color) {
+    --split-btn-color: #{$base};
+    --split-btn-hover-bg: #{$base};
+    --split-btn-hover-color: #{$hover-color};
+  }
+
   .split,
   .split-callout {
     @include two-column-split;
@@ -108,18 +118,13 @@
     &.dark-left .left,
     &.dark-right .right {
       @include dark-section-vars;
-
-      --split-btn-color: #{$color-dark-text};
-      --split-btn-hover-bg: #{$color-dark-text};
-      --split-btn-hover-color: #{$color-dark-bg};
+      @include split-btn-colors($color-dark-text, $color-dark-bg);
     }
 
     // Primary colored panels
     &.primary-left .left,
     &.primary-right .right {
-      --split-btn-color: var(--color-contrast-text);
-      --split-btn-hover-bg: var(--color-contrast-text);
-      --split-btn-hover-color: #{$color-text};
+      @include split-btn-colors(var(--color-contrast-text), $color-text);
 
       background: var(--color-link);
 

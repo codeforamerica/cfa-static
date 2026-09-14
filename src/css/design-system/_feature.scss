@@ -1,5 +1,7 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
+// jscpd:ignore-end
 
 // =============================================================================
 // FEATURES
@@ -7,15 +9,14 @@
 // Semantic markup: <ul class="features"> with <li> wrapping each <article class="feature">
 
 .design-system {
-  ul.features {
-    @include grid-auto($width-card, $space-md);
-
-    list-style: none;
-  }
-
-  // Also support legacy div.features
+  ul.features,
   div.features {
     @include grid-auto($width-card, $space-md);
+  }
+
+  // Legacy div.features has no list semantics, so only the list gets marker reset
+  ul.features {
+    list-style: none;
   }
 
   .feature-card,

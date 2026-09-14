@@ -225,6 +225,15 @@ export { baseExport as renamed };
       expect(exports.has("baseExport")).toBe(true);
     });
 
+    test("finds export default", () => {
+      const source = `
+function main() {}
+export default main;
+`;
+      const exports = extractExports(source);
+      expect(exports.has("main")).toBe(true);
+    });
+
     test.each([
       {
         name: "without aliases",

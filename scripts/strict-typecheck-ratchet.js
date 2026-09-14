@@ -14,6 +14,7 @@
  */
 
 import { runIfMain } from "#scripts/lib/is-main-module.js";
+import { printRatchetPassed } from "#scripts/lib/ratchet.js";
 import { runToolCapture } from "#scripts/lib/run-tool.js";
 import { frozenObject } from "#utils/fp/object.js";
 
@@ -177,8 +178,8 @@ export const main = (baseline = STRICT_ERROR_BASELINE) => {
     (sum, lines) => sum + lines.length,
     0,
   );
-  console.log(
-    `✅ Strict typecheck ratchet passed: ${total} known errors across ${errorsByFile.size} files, everything else strict-clean`,
+  printRatchetPassed(
+    `Strict typecheck ratchet passed: ${total} known errors across ${errorsByFile.size} files, everything else strict-clean`,
   );
 };
 

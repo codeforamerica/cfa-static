@@ -1,6 +1,8 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
+// jscpd:ignore-end
 
 // =============================================================================
 // DESIGN SYSTEM ROOT
@@ -79,7 +81,7 @@
 }
 
 .design-system {
-  --section-padding-y: var(--section-padding-y-sm);
+  @include section-padding-y(sm);
 
   scroll-behavior: smooth;
 
@@ -88,18 +90,15 @@
   // ===========================================================================
 
   font-family: var(--font-family-body);
-  font-size: $font-size-base;
-  line-height: $line-height-normal;
+
+  @include body-base;
+
   color: var(--color-text);
 
   -webkit-font-smoothing: antialiased;
 
   main & {
-    --section-padding-y: var(--section-padding-y-main-sm);
-
-    @include breakpoint.up("md") {
-      --section-padding-y: var(--section-padding-y-main-md);
-    }
+    @include section-padding-sm-md(main);
   }
 
   // ===========================================================================
@@ -154,9 +153,8 @@
 
   // Links - exclude buttons
   a:not(.btn) {
-    color: var(--color-link);
-    text-decoration: var(--link-decoration);
-    text-decoration-style: var(--link-decoration-style);
+    @include link-tokens;
+
     transition: color $transition-fast;
 
     &:hover {
@@ -381,7 +379,7 @@
 
   > section:nth-child(even),
   main > section:nth-child(even) {
-    background: var(--body-background-alt);
+    @include alt-bg;
   }
 
   // Even dark sections get alternate dark background
@@ -391,12 +389,10 @@
   }
 
   @include breakpoint.up("md") {
-    --section-padding-y: var(--section-padding-y-md);
+    @include section-padding-y(md);
   }
 
-  @include breakpoint.reduced-motion {
-    scroll-behavior: auto;
-  }
+  @include reduced-motion-scroll;
 
   @include breakpoint.reduced-motion {
     [data-reveal] {

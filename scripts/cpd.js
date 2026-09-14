@@ -14,6 +14,7 @@
 import { existsSync, readFileSync, rmSync } from "node:fs";
 import { isAbsolute, join, relative } from "node:path";
 import { ROOT_DIR } from "#lib/paths.js";
+import { installedJscpd, jscpdPaths } from "#scripts/jscpd/install.js";
 import { runIfMain } from "#scripts/lib/is-main-module.js";
 import { runTool } from "#scripts/lib/run-tool.js";
 
@@ -23,7 +24,7 @@ const MAX_EXCERPT_LINES = 20;
 
 /**
  * @typedef {{ name?: string, start: number, end: number }} CpdFileSpan
- * @typedef {{ firstFile?: CpdFileSpan, secondFile?: CpdFileSpan, format?: string, lines?: number, fragment?: string }} CpdDuplicate
+ * @typedef {{ firstFile?: CpdFileSpan, secondFile?: CpdFileSpan, format?: string, lines?: number, fragment?: string, kind?: "exact" | "renamed" | "similar", similarity?: number, method?: "gap" | "ast" }} CpdDuplicate
  */
 
 export const buildCpdFailureMessage = () => `
@@ -98,6 +99,27 @@ export const buildSourceExcerptLines = ({ name, start, end }) => {
   return lines.length > 0 ? lines : ["    (source unavailable)"];
 };
 
+/**
+ * Describe a clone's detection kind for the failure summary. jscpd v5
+ * reports exact clones plus the near-miss kinds the new flags surface:
+ * renamed (type-2) and similar (type-3, with the method that found it
+ * and the similarity ratio).
+ * @param {CpdDuplicate} duplicate
+ * @returns {string}
+ */
+export const describeCloneKind = (duplicate) => {
+  if (duplicate.kind === "renamed") return "renamed";
+  if (duplicate.kind === "similar") {
+    const how = duplicate.method ? ` (${duplicate.method})` : "";
+    const ratio =
+      typeof duplicate.similarity === "number"
+        ? ` ~${duplicate.similarity.toFixed(2)}`
+        : "";
+    return `similar${how}${ratio}`;
+  }
+  return "exact";
+};
+
 /** @param {CpdDuplicate | undefined} duplicate */
 export const buildCpdDuplicateLines = (duplicate) => {
   const firstFile = duplicate?.firstFile;
@@ -106,7 +128,7 @@ export const buildCpdDuplicateLines = (duplicate) => {
   if (!firstFile || !secondFile) return [];
 
   const lines = [
-    `❌ Clone found (${duplicate.format}, ${duplicate.lines} lines)`,
+    `❌ Clone found (${duplicate.format}, ${duplicate.lines} lines, ${describeCloneKind(duplicate)})`,
     `  ${firstFile.name}: ${firstFile.start}-${firstFile.end}`,
     "  Duplicated lines:",
     ...buildSourceExcerptLines(firstFile),
@@ -150,6 +172,21 @@ export const buildCpdFailureLines = (duplicates) => {
 };
 
 /**
+ * The repository's pinned jscpd binary, in preference order: an explicit
+ * JSCPD_BIN override, then the checksum-verified .bin/jscpd the devenv
+ * shell and pre-commit hook install (scripts/jscpd/install.js), then a
+ * binary dropped at bin/jscpd. GitHub Actions and ordinary npm installs
+ * have none of these and keep using the npm-shipped binary via npx.
+ * @returns {string | null}
+ */
+export const jscpdBinaryPath = () => {
+  if (process.env.JSCPD_BIN) return process.env.JSCPD_BIN;
+  if (installedJscpd()) return jscpdPaths.binaryPath;
+  const local = join(ROOT_DIR, "bin", "jscpd");
+  return existsSync(local) ? local : null;
+};
+
+/**
  * Spawn jscpd after deleting the previous report, so any report present
  * after a failing run was written by this run - which is how a duplication
  * failure is told apart from a crash.
@@ -159,7 +196,8 @@ export const buildCpdFailureLines = (duplicates) => {
  */
 export const runJscpd = (args, reportPath) => {
   rmSync(reportPath, { force: true });
-  return runTool("npx", ["jscpd", ...args]);
+  const binary = jscpdBinaryPath();
+  return binary ? runTool(binary, args) : runTool("npx", ["jscpd", ...args]);
 };
 
 /**

@@ -3,10 +3,7 @@ Features grid with list semantics.
 
 Parameters (via block object):
   - block.items: Array of feature objects with properties:
-    - icon: Icon content. Supported formats:
-        - Iconify ID: "prefix:name" (e.g., "hugeicons:home-01", "hugeicons:settings-02")
-        - Image path: starts with "/" (e.g., "/images/icon.svg")
-        - Raw content: emoji or HTML entity (e.g., "&#128640;")
+    - icon: Icon content (see icon.html for the supported formats)
     - icon_label: Accessible label for icon (optional, defaults to decorative)
     - name: Feature title
     - description: Feature description (supports markdown)
@@ -25,13 +22,11 @@ Usage:
   {% include "design-system/blocks/features.html", items: page.spec_feature_items %}
 {%- endcomment -%}
 
-{%- assign _items = items | default: block.items -%}
-{%- assign reveal = block.reveal | default: true -%}
-{%- unless items -%}{%- include "design-system/block-intro.html" -%}{%- endunless -%}
+{%- include "design-system/block-intro.html" -%}
 <ul class="features{% if block.center %} text-center{% endif %}" role="list">
-  {%- for item in _items -%}
+  {%- for item in items | default: block.items -%}
   <li>
-    <article class="feature"{% if reveal %} data-reveal{% endif %}{% if item.style %} style="{{ item.style }}"{% endif %}>
+    <article class="feature"{% if block.reveal | default: true %} data-reveal{% endif %}{% if item.style %} style="{{ item.style }}"{% endif %}>
       {%- if item.icon -%}
         {%- include "design-system/icon-badge.html", icon: item.icon, label: item.icon_label -%}
       {%- endif -%}

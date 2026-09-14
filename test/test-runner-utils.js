@@ -189,6 +189,7 @@ export const COMMON_STEPS = {
     args: ["run", "typecheck:strict"],
   },
   cpdFp: { name: "cpd:fp", cmd: "npm", args: ["run", "cpd:fp"] },
+  cpdData: { name: "cpd:data", cmd: "npm", args: ["run", "cpd:data"] },
   cpdDesignSystem: {
     name: "cpd:design-system",
     cmd: "npm",

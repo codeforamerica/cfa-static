@@ -1,5 +1,7 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
+// jscpd:ignore-end
 
 // =============================================================================
 // BREADCRUMBS
@@ -28,13 +30,7 @@
     }
 
     a {
-      color: var(--color-link);
-      text-decoration: none;
-      transition: color $transition-fast;
-
-      &:hover {
-        text-decoration: underline;
-      }
+      @include link-plain;
     }
 
     .separator {

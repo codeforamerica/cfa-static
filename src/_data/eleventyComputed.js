@@ -14,6 +14,20 @@ import {
 import { collectItemErrors } from "#utils/validate-item.js";
 
 /**
+ * Throw a single error joining the messages when a list is non-empty.
+ * @param {unknown[]} messages
+ */
+const throwIfNotEmpty = (messages) => {
+  if (messages.length > 0) throw new Error(messages.join("\n"));
+};
+
+/**
+ * The reveal-figure default shared by every split-* block.
+ * @type {Record<string, unknown>}
+ */
+const SPLIT_DEFAULTS = { reveal_figure: "scale" };
+
+/**
  * Default values for block types. Applied at build time so templates
  * don't need to handle defaults.
  * @type {Record<string, Record<string, unknown>>}
@@ -21,11 +35,11 @@ import { collectItemErrors } from "#utils/validate-item.js";
 const BLOCK_DEFAULTS = {
   features: { reveal: true, center: false },
   stats: { reveal: true },
-  "split-image": { reveal_figure: "scale" },
-  "split-code": { reveal_figure: "scale" },
-  "split-icon-links": { reveal_figure: "scale" },
-  "split-html": { reveal_figure: "scale" },
-  "split-callout": { reveal_figure: "scale" },
+  "split-image": SPLIT_DEFAULTS,
+  "split-code": SPLIT_DEFAULTS,
+  "split-icon-links": SPLIT_DEFAULTS,
+  "split-html": SPLIT_DEFAULTS,
+  "split-callout": SPLIT_DEFAULTS,
   "section-header": { align: "center" },
   "image-cards": { reveal: true },
   "code-block": { reveal: true },
@@ -161,14 +175,14 @@ export default {
       ? buildGalleryBlocks()
       : data.blocks;
     if (!sourceBlocks) {
-      if (itemErrors.length > 0) throw new Error(itemErrors.join("\n"));
+      throwIfNotEmpty(itemErrors);
       return sourceBlocks;
     }
     const allErrors = [
       ...itemErrors,
       ...collectBlockErrors(sourceBlocks, context),
     ];
-    if (allErrors.length > 0) throw new Error(allErrors.join("\n"));
+    throwIfNotEmpty(allErrors);
     return sourceBlocks.map(
       /** @param {Record<string, unknown>} block */ (block) => {
         const blockType = String(block.type);

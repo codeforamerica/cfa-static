@@ -1,7 +1,9 @@
+// jscpd:ignore-start -- shared @use import block
 @use "sass:math";
 @use "../variables" as *;
 @use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
+// jscpd:ignore-end
 
 // =============================================================================
 // ITEMS LIST (for list-item.html)
@@ -121,9 +123,7 @@
       @include product-card-typography;
 
       p:not(.price) {
-        @include body-sm;
-
-        color: var(--color-text-muted);
+        @include muted-body-sm;
       }
 
       // =======================================================================

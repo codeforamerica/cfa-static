@@ -25,6 +25,12 @@ const pageWithBlocks = (slug, blocks) => ({
   frontmatter: { name: slug, permalink: `/${slug}/`, blocks },
 });
 
+/** The plain + banner page pair every right-content site build shares. */
+const plainAndBannerPages = (bannerBlocks) => [
+  pageWithBlocks("plain", [PAGE_BLOCK]),
+  pageWithBlocks("banner", bannerBlocks),
+];
+
 /** Locate the image-background banner in a built document */
 const findBanner = (doc) => {
   const banner = doc.querySelector(".image-background");
@@ -44,8 +50,7 @@ describe("right-content sidebar", () => {
     const getSite = useSharedSite({
       images: [PARTY_IMAGE],
       files: [
-        pageWithBlocks("plain", [PAGE_BLOCK]),
-        pageWithBlocks("banner", [BANNER_BLOCK, PAGE_BLOCK]),
+        ...plainAndBannerPages([BANNER_BLOCK, PAGE_BLOCK]),
         {
           path: "pages/sidebar-item.md",
           frontmatter: { name: "Sidebar Item", permalink: "/sidebar-item/" },
@@ -106,10 +111,7 @@ describe("right-content sidebar", () => {
   describe("without a snippet", () => {
     const getSite = useSharedSite({
       images: [PARTY_IMAGE],
-      files: [
-        pageWithBlocks("plain", [PAGE_BLOCK]),
-        pageWithBlocks("banner", [BANNER_BLOCK]),
-      ],
+      files: plainAndBannerPages([BANNER_BLOCK]),
     });
 
     test("the body is one-column and has no aside", async () => {
