@@ -125,8 +125,8 @@ eligible even-positioned sections receive alternating backgrounds via
 
 `.container` supplies the default content width, `.container-wide` is the
 default block wrapper, and `.container-narrow` supplies prose width. A `full`
-block has no container wrapper. See the checkout's generated
-[Sass declarations](../../../docs/developer-reference.md#sass-source-declarations)
+block has no container wrapper. See the checkout's
+[Sass defaults](../../../src/css/_variables.scss)
 for source width values rather than copying them into this guide.
 
 ### Icons and Images
@@ -151,10 +151,10 @@ image paths, alt text, aspect ratios, and caption fields.
 
 ### Token Defaults
 
-Spacing, typography, radii, widths, and breakpoint declarations are generated in
-the checkout's [developer reference](../../../docs/developer-reference.md#sass-source-declarations).
-The [theme source declarations](../../../docs/developer-reference.md#theme-source-tokens)
-show literal custom-property overrides. Source expressions and Sass defaults
+Read [Sass defaults](../../../src/css/_variables.scss) for spacing, typography,
+radii, and widths, and [breakpoints](../../../src/css/_breakpoints.scss) for responsive thresholds.
+The active [theme.scss](../../../src/css/theme.scss) contains custom-property
+overrides; other themes live in [src/css/](../../../src/css/). Source expressions and Sass defaults
 are not computed browser values; inspect rendered output when changing themes.
 
 ## Source and Gallery

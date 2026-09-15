@@ -6,6 +6,7 @@ import {
   inlineCode,
   markdownTable,
 } from "#scripts/lib/markdown.js";
+import { getTableRows } from "#test/test-utils.js";
 
 const markdown = new MarkdownIt({ html: true });
 
@@ -43,11 +44,7 @@ describe("literal reference Markdown", () => {
         (cell) => cell.textContent,
       ),
     ).toEqual(["First", "Second"]);
-    expect(
-      [...document.querySelectorAll("tbody tr")].map((row) =>
-        [...row.querySelectorAll("td")].map((cell) => cell.textContent),
-      ),
-    ).toEqual(rows);
+    expect(getTableRows(document)).toEqual(rows);
   });
 
   test.each([
