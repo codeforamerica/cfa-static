@@ -1,10 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { data, expectObjectProps, toData } from "#test/test-utils.js";
+import { data, toData } from "#test/test-utils.js";
 import {
   compact,
   filter,
   filterMap,
-  findDuplicate,
   map,
   memberOf,
   notMemberOf,
@@ -13,7 +12,6 @@ import {
   pluralize,
   sort,
   sortBy,
-  uniqueBy,
 } from "#utils/fp/array.js";
 
 describe("array-utils", () => {
@@ -54,50 +52,6 @@ describe("array-utils", () => {
     const condition = false;
     // biome-ignore lint/nursery/noUnnecessaryConditions: intentional test of falsy value removal
     expect(compact([condition && "value", "always"])).toEqual(["always"]);
-  });
-
-  // ============================================
-  // findDuplicate Tests
-  // ============================================
-  test("Finds first duplicate value in simple array", () => {
-    expect(findDuplicate([1, 2, 1])).toBe(1);
-    expect(findDuplicate([1, 2, 3, 2, 1])).toBe(2);
-  });
-
-  test("Returns undefined when no duplicates exist", () => {
-    expect(findDuplicate([1, 2, 3])).toBe(undefined);
-    expect(findDuplicate([])).toBe(undefined);
-  });
-
-  test("Finds duplicate using key extractor", () => {
-    const items = [{ id: 1 }, { id: 2 }, { id: 1 }];
-    const duplicate = findDuplicate(items, (x) => x.id);
-
-    expect(duplicate).toEqual({ id: 1 });
-    expect(duplicate).toBe(items[2]); // Returns the duplicate item itself
-  });
-
-  test("Returns first duplicate when multiple exist", () => {
-    expect(findDuplicate([1, 2, 1, 3, 2])).toBe(1);
-  });
-
-  test("Works with string values", () => {
-    expect(findDuplicate(["a", "b", "a"])).toBe("a");
-    expect(findDuplicate(["a", "b", "c"])).toBe(undefined);
-  });
-
-  test("Works with objects using nested key", () => {
-    const options = [
-      { days: 1, price: 10 },
-      { days: 3, price: 25 },
-      { days: 1, price: 15 },
-    ];
-
-    const duplicate = findDuplicate(options, (opt) => opt.days);
-    expectObjectProps({
-      days: 1,
-      price: 15, // It's the second occurrence
-    })(duplicate);
   });
 
   // ============================================
@@ -490,34 +444,6 @@ describe("array-utils", () => {
     const numbers = [{ val: 5 }, { val: 2 }, { val: 8 }];
     const result = pipe(sortBy("val"))(numbers);
     expect(result.map((n) => n.val)).toEqual([2, 5, 8]);
-  });
-
-  // ============================================
-  // uniqueBy Tests
-  // ============================================
-  test("uniqueBy removes duplicates by key", () => {
-    const items = [
-      { id: 1, name: "first" },
-      { id: 2, name: "second" },
-      { id: 1, name: "duplicate" },
-    ];
-    const result = uniqueBy((x) => x.id)(items);
-    expect(result.length).toBe(2);
-    expect(result.map((x) => x.id)).toEqual([1, 2]);
-  });
-
-  test("uniqueBy keeps last occurrence (Map behavior)", () => {
-    const items = [
-      { id: "a", val: 1 },
-      { id: "a", val: 2 },
-    ];
-    const result = uniqueBy((x) => x.id)(items);
-    expect(result[0].val).toBe(2);
-  });
-
-  test("uniqueBy handles empty array", () => {
-    const result = uniqueBy((x) => x)([]);
-    expect(result).toEqual([]);
   });
 
   // ============================================

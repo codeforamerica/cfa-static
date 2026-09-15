@@ -7,7 +7,6 @@ import {
   withAllowlist,
 } from "#test/code-scanner.js";
 import { ALL_JS_FILES, path, rootDir, withTempFile } from "#test/test-utils.js";
-import { groupBy } from "#utils/fp/grouping.js";
 import { frozenSet } from "#utils/fp/set.js";
 
 /**
@@ -188,7 +187,7 @@ try {
     console.log("  These should be removed over time:\n");
 
     // Group by file for cleaner output
-    const byFileMap = groupBy(allowed, (a) => a.file);
+    const byFileMap = Map.groupBy(allowed, (a) => a.file);
     const byFile = Object.fromEntries(
       [...byFileMap].map(([file, items]) => [file, items.map((a) => a.line)]),
     );

@@ -184,11 +184,4 @@ const dedupeAsync = (fn, { cacheKey = DEFAULT_KEY_FN } = {}) => {
       .get(cacheKey(args));
 };
 
-export {
-  dedupeAsync,
-  groupByWithCache,
-  indexBy,
-  jsonKey,
-  memoize,
-  memoizeByRef,
-};
+export { dedupeAsync, groupByWithCache, indexBy, jsonKey, memoize };

@@ -105,24 +105,6 @@ const ALLOWED_SINGLE_USE_FUNCTIONS = frozenSet([
 // NOTE: The scanner now detects Eleventy registrations (addFilter, addShortcode, etc.)
 // so exports registered with Eleventy no longer need to be listed here.
 const ALLOWED_TEST_ONLY_EXPORTS = frozenSet([
-  // Generic fp utilities kept as a small standard library; some
-  // functions are currently exercised only from test code
-  "src/_lib/utils/fp/object.js:omit",
-  "src/_lib/utils/fp/set.js:setHas", // Curried predicate for filter/some/every
-  "src/_lib/utils/fp/grouping.js:groupBy", // Used by memoize.js and scripts/ via relative imports
-  "src/_lib/utils/fp/grouping.js:buildFirstOccurrenceLookup", // Toolkit API surface
-  "src/_lib/utils/fp/grouping.js:groupValuesBy", // Toolkit API surface
-  "src/_lib/utils/fp/memoize.js:memoizeByRef", // Toolkit API surface
-  "src/_lib/utils/fp/object.js:mapBoth", // Toolkit API surface
-  "src/_lib/utils/fp/object.js:pickTruthy", // Toolkit API surface
-  "src/_lib/utils/fp/array.js:findDuplicate", // Toolkit API surface
-  "src/_lib/utils/fp/array.js:uniqueBy", // Toolkit API surface
-  "src/_lib/utils/fp/sorting.js:descending", // Toolkit API surface
-
-  // Browser-automation internals: consumed inside their own modules by the
-  // exported orchestrators (startServer, screenshot, configureScreenshots).
-  "src/_lib/media/browser-utils.js:waitForServer",
-
   // DOM init functions - auto-called via onReady in production, but exported for unit tests
   // (ES modules execute at import time before tests can set up DOM)
   "src/_lib/public/ui/search.js:initSearch",
