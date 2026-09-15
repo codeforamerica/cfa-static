@@ -1,7 +1,7 @@
 /**
  * Tests for frozen set utilities
  */
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { frozenSet, frozenSetFrom, setHas, setLacks } from "#utils/fp/set.js";
 
 const expectHasAB = (set) => {
@@ -67,15 +67,10 @@ describe("frozenSet", () => {
     expect(set.has(4)).toBe(false);
   });
 
-  test("supports iteration with for...of", () => {
-    const set = frozenSet(["x", "y", "z"]);
-    const values = [];
+  test("supports iteration via destructuring", () => {
+    const [first, second, third] = frozenSet(["x", "y", "z"]);
 
-    for (const v of set) {
-      values.push(v);
-    }
-
-    expect(values).toEqual(["x", "y", "z"]);
+    expect([first, second, third]).toEqual(["x", "y", "z"]);
   });
 
   test("supports spread operator", () => {
@@ -86,17 +81,14 @@ describe("frozenSet", () => {
 
   test("forEach callbacks receive the frozen proxy as the set argument", () => {
     const set = frozenSet(["a", "b"]);
-    const seen = [];
-    let setArg = null;
+    const onEach = vi.fn();
 
-    set.forEach((value, _valueAgain, arg) => {
-      seen.push(value);
-      setArg = arg;
-    });
+    set.forEach(onEach);
 
-    expect(seen).toEqual(["a", "b"]);
+    expect(onEach.mock.calls.map(([value]) => value)).toEqual(["a", "b"]);
     // The third argument must be the frozen proxy itself, not the raw
     // Set, so callbacks cannot mutate the underlying Set through it
+    const setArg = onEach.mock.calls[0][2];
     expect(setArg).toBe(set);
     expect(() => setArg.add("c")).toThrow("Cannot call add() on a frozen set");
     expect(set.has("c")).toBe(false);
@@ -105,19 +97,19 @@ describe("frozenSet", () => {
 
 describe("frozenSetFrom", () => {
   test("creates a frozen set from an iterable", () => {
-    const map = new Map([
-      ["a", 1],
-      ["b", 2],
-    ]);
-    const set = frozenSetFrom(map.keys());
+    const set = frozenSetFrom(
+      new Map([
+        ["a", 1],
+        ["b", 2],
+      ]).keys(),
+    );
 
     expectHasAB(set);
     expect(set instanceof Set).toBe(true);
   });
 
   test("creates from another Set", () => {
-    const original = new Set([1, 2, 3]);
-    const frozen = frozenSetFrom(original);
+    const frozen = frozenSetFrom(new Set([1, 2, 3]));
 
     expect(frozen.has(1)).toBe(true);
     expect(frozen.has(2)).toBe(true);
@@ -160,8 +152,7 @@ describe("setHas", () => {
   });
 
   test("works with regular (non-frozen) sets", () => {
-    const set = new Set([1, 2, 3]);
-    const hasValue = setHas(set);
+    const hasValue = setHas(new Set([1, 2, 3]));
 
     expect(hasValue(1)).toBe(true);
     expect(hasValue(4)).toBe(false);

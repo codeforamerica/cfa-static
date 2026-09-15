@@ -147,6 +147,15 @@ jscpd found duplicated code.
     ).toHaveLength(1);
   });
 
+  test("extractErrorsFromOutput preserves large clone reports without recursion", () => {
+    const block = [
+      "❌ Clone found (javascript, 20000 lines)",
+      ...Array.from({ length: 20_000 }, (_, index) => `fragment line ${index}`),
+    ].join("\n");
+
+    expect(extractErrorsFromOutput(`${block}\n\n`)).toEqual([block]);
+  });
+
   test("extractErrorsFromOutput correctly parses test failures", () => {
     // Simulate real test-runner failure output
     const testOutput = `

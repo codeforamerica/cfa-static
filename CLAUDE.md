@@ -26,15 +26,16 @@ not describe scripts from memory.
 
 ## Code Policy
 
-- Repository paths come from `ROOT_DIR` in `#lib/paths.js`, not `process.cwd()`.
+- Use Node subpath import aliases from `package.json` wherever an alias applies, including dynamic and side-effect imports. Repository paths come from `ROOT_DIR` in `#lib/paths.js`, not `process.cwd()`.
 - Prefer arrow functions, `const`, curried helpers, and immutable transformations: `map`/`filter` for transformations, `flatMap` for combined filtering/expansion, `reduce` for aggregation, and `Object.fromEntries` for object construction. Use `pipe` when it makes a transformation clearer; do not force composition or extract helpers solely to add indirection.
 - `.push()` and other mutation-style escapes are gated by `test/unit/code-quality/` tests with distinct scopes, exempt directories, and allowlists. Read the failing gate before choosing an implementation, including inside reducers.
 - Biome and code-quality tests are complementary. The generated reference records actual Biome limits and overrides, not an invented universal scope. Do not broaden enforcement or weaken checks merely to accommodate a change.
-- Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns.
+- Keep HTML rendering in templates under `src/_includes/`; use existing block, shortcode, and filter registration patterns. Remove dead/commented-out code rather than retaining it as documentation.
 
 Generic functional helpers live under `#utils/fp/`; consult the generated export
 index and source JSDoc for APIs rather than copying stale utility inventories.
-Use reference-based caching for collection lookups where appropriate.
+Create cached helpers at module scope so calls reuse the cache; use
+reference-based caching for collection lookups where appropriate.
 
 ### Fail Fast, Never Mask
 
@@ -52,7 +53,9 @@ validation without weakening the gates.
 `test/code-quality/code-quality-exceptions.js` is a deletion-only legacy baseline,
 not a place to approve new violations: a per-entry ratchet fails on any entry the
 baseline has not recorded, and deletions must be locked into the baseline it
-prints; each gate also reports stale entries. If a check appears wrong,
+prints; suggested updates only remove recorded entries and never approve new
+ones. A genuine file rename or shifted line requires an explicitly reviewed
+baseline update. Each gate also reports stale entries. If a check appears wrong,
 demonstrate the false positive and discuss a targeted correction; do not add
 exceptions or convert thrown failures to default values.
 

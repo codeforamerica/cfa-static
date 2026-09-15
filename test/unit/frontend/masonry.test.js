@@ -60,9 +60,6 @@ const installCreateElement = (onCanvas, makeContext) => {
   };
 };
 
-const waitForDebounce = () =>
-  new Promise((resolve) => setTimeout(resolve, 120));
-
 const mountGrid = (classes, items, width) => {
   document.body.innerHTML = `
     <section class="design-system">
@@ -101,6 +98,8 @@ afterEach(() => {
   window.getComputedStyle = originalGetComputedStyle;
   window.addEventListener = originalAddEventListener;
   resizeHandlers = null;
+  // Restores real timers even if a debounce assertion threw mid-test
+  vi.useRealTimers();
 });
 
 describe("textHeight", () => {
@@ -165,6 +164,7 @@ describe("masonry layout", () => {
   });
 
   test.sequential("places regular item cards and reflows them after a debounced resize", async () => {
+    vi.useFakeTimers();
     const grid = mountGrid(
       "items masonry",
       `
@@ -229,11 +229,18 @@ describe("masonry layout", () => {
 
     setOffsetWidth(grid, 500);
     resizeHandlers[0]();
+    await vi.advanceTimersByTimeAsync(50);
+    expect(cards[0].style.width).toBe("280px");
     resizeHandlers[0]();
-    await waitForDebounce();
-
+    // Reflow must wait 100ms from the last trigger, not the first.
+    await vi.advanceTimersByTimeAsync(99);
+    expect(cards[0].style.width).toBe("280px");
+    expect(cards[1].style.transform).toBe("translate(312px, 0px)");
+    expect(grid.style.height).toBe(heightBefore);
+    await vi.advanceTimersByTimeAsync(1);
     expect(cards[0].style.width).toBe("500px");
     expect(cards[1].style.transform.startsWith("translate(0px, ")).toBe(true);
+
     // Reflow re-assigns the height to the new single-column value. A `+=`
     // would append, producing invalid CSS that the DOM drops — leaving the
     // old value unchanged.
@@ -335,7 +342,8 @@ describe("masonry layout", () => {
     );
   });
 
-  test.sequential("debounces resize so three rapid triggers reflow only once", async () => {
+  test.sequential("debounces resize so three staggered triggers reflow once after the last trigger", async () => {
+    vi.useFakeTimers();
     const grid = mountGrid("items masonry", "<li><p>One</p></li>", 500);
     runReady();
 
@@ -348,17 +356,27 @@ describe("masonry layout", () => {
 
     // Measure the cost of a single debounced reflow.
     resizeHandlers[0]();
-    await waitForDebounce();
+    expect(counting).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(99);
+    expect(counting).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
     const perReflow = counting.mock.calls.length;
     expect(perReflow).toBeGreaterThan(0);
 
     // Three triggers within the debounce window must collapse to one reflow.
     // Dropping clearTimeout would run three; a broken timer handle, two.
     counting.mockClear();
-    resizeHandlers[0]();
-    resizeHandlers[0]();
-    resizeHandlers[0]();
-    await waitForDebounce();
+    setOffsetWidth(grid, 600);
+    for (const elapsed of [50, 50, 99]) {
+      resizeHandlers[0]();
+      await vi.advanceTimersByTimeAsync(elapsed);
+      expect(counting).not.toHaveBeenCalled();
+    }
+    expect(grid.children[0].style.width).toBe("500px");
+    await vi.advanceTimersByTimeAsync(1);
+    expect(counting).toHaveBeenCalledTimes(perReflow);
+    expect(grid.children[0].style.width).toBe("600px");
+    await vi.advanceTimersByTimeAsync(100);
     expect(counting).toHaveBeenCalledTimes(perReflow);
   });
 });

@@ -15,6 +15,17 @@ describe("eleventyComputed.meta", () => {
     expect(result.published).toBe("2024-01-15");
   });
 
+  test("a news tag after other tags takes precedence over organization schema", () => {
+    const result = eleventyComputed.meta({
+      tags: ["pages", "news"],
+      schema_type: "organization",
+      title: "Test Post",
+      site,
+      page: { url: "/news/test-post/", date: new Date("2024-01-15") },
+    });
+    expect(result.published).toBe("2024-01-15");
+  });
+
   test("returns organization-shaped meta when schema_type is 'organization'", () => {
     const result = eleventyComputed.meta({
       schema_type: "organization",

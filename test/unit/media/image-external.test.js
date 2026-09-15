@@ -1,20 +1,17 @@
-import { describe, test } from "vitest";
-import { processExternalImage } from "#media/image-external.js";
-import { expectAsyncThrows } from "#test/test-utils.js";
+import { describe, expect, test } from "vitest";
+import { computeExternalImageHtml } from "#media/image-external.js";
 
 describe("image-external", () => {
-  describe("processExternalImage", () => {
-    test("throws when external URL cannot be fetched", async () => {
-      await expectAsyncThrows(() =>
-        processExternalImage({
-          src: "https://",
+  describe("computeExternalImageHtml", () => {
+    test("rejects an invalid external URL", async () => {
+      await expect(
+        computeExternalImageHtml({
+          imageName: "https://",
           alt: "Test image",
           loading: "lazy",
           classes: "featured",
-          returnElement: false,
-          document: null,
         }),
-      );
+      ).rejects.toMatchObject({ code: "ENOENT", path: "https://" });
     });
   });
 });

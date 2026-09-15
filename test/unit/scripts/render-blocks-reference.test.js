@@ -160,7 +160,9 @@ describe("block reference", () => {
     expect(rendered.body.textContent).toContain(
       "editor allowlist, not a runtime restriction",
     );
-  });
+    // Renders the entire reference document and parses it as Markdown,
+    // which can exceed the 1500ms default when lanes run in parallel.
+  }, 5000);
 
   test.each(
     COLLECTIONS,

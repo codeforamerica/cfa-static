@@ -134,11 +134,4 @@ const initSearch = () => {
 
 onReady(initSearch);
 
-export {
-  createSearchController,
-  handleSubmit,
-  initSearch,
-  loadPagefind,
-  readQueryParam,
-  renderResult,
-};
+export { createSearchController, initSearch, loadPagefind };

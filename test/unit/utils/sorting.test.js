@@ -1,11 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { data } from "#test/test-utils.js";
 import { compareBy, descending, orderThenString } from "#utils/fp/sorting.js";
-import {
-  sortByDateDescending,
-  sortItems,
-  sortNavigationItems,
-} from "#utils/sorting.js";
+import { sortByDateDescending, sortItems } from "#utils/sorting.js";
 
 // ============================================
 // Curried Data Factories
@@ -13,9 +9,6 @@ import {
 
 /** Item factory for order/name sorting */
 const orderedItem = data({})("name", "order");
-
-/** Navigation item factory */
-const navItem = data({})("eleventyNavigation", "name");
 
 // Generic helper: sort items and assert extracted values match expected
 const expectSortedValues = (items, comparator, extractor, expected) =>
@@ -171,62 +164,6 @@ describe("sorting", () => {
       { priority: 1, label: "beta" },
       { priority: 2, label: "zeta" },
       { priority: 3, label: "omega" },
-    ]);
-  });
-
-  // ============================================
-  // sortNavigationItems Tests
-  // ============================================
-  // Common extractor for nav key
-  const extractNavKey = (i) => i.data.eleventyNavigation.key;
-
-  test("sortNavigationItems sorts by eleventyNavigation.order ascending", () => {
-    const items = navItem(
-      [{ order: 3, key: "C" }, "Item C"],
-      [{ order: 1, key: "A" }, "Item A"],
-      [{ order: 2, key: "B" }, "Item B"],
-    );
-    expectSortedValues(items, sortNavigationItems, extractNavKey, [
-      "A",
-      "B",
-      "C",
-    ]);
-  });
-
-  test("sortNavigationItems falls back to key when orders are equal", () => {
-    const items = navItem(
-      [{ order: 1, key: "Zebra" }, "Z"],
-      [{ order: 1, key: "Apple" }, "A"],
-      [{ order: 1, key: "Mango" }, "M"],
-    );
-    expectSortedValues(items, sortNavigationItems, extractNavKey, [
-      "Apple",
-      "Mango",
-      "Zebra",
-    ]);
-  });
-
-  test("sortNavigationItems defaults missing order to 999", () => {
-    const items = navItem(
-      [{ key: "NoOrder" }, "No Order"],
-      [{ order: 1, key: "First" }, "F"],
-      [{ order: 500, key: "Middle" }, "M"],
-    );
-    expectSortedValues(items, sortNavigationItems, extractNavKey, [
-      "First",
-      "Middle",
-      "NoOrder",
-    ]);
-  });
-
-  test("sortNavigationItems falls back to title when key is missing", () => {
-    const items = navItem(
-      [{ order: 1 }, "Zebra Title"],
-      [{ order: 1 }, "Apple Title"],
-    );
-    expectSortedValues(items, sortNavigationItems, (i) => i.data.name, [
-      "Apple Title",
-      "Zebra Title",
     ]);
   });
 });

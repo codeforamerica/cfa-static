@@ -173,4 +173,4 @@ const configureHtmlTransform = (eleventyConfig, processAndWrapImage) => {
   );
 };
 
-export { configureHtmlTransform, createHtmlTransform };
+export { configureHtmlTransform };

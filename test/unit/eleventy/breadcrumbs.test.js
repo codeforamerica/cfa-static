@@ -182,19 +182,22 @@ describe("breadcrumbsFilter", () => {
     ]);
   });
 
-  test("derives URL from page URL for unknown navigation parent", () => {
+  test.each([
+    "Item",
+    "",
+  ])("derives the parent URL and retains the non-linked title %j", (title) => {
     const mockConfig = setupFilter();
     const crumbs = callFilter(
       mockConfig,
       { url: "/custom/item/" },
-      "Item",
+      title,
       "Custom Section",
     );
 
     expect(crumbs).toEqual([
       { label: "Home", url: "/" },
       { label: "Custom Section", url: "/custom/" },
-      { label: "Item", url: null },
+      { label: title, url: null },
     ]);
   });
 });

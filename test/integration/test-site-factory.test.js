@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { createTestSite, withSetupTestSite } from "#test/test-site-factory.js";
+import { describe, expect, test } from "vitest";
+import { useSharedSite, withSetupTestSite } from "#test/test-site-factory.js";
 import { expectAsyncThrows, rootDir } from "#test/test-utils.js";
 
 /** Minimal page file for tests that just need a valid site */
@@ -123,34 +123,30 @@ describe("test-site-factory", () => {
   // Tests that verify file manipulation (no build required)
   // =========================================================================
   describe("file manipulation methods", () => {
-    let site;
+    test("addFile adds a new file to the site", async () => {
+      await withSetupTestSite({ files: [MINIMAL_PAGE] }, (site) => {
+        site.addFile("test-file.txt", "Test content");
 
-    beforeAll(async () => {
-      site = await createTestSite({ files: [MINIMAL_PAGE] });
-    });
-
-    afterAll(() => site?.cleanup());
-
-    test("addFile adds a new file to the site", () => {
-      site.addFile("test-file.txt", "Test content");
-
-      const filePath = path.join(site.srcDir, "test-file.txt");
-      expect(fs.existsSync(filePath)).toBe(true);
-      expect(fs.readFileSync(filePath, "utf-8")).toBe("Test content");
-    });
-
-    test("addMarkdown adds a markdown file with frontmatter", () => {
-      site.addMarkdown("pages/added.md", {
-        frontmatter: { name: "Added Page" },
-        content: "# Added Content",
+        const filePath = path.join(site.srcDir, "test-file.txt");
+        expect(fs.existsSync(filePath)).toBe(true);
+        expect(fs.readFileSync(filePath, "utf-8")).toBe("Test content");
       });
+    });
 
-      const filePath = path.join(site.srcDir, "pages/added.md");
-      expect(fs.existsSync(filePath)).toBe(true);
+    test("addMarkdown adds a markdown file with frontmatter", async () => {
+      await withSetupTestSite({ files: [MINIMAL_PAGE] }, (site) => {
+        site.addMarkdown("pages/added.md", {
+          frontmatter: { name: "Added Page" },
+          content: "# Added Content",
+        });
 
-      const fileContent = fs.readFileSync(filePath, "utf-8");
-      expect(fileContent).toContain("name: Added Page");
-      expect(fileContent).toContain("# Added Content");
+        const filePath = path.join(site.srcDir, "pages/added.md");
+        expect(fs.existsSync(filePath)).toBe(true);
+
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        expect(fileContent).toContain("name: Added Page");
+        expect(fileContent).toContain("# Added Content");
+      });
     });
   });
 
@@ -158,47 +154,40 @@ describe("test-site-factory", () => {
   // Tests that verify site OUTPUT (shared build for efficiency)
   // =========================================================================
   describe("site output methods", () => {
-    let site;
-
-    beforeAll(async () => {
-      site = await createTestSite({
-        files: [
-          MINIMAL_PAGE,
-          {
-            path: "pages/test.md",
-            frontmatter: {
-              name: "Test Page",
-              permalink: "/test/",
-              blocks: [{ type: "markdown", content: "# Hello World" }],
-            },
-            content: "",
+    const getSite = useSharedSite({
+      files: [
+        MINIMAL_PAGE,
+        {
+          path: "pages/test.md",
+          frontmatter: {
+            name: "Test Page",
+            permalink: "/test/",
+            blocks: [{ type: "markdown", content: "# Hello World" }],
           },
-          {
-            path: "pages/about.md",
-            frontmatter: {
-              name: "About",
-              permalink: "/about/",
-              blocks: [{ type: "markdown", content: "About" }],
-            },
-            content: "",
+          content: "",
+        },
+        {
+          path: "pages/about.md",
+          frontmatter: {
+            name: "About",
+            permalink: "/about/",
+            blocks: [{ type: "markdown", content: "About" }],
           },
-        ],
-      });
-      await site.build();
-    }, 30_000);
-
-    afterAll(() => site?.cleanup());
+          content: "",
+        },
+      ],
+    });
 
     test("hasOutput returns true for existing files", () => {
-      expect(site.hasOutput("test/index.html")).toBe(true);
+      expect(getSite().hasOutput("test/index.html")).toBe(true);
     });
 
     test("hasOutput returns false for non-existing files", () => {
-      expect(site.hasOutput("nonexistent/file.html")).toBe(false);
+      expect(getSite().hasOutput("nonexistent/file.html")).toBe(false);
     });
 
     test("getDoc returns a DOM document for querying HTML", async () => {
-      const doc = await site.getDoc("test/index.html");
+      const doc = await getSite().getDoc("test/index.html");
 
       // Should return a document we can query
       expect(doc.querySelector("h1")).toBeTruthy();
@@ -207,7 +196,7 @@ describe("test-site-factory", () => {
     });
 
     test("listOutputFiles returns all output files recursively", () => {
-      const files = site.listOutputFiles();
+      const files = getSite().listOutputFiles();
 
       // Should list HTML files from the build
       expect(files.length).toBeGreaterThan(0);
@@ -216,7 +205,7 @@ describe("test-site-factory", () => {
 
     test("getOutput throws error when file does not exist", () => {
       expect(() => {
-        site.getOutput("nonexistent/file.html");
+        getSite().getOutput("nonexistent/file.html");
       }).toThrow("Output file not found: nonexistent/file.html");
     });
   });

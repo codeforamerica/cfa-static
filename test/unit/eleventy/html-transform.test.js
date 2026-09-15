@@ -1,8 +1,5 @@
 import { describe, expect, test } from "vitest";
-import {
-  configureHtmlTransform,
-  createHtmlTransform,
-} from "#eleventy/html-transform.js";
+import { configureHtmlTransform } from "#eleventy/html-transform.js";
 import { createMockEleventyConfig } from "#test/test-utils.js";
 
 describe("html-transform", () => {
@@ -17,47 +14,57 @@ describe("html-transform", () => {
     return `<div class="image-wrapper"><picture><img src="${options.imageName}"></picture></div>`;
   };
 
-  describe("createHtmlTransform", () => {
-    test("returns a function", () => {
-      const transform = createHtmlTransform(mockImageProcessor);
-      expect(typeof transform).toBe("function");
+  /**
+   * Run the HTML content through the PostHTML plugin registered by
+   * configureHtmlTransform for the given output path.
+   */
+  const runRegisteredTransform = (content, outputPath = "index.html") => {
+    const mockConfig = createMockEleventyConfig();
+    configureHtmlTransform(mockConfig, mockImageProcessor);
+    const runTree = mockConfig.htmlTransformer.plugins.html.plugin({
+      outputPath,
+    });
+    return runTree({ render: () => content, parser: (html) => html });
+  };
+
+  describe("registered transform", () => {
+    test("plugin factory returns a transform function", () => {
+      const mockConfig = createMockEleventyConfig();
+      configureHtmlTransform(mockConfig, mockImageProcessor);
+      const plugin = mockConfig.htmlTransformer.plugins.html.plugin;
+
+      expect(typeof plugin).toBe("function");
+      expect(typeof plugin({ outputPath: "index.html" })).toBe("function");
     });
 
     test("skips non-HTML files", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const content = "body { color: red; }";
-      const result = await transform(content, "style.css");
-      expect(result).toBe(content);
+      expect(await runRegisteredTransform(content, "style.css")).toBe(content);
     });
 
     test("returns empty content unchanged", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
-      expect(await transform("", "index.html")).toBe("");
-      expect(await transform(null, "index.html")).toBe(null);
+      expect(await runRegisteredTransform("", "index.html")).toBe("");
+      expect(await runRegisteredTransform(null, "index.html")).toBe(null);
     });
 
     test("returns content when outputPath is null", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const content = "<p>Test</p>";
-      const result = await transform(content, null);
-      expect(result).toBe(content);
+      expect(await runRegisteredTransform(content, null)).toBe(content);
     });
 
     test("linkifies URLs in text", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const html =
         "<html><body><p>Visit https://example.com today</p></body></html>";
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       expect(result).toContain('href="https://example.com"');
       expect(result).toContain(">example.com</a>");
     });
 
     test("leaves inline script bodies unescaped while linkifying", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const script = "<script>const f = (a) => a > 1 && a < 5;</script>";
       const html = `<html><body><p>Visit https://example.com</p>${script}</body></html>`;
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       expect(result).toContain(script);
       expect(result).not.toContain("&gt;");
@@ -65,19 +72,17 @@ describe("html-transform", () => {
     });
 
     test("leaves inline style bodies unescaped while linkifying", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const style = "<style>.parent > .child { color: red; }</style>";
       const html = `<html><body><p>Visit https://example.com</p>${style}</body></html>`;
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       expect(result).toContain(style);
       expect(result).not.toContain("&gt;");
     });
 
     test("linkifies and encrypts email addresses", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const html = "<html><body><p>Contact hello@example.com</p></body></html>";
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       expect(result).not.toContain("mailto:hello@example.com");
       expect(result).toContain("data-decrypt-link");
@@ -86,10 +91,9 @@ describe("html-transform", () => {
     });
 
     test("linkifies phone numbers with default config", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       // Valid 11-digit UK phone number
       const html = "<html><body><p>Call 01234 567 890</p></body></html>";
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       // Phone transform runs - default config may have phoneNumberLength=null (treated as 11)
       // Test that transform completes without error
@@ -97,39 +101,35 @@ describe("html-transform", () => {
     });
 
     test("wraps tables in scrollable containers", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const html =
         "<html><body><table><tr><td>Cell</td></tr></table></body></html>";
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       expect(result).toContain('class="scrollable-table"');
     });
 
     test("processes images with /images/ src", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const html =
         '<html><body><img src="/images/test.jpg" alt="Test"></body></html>';
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       expect(result).toContain('class="image-wrapper"');
     });
 
     test("preserves doctype declaration", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const html = "<!DOCTYPE html><html><body><p>Test</p></body></html>";
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       expect(result.startsWith("<!DOCTYPE html>")).toBe(true);
     });
 
     test("applies all transforms in correct order", async () => {
-      const transform = createHtmlTransform(mockImageProcessor);
       const html = `<html><body>
         <p>Visit https://example.com and email test@example.com</p>
         <table><tr><td>Data</td></tr></table>
         <img src="/images/photo.jpg" alt="Photo">
       </body></html>`;
-      const result = await transform(html, "index.html");
+      const result = await runRegisteredTransform(html, "index.html");
 
       // URLs linkified
       expect(result).toContain('href="https://example.com"');

@@ -80,7 +80,7 @@
   };
 
   function calculateAndSetSizes(img) {
-    const sizes = elemWidth(img) ?? elemWidth(img.parentElement);
+    const sizes = elemWidth(img) || elemWidth(img.parentElement);
     if (sizes) {
       img.sizes = sizes;
       for (const source of getSibblingSources(img)) {

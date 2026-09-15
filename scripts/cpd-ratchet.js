@@ -75,10 +75,6 @@ export const lowerMinTokens = (args) => {
 };
 
 /**
- * Read the config-driven default scan's minTokens out of .jscpd.json.
- * @returns {number}
- */
-/**
  * Validate and return a config's recorded minTokens threshold.
  * @param {{ minTokens?: unknown }} config - parsed .jscpd.json content
  * @returns {number}

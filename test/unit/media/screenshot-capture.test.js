@@ -1,10 +1,6 @@
 import { join } from "node:path";
 import { describe, expect, test, vi } from "vitest";
-import {
-  screenshot,
-  screenshotAllViewports,
-  takeScreenshotWithPlaywright,
-} from "#media/screenshot.js";
+import { screenshot, screenshotAllViewports } from "#media/screenshot.js";
 import { withTempDirAsync } from "#test/test-utils.js";
 
 const page = {
@@ -30,33 +26,31 @@ vi.mock("#media/browser-utils.js", async (importOriginal) => ({
   ensureBrowserInstalled: () => Promise.resolve(process.execPath),
 }));
 
-describe("takeScreenshotWithPlaywright", () => {
+describe("screenshot", () => {
   test("navigates and captures with the requested viewport", async () => {
     await withTempDirAsync("screenshot-capture", async (dir) => {
-      const outputPath = join(dir, "shots/page.png");
+      const result = await screenshot("/about/", {
+        outputDir: dir,
+        baseUrl: "http://localhost:9",
+        viewport: "mobile",
+        timeout: 1234,
+      });
 
-      const result = await takeScreenshotWithPlaywright(
-        "http://localhost:9/about/",
-        outputPath,
-        "mobile",
-        { timeout: 1234 },
-      );
-
-      expect(browser.newContext).toHaveBeenCalledWith(
+      expect(browser.newContext).toHaveBeenLastCalledWith(
         expect.objectContaining({ viewport: { width: 375, height: 667 } }),
       );
-      expect(page.goto).toHaveBeenCalledWith("http://localhost:9/about/", {
+      expect(page.goto).toHaveBeenLastCalledWith("http://localhost:9/about/", {
         waitUntil: "domcontentloaded",
         timeout: 1234,
       });
-      expect(page.screenshot).toHaveBeenCalledWith({
-        path: outputPath,
+      expect(page.screenshot).toHaveBeenLastCalledWith({
+        path: join(dir, "about-mobile.png"),
         fullPage: false,
       });
       expect(browser.close).toHaveBeenCalled();
       expect(result).toEqual({
         success: true,
-        path: outputPath,
+        path: join(dir, "about-mobile.png"),
         url: "http://localhost:9/about/",
         viewport: "mobile",
       });
@@ -65,30 +59,28 @@ describe("takeScreenshotWithPlaywright", () => {
 
   test("unknown viewports fall back to desktop, full-page captures fullPage", async () => {
     await withTempDirAsync("screenshot-fallback", async (dir) => {
-      await takeScreenshotWithPlaywright(
-        "http://localhost:9/",
-        join(dir, "a.png"),
-        "nonsense",
-        { timeout: 1 },
-      );
+      await screenshot("/", {
+        outputDir: dir,
+        baseUrl: "http://localhost:9",
+        viewport: "nonsense",
+        timeout: 1,
+      });
       expect(browser.newContext).toHaveBeenLastCalledWith(
         expect.objectContaining({ viewport: { width: 1280, height: 800 } }),
       );
 
-      await takeScreenshotWithPlaywright(
-        "http://localhost:9/",
-        join(dir, "b.png"),
-        "full-page",
-        { timeout: 1 },
-      );
+      await screenshot("/", {
+        outputDir: dir,
+        baseUrl: "http://localhost:9",
+        viewport: "full-page",
+        timeout: 1,
+      });
       expect(page.screenshot).toHaveBeenLastCalledWith(
         expect.objectContaining({ fullPage: true }),
       );
     });
   });
-});
 
-describe("screenshot", () => {
   test("builds the output path from the page path and viewport", async () => {
     await withTempDirAsync("screenshot-op", async (dir) => {
       const result = await screenshot("/news/first/", {

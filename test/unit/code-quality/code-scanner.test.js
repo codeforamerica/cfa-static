@@ -6,6 +6,7 @@ import {
   createPatternMatcher,
   expectNoStaleExceptions,
   expectScanResult,
+  extractExports,
   formatViolationReport,
   getBraceDepthChange,
   isCommentLine,
@@ -40,6 +41,23 @@ describe("code-scanner", () => {
   });
 
   describe("removeStrings", () => {
+    test("scans long lines without recursive stack growth", () => {
+      const code = "identifier;".repeat(10000);
+      expect(removeStrings(`${code}"${code}"${code}`)).toBe(`${code}${code}`);
+    });
+
+    test.each([
+      "'unfinished",
+      '"unfinished\\',
+      "`unfinished",
+    ])("drops unterminated string contents: %s", (literal) => {
+      expect(removeStrings(`prefix ${literal}`)).toBe("prefix ");
+    });
+
+    test("handles an escaped backslash before a closing quote", () => {
+      expect(removeStrings('"two\\\\" + outside')).toBe(" + outside");
+    });
+
     test("removes double-quoted strings", () => {
       expect(removeStrings('const x = "hello";')).toBe("const x = ;");
     });
@@ -89,6 +107,43 @@ describe("code-scanner", () => {
   });
 
   describe("createBraceDepthScanner", () => {
+    test("collects large scans in source order", () => {
+      const scanner = createBraceDepthScanner({ pattern: /target/ });
+      const source = `{\n${"target();\n".repeat(10000)}}`;
+      const results = scanner(source);
+      expect(results).toHaveLength(10000);
+      expect(results[0]).toEqual({
+        lineNumber: 2,
+        line: "target();",
+        braceDepth: 1,
+      });
+      expect(results.at(-1)).toEqual({
+        lineNumber: 10001,
+        line: "target();",
+        braceDepth: 1,
+      });
+    });
+
+    test("updates depth on skipped lines before scanning subsequent lines", () => {
+      const scanner = createBraceDepthScanner({
+        pattern: /target/,
+        skipLine: (line) => line.includes("skip"),
+      });
+      expect(scanner("skip {\ntarget();\nskip }\ntarget();")).toEqual([
+        { lineNumber: 2, line: "target();", braceDepth: 1 },
+      ]);
+    });
+
+    test("keeps tracking depth when extraction rejects a match", () => {
+      const scanner = createBraceDepthScanner({
+        pattern: /target/,
+        extractData: (_line, num, depth) => (num === 2 ? null : { depth }),
+      });
+      expect(scanner("{\ntarget {\ntarget();\n}\n}")).toEqual([
+        { lineNumber: 3, line: "target();", braceDepth: 2, depth: 2 },
+      ]);
+    });
+
     test("finds patterns at brace depth > 0", () => {
       const scanner = createBraceDepthScanner({ pattern: /memoize\(/ });
       const source = `const outer = () => {
@@ -117,6 +172,41 @@ describe("code-scanner", () => {
       const results = scanner(source);
       expect(results.length).toBe(1);
       expect(results[0].custom).toBe(5);
+    });
+  });
+
+  describe("extractExports", () => {
+    test.each([
+      "multiline list",
+      "declarations",
+    ])("collects every name in a large set of exports: %s", (form) => {
+      const names = Array.from({ length: 10000 }, (_, i) => `exported${i}`);
+      const source =
+        form === "multiline list"
+          ? `export {\n${names.join(",\n")}\n};`
+          : names.map((name) => `export const ${name} = 1;`).join("\n");
+      expect([...extractExports(source)]).toEqual(names);
+    });
+
+    test("preserves export order across declaration and list forms", () => {
+      const source = `export const first = 1;
+export { second,
+// ignored, }
+third as renamed,
+};
+export function fourth() {}
+export default fifth;
+export { first, sixth };
+export {
+unfinished,`;
+      expect([...extractExports(source)]).toEqual([
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+        "sixth",
+      ]);
     });
   });
 

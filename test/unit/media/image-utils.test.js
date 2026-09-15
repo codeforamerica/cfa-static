@@ -2,7 +2,6 @@ import { describe, expect, test } from "vitest";
 import {
   buildImageWrapperStyles,
   DEFAULT_IMAGE_OPTIONS,
-  getPathAwareBasename,
   normalizeImagePath,
   normalizeImageUrl,
   parseWidths,
@@ -111,34 +110,56 @@ describe("image-utils", () => {
         loading: "eager",
         classes: "featured",
       });
-      expect(imgAttributes.alt).toBe("A photo");
-      expect(imgAttributes.sizes).toBe("100vw");
-      expect(imgAttributes.loading).toBe("eager");
-      expect(imgAttributes.decoding).toBe("async");
-      expect(pictureAttributes.class).toBe("featured");
+      expect(imgAttributes).toEqual({
+        alt: "A photo",
+        sizes: "100vw",
+        loading: "eager",
+        decoding: "async",
+      });
+      expect(pictureAttributes).toEqual({ class: "featured" });
     });
 
     test("uses defaults for missing img values", () => {
       const { imgAttributes } = prepareImageAttributes({});
-      expect(imgAttributes.alt).toBe("");
-      expect(imgAttributes.loading).toBe("lazy");
-      expect(imgAttributes.decoding).toBe("async");
+      expect(imgAttributes).toEqual({
+        alt: "",
+        sizes: "auto",
+        loading: "lazy",
+        decoding: "async",
+      });
     });
 
-    test("returns empty picture attributes when classes is null", () => {
-      const { pictureAttributes } = prepareImageAttributes({
-        alt: "Photo",
-        classes: null,
-      });
-      expect(pictureAttributes).toEqual({});
+    test("preserves an explicitly null alt attribute", () => {
+      expect(
+        prepareImageAttributes({ alt: null }).imgAttributes.alt,
+      ).toBeNull();
     });
 
-    test("returns empty picture attributes when classes is empty string", () => {
-      const { pictureAttributes } = prepareImageAttributes({
-        alt: "Photo",
-        classes: "  ",
+    test.each([null, ""])("defaults empty sizes and loading (%j)", (value) => {
+      const { imgAttributes } = prepareImageAttributes({
+        sizes: value,
+        loading: value,
       });
-      expect(pictureAttributes).toEqual({});
+      expect(imgAttributes).toMatchObject({ sizes: "auto", loading: "lazy" });
+    });
+
+    test.each([
+      undefined,
+      null,
+      "",
+      "  ",
+      "\t\n",
+    ])("omits blank picture classes (%j)", (classes) => {
+      expect(prepareImageAttributes({ classes }).pictureAttributes).toEqual({});
+    });
+
+    test("preserves whitespace around nonblank picture classes", () => {
+      expect(
+        prepareImageAttributes({ classes: "  hero featured  " })
+          .pictureAttributes,
+      ).toEqual({
+        class: "  hero featured  ",
+      });
     });
   });
 
@@ -192,94 +213,25 @@ describe("image-utils", () => {
     });
   });
 
-  describe("getPathAwareBasename", () => {
-    test("extracts basename for images in root images folder", () => {
-      expect(getPathAwareBasename("./src/images/photo.jpg")).toBe("photo");
-    });
-
-    test("includes subdirectory in basename for nested images", () => {
-      expect(getPathAwareBasename("./src/images/products/photo.jpg")).toBe(
-        "products-photo",
-      );
-    });
-
-    test("handles multiple subdirectory levels", () => {
-      expect(
-        getPathAwareBasename("./src/images/products/featured/photo.jpg"),
-      ).toBe("products-featured-photo");
-    });
-
-    test("handles paths without ./ prefix", () => {
-      expect(getPathAwareBasename("src/images/products/photo.jpg")).toBe(
-        "products-photo",
-      );
-    });
-
-    test("handles paths starting with images/", () => {
-      expect(getPathAwareBasename("images/products/photo.jpg")).toBe(
-        "products-photo",
-      );
-    });
-
-    test("handles Windows-style backslashes", () => {
-      expect(getPathAwareBasename(".\\src\\images\\products\\photo.jpg")).toBe(
-        "products-photo",
-      );
-    });
-
-    test("preserves path for non-images directories", () => {
-      expect(getPathAwareBasename("./src/assets/icons/logo.png")).toBe(
-        "assets-icons-logo",
-      );
-    });
-
-    test("handles paths outside src directory", () => {
-      expect(getPathAwareBasename("/other/path/photo.jpg")).toBe(
-        "other-path-photo",
-      );
-    });
-
-    test("handles various image extensions", () => {
-      expect(getPathAwareBasename("./src/images/products/item.png")).toBe(
-        "products-item",
-      );
-      expect(getPathAwareBasename("./src/images/news/banner.webp")).toBe(
-        "news-banner",
-      );
-    });
-
-    test("strips .image-cache/ prefix from cropped images", () => {
-      expect(getPathAwareBasename(".image-cache/photo-crop-abc123.jpeg")).toBe(
-        "photo-crop-abc123",
-      );
-    });
-
-    test("strips image-cache/ prefix without leading dot", () => {
-      expect(getPathAwareBasename("image-cache/photo-crop-abc123.jpeg")).toBe(
-        "photo-crop-abc123",
-      );
-    });
-
-    test("strips .image-cache/ from absolute paths", () => {
-      expect(
-        getPathAwareBasename("/abs/path/.image-cache/photo-crop-abc123.jpeg"),
-      ).toBe("photo-crop-abc123");
-    });
-
-    test("strips .image-cache/ from paths with parent directory references", () => {
-      expect(
-        getPathAwareBasename("../.image-cache/photo-crop-abc123.jpeg"),
-      ).toBe("photo-crop-abc123");
-    });
-
-    test("strips .image-cache/ from paths with other prefixes", () => {
-      expect(
-        getPathAwareBasename("foo/.image-cache/photo-crop-abc123.jpeg"),
-      ).toBe("photo-crop-abc123");
-    });
-  });
-
   describe("filenameFormat", () => {
+    test.each([
+      ["src/images/products/photo.jpg", "products-photo-240.webp"],
+      ["images/products/photo.jpg", "products-photo-240.webp"],
+      [".\\src\\images\\products\\photo.jpg", "products-photo-240.webp"],
+      ["/other/path/photo.jpg", "other-path-photo-240.webp"],
+      ["./src/images/products/item.png", "products-item-240.webp"],
+      ["./src/images/news/banner.webp", "news-banner-240.webp"],
+      ["image-cache/photo-crop-abc123.jpeg", "photo-crop-abc123-240.webp"],
+      [
+        "/abs/path/.image-cache/photo-crop-abc123.jpeg",
+        "photo-crop-abc123-240.webp",
+      ],
+      ["../.image-cache/photo-crop-abc123.jpeg", "photo-crop-abc123-240.webp"],
+      ["foo/.image-cache/photo-crop-abc123.jpeg", "photo-crop-abc123-240.webp"],
+    ])("normalizes source path %s in the output filename", (src, expected) => {
+      expect(filenameFormat("id", src, 240, "webp")).toBe(expected);
+    });
+
     test("generates correct filename for root images", () => {
       expect(filenameFormat("id", "./src/images/photo.jpg", 240, "webp")).toBe(
         "photo-240.webp",

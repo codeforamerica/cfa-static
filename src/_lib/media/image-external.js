@@ -20,19 +20,18 @@ import {
 import { dedupeAsync, jsonKey } from "#utils/fp/memoize.js";
 import { slugify } from "#utils/slug-utils.js";
 
-/** @param {string} str */
-const shortHash = (str) =>
-  crypto.createHash("md5").update(str).digest("hex").slice(0, 8);
-
-/**
- * @param {string} _id
- * @param {string} _src
- * @param {number} width
- * @param {string} format
- * @param {{ slug: string }} options
- */
-const externalFilenameFormat = (_id, _src, width, format, options) =>
-  `${options.slug}-${width}.${format}`;
+const EXTERNAL_IMAGE_OPTIONS = {
+  ...DEFAULT_IMAGE_OPTIONS,
+  /**
+   * @param {string} _id
+   * @param {string} _src
+   * @param {number} width
+   * @param {string} format
+   * @param {{ slug: string }} options
+   */
+  filenameFormat: (_id, _src, width, format, options) =>
+    `${options.slug}-${width}.${format}`,
+};
 
 /**
  * Process an external image URL through eleventy-img into wrapped HTML.
@@ -66,11 +65,14 @@ const processExternal = dedupeAsync(
       classes,
     });
 
-    const filenameSlug = `${slugify(alt || "external-image")}-${shortHash(src)}`;
+    const urlHash = crypto
+      .createHash("md5")
+      .update(src)
+      .digest("hex")
+      .slice(0, 8);
     const imageOptions = {
-      ...DEFAULT_IMAGE_OPTIONS,
-      filenameFormat: externalFilenameFormat,
-      slug: filenameSlug,
+      ...EXTERNAL_IMAGE_OPTIONS,
+      slug: `${slugify(alt || "external-image")}-${urlHash}`,
     };
 
     const imageMetadata = await pipeline.processFormats(
