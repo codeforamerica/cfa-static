@@ -67,6 +67,7 @@ export const languageForUrl = (url, languages) => {
  * landmark, or a skip link with no text — bugs a screen reader meets long
  * before anyone sees them.
  */
+/* jscpd:ignore-start -- declaration data: required language field list */
 /** @type {Array<keyof import("#lib/types").Language>} */
 const REQUIRED_LANGUAGE_FIELDS = [
   "code",
@@ -79,6 +80,7 @@ const REQUIRED_LANGUAGE_FIELDS = [
   "skip_to_content_label",
   "search_label",
 ];
+/* jscpd:ignore-end */
 
 /**
  * What is wrong with the fields every language must declare, as messages, or

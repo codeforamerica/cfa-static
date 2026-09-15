@@ -20,12 +20,9 @@ Or with objects:
   (where page.stats = [{value: "99%", label: "Uptime"}, ...])
 {%- endcomment -%}
 
-{%- assign _items = items | default: block.items -%}
-{%- assign reveal = block.reveal | default: true -%}
-
-{%- unless items -%}{%- include "design-system/block-intro.html" -%}{%- endunless -%}
+{%- include "design-system/block-intro.html" -%}
 <dl class="stats">
-  {%- for item in _items -%}
+  {%- for item in items | default: block.items -%}
     {%- comment -%} Handle both "value|label" strings and {value, label} objects {%- endcomment -%}
     {%- if item.value -%}
       {%- assign value = item.value -%}
@@ -35,7 +32,7 @@ Or with objects:
       {%- assign value = parts[0] -%}
       {%- assign label = parts[1] -%}
     {%- endif -%}
-    <div class="stat"{% if reveal %} data-reveal{% endif %}>
+    <div class="stat"{% if block.reveal | default: true %} data-reveal{% endif %}>
       <dt>{{ label }}</dt>
       <dd><strong>{{ value }}</strong></dd>
     </div>

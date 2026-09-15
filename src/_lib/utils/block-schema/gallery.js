@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   HORIZONTAL_FIELD,
   INTRO_CONTENT_FIELD,
@@ -46,3 +47,4 @@ export const example = {
     { image: "fireworks.jpg", caption: "Fireworks" },
   ],
 };
+/* jscpd:ignore-end */

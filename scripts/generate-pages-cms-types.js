@@ -243,6 +243,7 @@ const extractAllTypes = (config) => {
   return output.interfaces;
 };
 
+/* jscpd:ignore-start -- declaration data: generated-file header */
 const FILE_HEADER = [
   "/**",
   " * @fileoverview Auto-generated PagesCMS types from .pages.yml",
@@ -256,6 +257,7 @@ const FILE_HEADER = [
   " */",
   "",
 ];
+/* jscpd:ignore-end */
 
 /**
  * Generate type declarations from PagesCMS YAML.

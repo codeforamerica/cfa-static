@@ -3,7 +3,11 @@ Renders the optional markdown intro for a block.
 
 Expects:
   block - the block frontmatter object
+  items - (optional) when truthy, the block is being embedded with an items
+          array, so the intro is skipped.
 {%- endcomment -%}
 {%- if block.intro_content -%}
-  <div class="prose">{{ block.intro_content | renderContent: "md" }}</div>
+  {%- unless items -%}
+    <div class="prose">{{ block.intro_content | renderContent: "md" }}</div>
+  {%- endunless -%}
 {%- endif -%}

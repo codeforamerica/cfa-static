@@ -49,18 +49,6 @@ const compareBy = (getKey) => (a, b) => {
 };
 
 /**
- * Reverse a comparator (flip ascending to descending or vice versa).
- *
- * @template T
- * @param {(a: T, b: T) => number} comparator - Comparator to reverse
- * @returns {(a: T, b: T) => number} Reversed comparator
- *
- * @example
- * const byAgeDesc = descending(compareBy(user => user.age));
- */
-const descending = (comparator) => (a, b) => comparator(b, a);
-
-/**
  * Factory function to create a comparator that sorts by numeric value first,
  * then by string value as a secondary sort key.
  * @template T
@@ -73,4 +61,4 @@ const orderThenString = (getNumeric, getString) => (a, b) => {
   return diff !== 0 ? diff : compareBy(getString)(a, b);
 };
 
-export { compareBy, descending, orderThenString };
+export { compareBy, compareStringKeys, orderThenString };

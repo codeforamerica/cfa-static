@@ -22,13 +22,11 @@ Usage:
   ]
 {%- endcomment -%}
 
-{%- assign reveal = block.reveal | default: true -%}
-
 {%- include "design-system/block-intro.html" -%}
 
 <ul class="items" role="list">
   {%- for item in block.items -%}
-  <li{% if reveal %} data-reveal{% endif %}>
+  <li{% if block.reveal | default: true %} data-reveal{% endif %}>
     {%- if item.image -%}
       {%- comment -%}
         With a link, the card's heading links the same place, so this one is

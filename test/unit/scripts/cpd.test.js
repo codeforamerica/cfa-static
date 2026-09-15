@@ -15,15 +15,19 @@ import {
   buildCpdFailureMessage,
   buildSourceExcerptLines,
   cpdMain,
+  describeCloneKind,
+  jscpdBinaryPath,
   loadCpdDuplicates,
   runCpd,
 } from "#scripts/cpd.js";
 import { lowerMinTokens, parseCpdArgs } from "#scripts/cpd-ratchet.js";
+import { installedJscpd, jscpdPaths } from "#scripts/jscpd/install.js";
 import { mockExitThrow, noop } from "#test/test-utils.js";
 
 const SAMPLE_DUPLICATE = {
   format: "javascript",
   lines: 7,
+  kind: "exact",
   firstFile: { name: "scripts/cpd-ratchet.js", start: 47, end: 53 },
   secondFile: { name: "scripts/cpd.js", start: 42, end: 48 },
   fragment: "throw new Error(...)",
@@ -56,12 +60,33 @@ describe("cpd failure guidance", () => {
   test("formats duplicate spans for the precommit summary", () => {
     const lines = buildCpdDuplicateLines(SAMPLE_DUPLICATE);
 
-    expect(lines).toContain("❌ Clone found (javascript, 7 lines)");
+    expect(lines).toContain("❌ Clone found (javascript, 7 lines, exact)");
     expect(lines).toContain("  scripts/cpd-ratchet.js: 47-53");
     expect(lines).toContain("  Duplicated lines:");
     expect(lines).toContain("  scripts/cpd.js: 42-48");
+    expect(lines).toContain("  Duplicated lines:");
     expect(lines).toContain("  Normalized duplicate fragment:");
     expect(lines).toContain("    throw new Error(...)");
+  });
+
+  test("describes renamed clones without a ratio", () => {
+    expect(describeCloneKind({ kind: "renamed" })).toBe("renamed");
+  });
+
+  test("describes gap-merged similar clones with their ratio", () => {
+    expect(
+      describeCloneKind({ kind: "similar", method: "gap", similarity: 0.91 }),
+    ).toBe("similar (gap) ~0.91");
+  });
+
+  test("describes AST-similar clones with their ratio", () => {
+    expect(
+      describeCloneKind({ kind: "similar", method: "ast", similarity: 1 }),
+    ).toBe("similar (ast) ~1.00");
+  });
+
+  test("defaults clones without a kind to exact", () => {
+    expect(describeCloneKind({})).toBe("exact");
   });
 
   test("loads numbered source excerpts from duplicate spans", () => {
@@ -150,6 +175,57 @@ describe("loadCpdDuplicates", () => {
 
 // These tests spawn a real jscpd via npx, which can take well over the
 // default timeout when the full suite's lanes load the machine.
+describe("jscpdBinaryPath", () => {
+  test("prefers JSCPD_BIN when set", () => {
+    const previous = process.env.JSCPD_BIN;
+    process.env.JSCPD_BIN = "/nix/store/jscpd/bin/jscpd";
+    try {
+      expect(jscpdBinaryPath()).toBe("/nix/store/jscpd/bin/jscpd");
+    } finally {
+      if (previous === undefined) delete process.env.JSCPD_BIN;
+      else process.env.JSCPD_BIN = previous;
+    }
+  });
+
+  test("uses the installed .bin/jscpd, else falls back to npx", () => {
+    const previous = process.env.JSCPD_BIN;
+    delete process.env.JSCPD_BIN;
+    try {
+      // The devenv stages .bin/jscpd locally; without it, npx (null) is the
+      // npm-binary fallback that GitHub Actions uses.
+      const resolved = jscpdBinaryPath();
+      if (installedJscpd()) {
+        expect(resolved).toBe(jscpdPaths.binaryPath);
+      } else {
+        expect(resolved).toBeNull();
+      }
+    } finally {
+      if (previous === undefined) delete process.env.JSCPD_BIN;
+      else process.env.JSCPD_BIN = previous;
+    }
+  });
+
+  test("falls back to the repo-local bin/jscpd when no installed binary applies", () => {
+    const binDir = join(ROOT_DIR, "bin");
+    const local = join(binDir, "jscpd");
+    const previous = process.env.JSCPD_BIN;
+    delete process.env.JSCPD_BIN;
+    try {
+      mkdirSync(binDir, { recursive: true });
+      writeFileSync(local, "");
+
+      expect(jscpdBinaryPath(false)).toBe(local);
+
+      rmSync(local, { force: true });
+      expect(jscpdBinaryPath(false)).toBeNull();
+    } finally {
+      rmSync(local, { force: true });
+      if (previous === undefined) delete process.env.JSCPD_BIN;
+      else process.env.JSCPD_BIN = previous;
+    }
+  });
+});
+
 describe("runCpd", () => {
   test("runs jscpd and returns its status", () => {
     expect(runCpd(["--version"], REPORT_PATH)).toBe(0);
@@ -236,14 +312,15 @@ describe("cpd-ratchet invocation parsing", () => {
 
   test("throws when no strict segment carries --min-tokens", () => {
     expect(() => parseCpdArgs("node scripts/cpd.js")).toThrow(
-      "Expected exactly one --min-tokens segment",
+      "Expected exactly one strict (--ignore-pattern, non-near) --min-tokens segment",
     );
   });
 
   test("throws when the strict segment is not a cpd.js invocation", () => {
-    expect(() => parseCpdArgs("jscpd src --min-tokens 18")).toThrow(
-      "no longer starts with",
-    );
+    // No --ignore-pattern, so this min-tokens segment is not the strict one.
+    expect(() =>
+      parseCpdArgs("jscpd src --min-tokens 18 --ignore-pattern 'import.*from'"),
+    ).toThrow("no longer starts with");
   });
 
   test("lowers only the min-tokens value", () => {

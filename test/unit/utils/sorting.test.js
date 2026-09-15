@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { data } from "#test/test-utils.js";
-import { compareBy, descending, orderThenString } from "#utils/fp/sorting.js";
+import { compareBy, orderThenString } from "#utils/fp/sorting.js";
 import { sortByDateDescending, sortItems } from "#utils/sorting.js";
 
 // ============================================
@@ -119,32 +119,8 @@ describe("sorting", () => {
   });
 
   // ============================================
-  // descending Tests
+  // orderThenString Tests
   // ============================================
-  test("descending reverses ascending comparator to sort descending", () => {
-    const items = [{ age: 10 }, { age: 30 }, { age: 20 }];
-    const byAgeAsc = compareBy((item) => item.age);
-    const byAgeDesc = descending(byAgeAsc);
-    const sorted = [...items].sort(byAgeDesc);
-    expect(sorted.map((i) => i.age)).toEqual([30, 20, 10]);
-  });
-
-  test("descending preserves 0 for equal values", () => {
-    const byValue = compareBy((item) => item.value);
-    const byValueDesc = descending(byValue);
-    const a = { value: 5 };
-    const b = { value: 5 };
-    expect(byValueDesc(a, b)).toBe(0);
-  });
-
-  test("descending can be applied to custom comparators", () => {
-    const byLength = (a, b) => a.length - b.length;
-    const byLengthDesc = descending(byLength);
-    const items = ["a", "aaa", "aa"];
-    const sorted = [...items].sort(byLengthDesc);
-    expect(sorted).toEqual(["aaa", "aa", "a"]);
-  });
-
   test("orderThenString sorts by numeric key then string key", () => {
     const items = [
       { priority: 2, label: "zeta" },

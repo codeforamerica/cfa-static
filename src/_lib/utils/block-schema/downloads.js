@@ -1,10 +1,9 @@
-/* jscpd:ignore-start */
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   INTRO_CONTENT_FIELD,
   objectList,
   str,
 } from "#utils/block-schema/shared.js";
-/* jscpd:ignore-end */
 
 export const type = "downloads";
 export const containerWidth = "narrow";
@@ -32,7 +31,6 @@ export const fields = {
   },
 };
 
-/* jscpd:ignore-start */
 export const docs = {
   summary:
     "List of downloadable files. Each item auto-detects its icon from the file extension and its size from the filesystem at build time.",
@@ -40,7 +38,6 @@ export const docs = {
   htmlRoot: '<ul class="downloads" role="list">',
   notes: FILE_RESOLUTION_NOTE,
 };
-/* jscpd:ignore-end */
 
 export const example = {
   type: "downloads",
@@ -49,3 +46,4 @@ export const example = {
     { file: "/files/template-overview.txt", label: "Template overview (TXT)" },
   ],
 };
+/* jscpd:ignore-end */

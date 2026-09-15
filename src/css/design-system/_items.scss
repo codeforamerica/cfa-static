@@ -1,7 +1,9 @@
+// jscpd:ignore-start -- shared @use import block
 @use "sass:math";
 @use "../variables" as *;
 @use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
+// jscpd:ignore-end
 
 // =============================================================================
 // ITEMS LIST (for list-item.html)
@@ -74,11 +76,8 @@
       flex-direction: column;
       gap: var(--item-gap);
 
-      border: $border-light;
-      border-radius: $radius-lg;
-
-      background: var(--color-card-bg);
-
+      @include box-border($radius-lg);
+      @include card-bg;
       @include card-hover;
 
       &.featured {
@@ -121,9 +120,7 @@
       @include product-card-typography;
 
       p:not(.price) {
-        @include body-sm;
-
-        color: var(--color-text-muted);
+        @include muted-body-sm;
       }
 
       // =======================================================================

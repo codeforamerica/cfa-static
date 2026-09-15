@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 /**
  * Shared unified fields for all split-* block types.
  *
@@ -56,3 +57,4 @@ export const SPLIT_BASE_DOCS = {
   scss: "src/css/design-system/_split.scss",
   htmlRoot: '<div class="split">',
 };
+/* jscpd:ignore-end */

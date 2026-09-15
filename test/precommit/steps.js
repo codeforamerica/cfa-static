@@ -91,8 +91,6 @@ export const getSteps = () => {
     { name: "knip", cmd: ["npm", "run", "knip"] },
     { name: "typecheck", cmd: ["npm", "run", "typecheck"] },
     { name: "typecheck:strict", cmd: ["npm", "run", "typecheck:strict"] },
-    { name: "cpd:fp", cmd: ["npm", "run", "cpd:fp"] },
-    { name: "cpd:design-system", cmd: ["npm", "run", "cpd:design-system"] },
     { name: "cpd", cmd: ["npm", "run", "cpd"] },
     { name: "cpd:ratchet", cmd: ["npm", "run", "cpd:ratchet"] },
     {

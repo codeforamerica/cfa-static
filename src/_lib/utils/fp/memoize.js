@@ -10,6 +10,21 @@ import { buildReverseIndex } from "#utils/fp/grouping.js";
 const DEFAULT_KEY_FN = (args) => /** @type {string | number} */ (args[0]);
 
 /**
+ * Store a computed value and return it. Shared by the memoizers so the
+ * store-and-return shape lives in one place while each keeps its own
+ * concrete Map/WeakMap guard (which lets TypeScript narrow has()/get()).
+ * @template V
+ * @param {Map<any, V> | WeakMap<any, V>} cache
+ * @param {any} key
+ * @param {V} result
+ * @returns {V}
+ */
+const computeAndStore = (cache, key, result) => {
+  cache.set(key, result);
+  return result;
+};
+
+/**
  * Memoize a function with optional custom cache key.
  *
  * IMPORTANT: This uses a Map that grows indefinitely during a build.
@@ -28,10 +43,7 @@ const memoize = (fn, options = {}) => {
   return (...args) => {
     const key = keyFn(args);
     if (cache.has(key)) return cache.get(key);
-
-    const result = fn(...args);
-    cache.set(key, result);
-    return result;
+    return computeAndStore(cache, key, fn(...args));
   };
 };
 
@@ -45,12 +57,10 @@ const memoize = (fn, options = {}) => {
 const memoizeByRef = (buildFn) => {
   const cache = new WeakMap();
   return (arr) => {
-    // Check key presence, not truthiness: a falsy buildFn result
-    // (0, null, false, ...) is still a cached value
+    // Check key presence, not truthiness: a falsy buildFn result (0, null,
+    // false, ...) is still a cached value.
     if (cache.has(arr)) return cache.get(arr);
-    const result = buildFn(arr);
-    cache.set(arr, result);
-    return result;
+    return computeAndStore(cache, arr, buildFn(arr));
   };
 };
 
@@ -174,11 +184,4 @@ const dedupeAsync = (fn, { cacheKey = DEFAULT_KEY_FN } = {}) => {
       .get(cacheKey(args));
 };
 
-export {
-  dedupeAsync,
-  groupByWithCache,
-  indexBy,
-  jsonKey,
-  memoize,
-  memoizeByRef,
-};
+export { dedupeAsync, groupByWithCache, indexBy, jsonKey, memoize };

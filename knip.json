@@ -16,12 +16,20 @@
 	"ignore": [],
 	"ignoreDependencies": [
 		"@biomejs/biome",
+		"jscpd",
 		"pagefind",
 		"postcss-scss",
 		"zod"
 	],
 	"ignoreBinaries": [],
 	"ignoreExportsUsedInFile": true,
+	// withSchemaBreadcrumbs / withSchemaLanguage are registered as Eleventy
+	// filters via registerFilters (src/_lib/eleventy/register.js); knip
+	// cannot trace the map-form registration the way it traced
+	// addFilter("name", fn), so its exports are reported as unused here.
+	"ignoreIssues": {
+		"src/_lib/eleventy/breadcrumbs.js": ["exports"]
+	},
 	"rules": {},
 	"eleventy": false
 }

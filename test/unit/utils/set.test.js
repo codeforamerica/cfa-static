@@ -2,7 +2,7 @@
  * Tests for frozen set utilities
  */
 import { describe, expect, test, vi } from "vitest";
-import { frozenSet, frozenSetFrom, setHas, setLacks } from "#utils/fp/set.js";
+import { frozenSet, frozenSetFrom, setLacks } from "#utils/fp/set.js";
 
 const expectHasAB = (set) => {
   expect(set.has("a")).toBe(true);
@@ -129,33 +129,6 @@ describe("frozenSetFrom", () => {
     expect(set.has("y")).toBe(true);
     expect(set.has("z")).toBe(true);
     expect(set.size).toBe(3);
-  });
-});
-
-describe("setHas", () => {
-  test("returns membership predicate function", () => {
-    const set = frozenSet(["read", "write", "delete"]);
-    const isAllowed = setHas(set);
-
-    expect(isAllowed("read")).toBe(true);
-    expect(isAllowed("write")).toBe(true);
-    expect(isAllowed("admin")).toBe(false);
-  });
-
-  test("works with filter", () => {
-    const VALID = frozenSet(["a", "b", "c"]);
-    const items = ["a", "x", "b", "y", "c"];
-
-    const filtered = items.filter(setHas(VALID));
-
-    expect(filtered).toEqual(["a", "b", "c"]);
-  });
-
-  test("works with regular (non-frozen) sets", () => {
-    const hasValue = setHas(new Set([1, 2, 3]));
-
-    expect(hasValue(1)).toBe(true);
-    expect(hasValue(4)).toBe(false);
   });
 });
 

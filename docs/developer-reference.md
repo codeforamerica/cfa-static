@@ -21,9 +21,7 @@ Every declared npm script is listed below in package order. Values are the exact
 | `npm run test:integration` | `vitest run test/integration` |
 | `npm run typecheck` | `tsc --noEmit --incremental --tsBuildInfoFile tsconfig.tsbuildinfo` |
 | `npm run typecheck:strict` | `node scripts/strict-typecheck-ratchet.js` |
-| `npm run cpd:fp` | `jscpd src/_lib/utils/fp --min-tokens 12` |
-| `npm run cpd:design-system` | `jscpd src/css/design-system --min-tokens 17` |
-| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 17 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from'` |
+| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 17 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from' --max-gap-lines 3 --ignore-case && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 32 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from' --max-gap-lines 3 --ignore-identifiers --ignore-literals --similarity 0.85 && node scripts/cpd.js src/_lib/utils/fp --min-tokens 12 --max-gap-lines 3 && node scripts/cpd.js src/css/design-system --min-tokens 16 --max-gap-lines 3` |
 | `npm run cpd:ratchet` | `node scripts/cpd-ratchet.js` |
 | `npm run knip` | `knip` |
 | `npm run knip:fix` | `knip --fix` |
@@ -203,26 +201,24 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [`compact`](../src/_lib/utils/fp/array.js#L206) | Remove falsy values from an array |
-| [`exclude`](../src/_lib/utils/fp/array.js#L309) | Filter out items that are in the exclusion list. Shorthand for filter(notMemberOf(values)). |
+| [`compact`](../src/_lib/utils/fp/array.js#L196) | Remove falsy values from an array |
+| [`exclude`](../src/_lib/utils/fp/array.js#L276) | Filter out items that are in the exclusion list. Shorthand for filter(notMemberOf(values)). |
 | [`filter`](../src/_lib/utils/fp/array.js#L52) | Curried filter function |
-| [`filterMap`](../src/_lib/utils/fp/array.js#L172) | Filter and map in a single pass (curried) |
-| [`findDuplicate`](../src/_lib/utils/fp/array.js#L226) | Find the first duplicate item in an array |
+| [`filterMap`](../src/_lib/utils/fp/array.js#L162) | Filter and map in a single pass (curried) |
 | [`flatMap`](../src/_lib/utils/fp/array.js#L68) | Curried flatMap function |
-| [`join`](../src/_lib/utils/fp/array.js#L140) | Curried join function |
+| [`join`](../src/_lib/utils/fp/array.js#L130) | Curried join function |
 | [`map`](../src/_lib/utils/fp/array.js#L60) | Curried map function |
-| [`mapAsync`](../src/_lib/utils/fp/array.js#L330) | Async map with Promise.all (curried) |
-| [`memberOf`](../src/_lib/utils/fp/array.js#L270) | Create a membership predicate |
-| [`notMemberOf`](../src/_lib/utils/fp/array.js#L289) | Create a negated membership predicate |
-| [`pick`](../src/_lib/utils/fp/array.js#L188) | Create a picker function for the specified keys (curried form) |
+| [`mapAsync`](../src/_lib/utils/fp/array.js#L297) | Async map with Promise.all (curried) |
+| [`memberOf`](../src/_lib/utils/fp/array.js#L237) | Create a membership predicate |
+| [`notMemberOf`](../src/_lib/utils/fp/array.js#L256) | Create a negated membership predicate |
+| [`pick`](../src/_lib/utils/fp/array.js#L178) | Create a picker function for the specified keys (curried form) |
 | [`pipe`](../src/_lib/utils/fp/array.js#L30) | Left-to-right function composition |
-| [`pluralize`](../src/_lib/utils/fp/array.js#L359) | Create a pluralization formatter. Curried: (singular, plural?) => (count) => string |
+| [`pluralize`](../src/_lib/utils/fp/array.js#L326) | Create a pluralization formatter. Curried: (singular, plural?) => (count) => string |
 | [`reduce`](../src/_lib/utils/fp/array.js#L77) | Curried reduce function |
 | [`sort`](../src/_lib/utils/fp/array.js#L85) | Non-mutating sort function |
 | [`sortBy`](../src/_lib/utils/fp/array.js#L105) | Sort by a property or getter function. Auto-detects type: uses localeCompare for strings, subtraction for numbers. |
-| [`split`](../src/_lib/utils/fp/array.js#L147) | Curried split function |
+| [`split`](../src/_lib/utils/fp/array.js#L137) | Curried split function |
 | [`unique`](../src/_lib/utils/fp/array.js#L123) | Remove duplicate values |
-| [`uniqueBy`](../src/_lib/utils/fp/array.js#L131) | Remove duplicates by key extraction function |
 
 ### `#utils/fp/grouping.js`
 
@@ -230,10 +226,7 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [`buildFirstOccurrenceLookup`](../src/_lib/utils/fp/grouping.js#L95) | Build a first-occurrence-wins lookup from items |
-| [`buildReverseIndex`](../src/_lib/utils/fp/grouping.js#L46) | Build a reverse index from items to keys (many-to-many relationship) |
-| [`groupBy`](../src/_lib/utils/fp/grouping.js#L114) | Group items by a single key (one-to-many relationship) |
-| [`groupValuesBy`](../src/_lib/utils/fp/grouping.js#L69) | Group values by key with deduplication |
+| [`buildReverseIndex`](../src/_lib/utils/fp/grouping.js#L59) | Build a reverse index from items to keys (many-to-many relationship) |
 
 ### `#utils/fp/memoize.js`
 
@@ -241,12 +234,11 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [`dedupeAsync`](../src/_lib/utils/fp/memoize.js#L165) | Deduplicate concurrent async calls by key. |
-| [`groupByWithCache`](../src/_lib/utils/fp/memoize.js#L136) | Create a grouper that builds and caches a reverse index for arrays. |
-| [`indexBy`](../src/_lib/utils/fp/memoize.js#L104) | No adjacent JSDoc summary; see source. |
-| [`jsonKey`](../src/_lib/utils/fp/memoize.js#L145) | Generate a cache key from function arguments by JSON stringifying them. Useful for memoizing functions that take object arguments. |
-| [`memoize`](../src/_lib/utils/fp/memoize.js#L23) | Memoize a function with optional custom cache key. |
-| [`memoizeByRef`](../src/_lib/utils/fp/memoize.js#L45) | Create a cached function using WeakMap for object identity caching. The result is cached per array reference, allowing garbage collection. |
+| [`dedupeAsync`](../src/_lib/utils/fp/memoize.js#L175) | Deduplicate concurrent async calls by key. |
+| [`groupByWithCache`](../src/_lib/utils/fp/memoize.js#L146) | Create a grouper that builds and caches a reverse index for arrays. |
+| [`indexBy`](../src/_lib/utils/fp/memoize.js#L114) | No adjacent JSDoc summary; see source. |
+| [`jsonKey`](../src/_lib/utils/fp/memoize.js#L155) | Generate a cache key from function arguments by JSON stringifying them. Useful for memoizing functions that take object arguments. |
+| [`memoize`](../src/_lib/utils/fp/memoize.js#L38) | Memoize a function with optional custom cache key. |
 
 ### `#utils/fp/object.js`
 
@@ -255,15 +247,12 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 | Export | JSDoc Summary |
 | --- | --- |
 | [`filterObject`](../src/_lib/utils/fp/object.js#L61) | Curried object filtering -> returns new object |
-| [`fromPairs`](../src/_lib/utils/fp/object.js#L139) | Build an object directly from an array of \[key, value\] pairs |
-| [`frozenObject`](../src/_lib/utils/fp/object.js#L191) | Create a frozen (shallowly immutable) object from key-value pairs |
-| [`mapBoth`](../src/_lib/utils/fp/object.js#L72) | Transform both key and value with the same function |
+| [`fromPairs`](../src/_lib/utils/fp/object.js#L118) | Build an object directly from an array of \[key, value\] pairs |
+| [`frozenObject`](../src/_lib/utils/fp/object.js#L163) | Create a frozen (shallowly immutable) object from key-value pairs |
 | [`mapEntries`](../src/_lib/utils/fp/object.js#L19) | Curried map over entries -> returns array |
 | [`mapObject`](../src/_lib/utils/fp/object.js#L42) | Curried object transformation -> returns new object Callback must return \[newKey, newValue\] tuple |
-| [`omit`](../src/_lib/utils/fp/object.js#L146) | Create a curried function that omits specified keys from an object. |
-| [`pickNonNull`](../src/_lib/utils/fp/object.js#L93) | Keep only entries with non-null values (keeps false, 0, '', etc.) Useful for config merging where null means "use default" |
-| [`pickTruthy`](../src/_lib/utils/fp/object.js#L82) | Keep only entries with truthy values |
-| [`toObject`](../src/_lib/utils/fp/object.js#L117) | Build an object from an array by extracting key-value pairs |
+| [`pickNonNull`](../src/_lib/utils/fp/object.js#L72) | Keep only entries with non-null values (keeps false, 0, '', etc.) Useful for config merging where null means "use default" |
+| [`toObject`](../src/_lib/utils/fp/object.js#L96) | Build an object from an array by extracting key-value pairs |
 
 ### `#utils/fp/set.js`
 
@@ -273,8 +262,7 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 | --- | --- |
 | [`frozenSet`](../src/_lib/utils/fp/set.js#L148) | Create a frozen (immutable) Set from values |
 | [`frozenSetFrom`](../src/_lib/utils/fp/set.js#L128) | Create a frozen Set from any iterable |
-| [`setHas`](../src/_lib/utils/fp/set.js#L167) | Create a membership predicate using a Set for O(1) lookups |
-| [`setLacks`](../src/_lib/utils/fp/set.js#L182) | Create a negated membership predicate using a Set for O(1) lookups |
+| [`setLacks`](../src/_lib/utils/fp/set.js#L163) | Create a negated membership predicate using a Set for O(1) lookups |
 
 ### `#utils/fp/sorting.js`
 
@@ -283,8 +271,8 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 | Export | JSDoc Summary |
 | --- | --- |
 | [`compareBy`](../src/_lib/utils/fp/sorting.js#L43) | Create a comparator from a key-extraction function. Auto-detects type: uses localeCompare for strings, subtraction for numbers. |
-| [`descending`](../src/_lib/utils/fp/sorting.js#L61) | Reverse a comparator (flip ascending to descending or vice versa). |
-| [`orderThenString`](../src/_lib/utils/fp/sorting.js#L71) | Factory function to create a comparator that sorts by numeric value first, then by string value as a secondary sort key. |
+| [`compareStringKeys`](../src/_lib/utils/fp/sorting.js#L11) | Compare two string keys using locale comparison. |
+| [`orderThenString`](../src/_lib/utils/fp/sorting.js#L59) | Factory function to create a comparator that sorts by numeric value first, then by string value as a secondary sort key. |
 
 ## Theme Source Tokens
 

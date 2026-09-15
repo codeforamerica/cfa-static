@@ -9,7 +9,16 @@
  * implementation, if nothing else uses it) instead of allowlisting.
  */
 import { describe, expect, test } from "vitest";
+import { configureGuides } from "#collections/guides.js";
+import { configureNavigation } from "#collections/navigation.js";
+import { configureBlocks } from "#eleventy/blocks.js";
+import { configureBreadcrumbs } from "#eleventy/breadcrumbs.js";
+import { configureCollectionLookup } from "#eleventy/collection-lookup.js";
+import { configureFileUtils } from "#eleventy/file-utils.js";
 import { configureFilters } from "#eleventy/filters.js";
+import { configureStyleBundle } from "#eleventy/style-bundle.js";
+import { configureIconify } from "#media/iconify.js";
+import { configureImages } from "#media/image.js";
 import { readSource } from "#test/code-scanner.js";
 import {
   createExtractor,
@@ -21,11 +30,37 @@ import { unique } from "#utils/fp/array.js";
 const REGISTRATION_PATTERN =
   /\.add(?:Async)?(?:Filter|Shortcode)\(\s*\n?\s*"([^"]+)"/g;
 
-const registeredNames = () => {
+/** Every configure* module, so the helper-registered maps are seen too. */
+const CONFIGURE_MODULES = [
+  configureBlocks,
+  configureBreadcrumbs,
+  configureCollectionLookup,
+  configureFileUtils,
+  configureFilters,
+  configureGuides,
+  configureIconify,
+  configureImages,
+  configureNavigation,
+  configureStyleBundle,
+];
+
+const REGISTRATION_MAPS = [
+  "filters",
+  "asyncFilters",
+  "shortcodes",
+  "asyncShortcodes",
+];
+
+const registeredNames = async () => {
   const mockConfig = createMockEleventyConfig();
-  configureFilters(mockConfig);
+  await Promise.all(
+    CONFIGURE_MODULES.map((configure) => configure(mockConfig)),
+  );
+  const fromConfig = REGISTRATION_MAPS.flatMap((map) =>
+    Object.keys(mockConfig[map] || {}),
+  );
   return unique([
-    ...Object.keys(mockConfig.filters),
+    ...fromConfig,
     ...createExtractor(REGISTRATION_PATTERN)(getFiles(/^src\/.*\.js$/)),
   ]);
 };
@@ -39,8 +74,8 @@ describe("unused-filters", () => {
     .map(readSource)
     .join("\n");
 
-  test("every registered filter and shortcode is used by a template", () => {
-    const unused = registeredNames().filter(
+  test("every registered filter and shortcode is used by a template", async () => {
+    const unused = (await registeredNames()).filter(
       (name) => !usagePattern(name).test(templates),
     );
 
@@ -51,8 +86,8 @@ describe("unused-filters", () => {
     ).toEqual([]);
   });
 
-  test("the scan sees known-good registrations and templates", () => {
-    const names = registeredNames();
+  test("the scan sees known-good registrations and templates", async () => {
+    const names = await registeredNames();
     for (const name of ["cacheBust", "image", "toNavigation", "getBySlug"]) {
       expect(names).toContain(name);
     }

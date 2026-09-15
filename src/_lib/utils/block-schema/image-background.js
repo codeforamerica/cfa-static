@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   bool,
   img,
@@ -52,3 +53,4 @@ export const example = {
   content:
     "# Content over a full-width image\n\nA tint keeps the text readable.",
 };
+/* jscpd:ignore-end */

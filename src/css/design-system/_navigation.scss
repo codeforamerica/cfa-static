@@ -1,7 +1,9 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
 @use "../nav-mixins" as nav;
+// jscpd:ignore-end
 
 // =============================================================================
 // NAVIGATION

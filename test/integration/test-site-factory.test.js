@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { useSharedSite, withSetupTestSite } from "#test/test-site-factory.js";
-import { expectAsyncThrows, rootDir } from "#test/test-utils.js";
+import { createTempDir, expectAsyncThrows } from "#test/test-utils.js";
 
 /** Minimal page file for tests that just need a valid site */
 const MINIMAL_PAGE = {
@@ -90,7 +90,13 @@ describe("test-site-factory", () => {
     });
 
     const withTempTestImage = async (filename, dest, fn) => {
-      const testImagePath = path.join(rootDir, filename);
+      // Keep the source image in a temp dir, never the repo root: the
+      // findFiles walker stats every root entry from parallel workers, so a
+      // transient root-level file causes collection-time ENOENT races.
+      const testImagePath = path.join(
+        createTempDir("site-factory-image"),
+        filename,
+      );
       fs.writeFileSync(testImagePath, "fake image content");
       try {
         await withSetupTestSite(
@@ -98,7 +104,10 @@ describe("test-site-factory", () => {
           fn,
         );
       } finally {
-        fs.unlinkSync(testImagePath);
+        fs.rmSync(path.dirname(testImagePath), {
+          recursive: true,
+          force: true,
+        });
       }
     };
 

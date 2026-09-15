@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 export const type = "news-meta";
 
 export const collections = ["news"];
@@ -13,3 +14,4 @@ export const docs = {
 export const example = {
   type: "news-meta",
 };
+/* jscpd:ignore-end */

@@ -1,4 +1,7 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
+@use "../mixins" as *;
+// jscpd:ignore-end
 
 // =============================================================================
 // TABLE OF CONTENTS
@@ -21,9 +24,7 @@
     }
 
     ol {
-      display: flex;
-      flex-direction: column;
-      gap: $space-xs;
+      @include flex-col($space-xs);
 
       margin-block: 0;
       padding-inline-start: $space-lg;

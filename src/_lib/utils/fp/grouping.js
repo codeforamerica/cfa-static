@@ -2,8 +2,7 @@
  * Functional grouping utilities for building indices and lookups
  */
 
-import { filter, flatMap, pipe, reduce } from "#utils/fp/array.js";
-import { fromPairs } from "#utils/fp/object.js";
+import { flatMap, pipe, reduce } from "#utils/fp/array.js";
 
 /**
  * Append item to array at key in Map, creating array if needed
@@ -27,6 +26,20 @@ const appendToMap = (map, [key, item]) =>
 const collectToMap = (pairs) => reduce(appendToMap, new Map())(pairs);
 
 /**
+ * Curried collector: turn items into [key, item] pairs, then group them
+ * into a Map.
+ * @template T
+ * @template K
+ * @param {(item: T) => Iterable<[K, T]>} toPairs - Pair extraction function
+ * @returns {(items: T[]) => Map<K, T[]>} Grouping function
+ */
+const collectBy = (toPairs) =>
+  pipe(
+    flatMap((item) => [...toPairs(item)]),
+    collectToMap,
+  );
+
+/**
  * Build a reverse index from items to keys (many-to-many relationship)
  *
  * Each item can map to multiple keys via the getKeys function.
@@ -44,83 +57,6 @@ const collectToMap = (pairs) => reduce(appendToMap, new Map())(pairs);
  * const widgetProducts = index.get("widgets") ?? [];
  */
 const buildReverseIndex = (items, getKeys) =>
-  pipe(
-    flatMap((item) => getKeys(item).map((key) => [key, item])),
-    collectToMap,
-  )(items);
+  collectBy((item) => getKeys(item).map((key) => [key, item]))(items);
 
-/**
- * Group values by key with deduplication
- *
- * Takes an array of (key, value) pairs and groups unique values by key.
- * Returns a Map where each key points to an array of unique values.
- *
- * @template K
- * @template V
- * @param {[K, V][]} pairs - Array of [key, value] pairs
- * @returns {Map<K, V[]>} Map from key to unique values
- *
- * @example
- * // Group attribute values by attribute name
- * const pairs = [["size", "small"], ["size", "large"], ["size", "small"]];
- * const grouped = groupValuesBy(pairs);
- * // Map { "size" => ["small", "large"] }
- */
-const groupValuesBy = (pairs) => {
-  const grouped = collectToMap(pairs);
-  return new Map([...grouped].map(([k, v]) => [k, [...new Set(v)]]));
-};
-
-/**
- * Build a first-occurrence-wins lookup from items
- *
- * Extracts (key, value) pairs from items and builds a lookup object
- * where only the first occurrence of each key is kept.
- *
- * Uses reverse + fromPairs: reversing makes the first occurrence end up
- * last, so it overwrites any later occurrences when building the object.
- *
- * @template T
- * @template V
- * @param {T[]} items - Array of items to process
- * @param {(item: T) => [string, V][]} getPairs - Function that extracts [[key, value], ...] pairs from each item
- * @returns {Record<string, V>} Lookup object with first occurrence of each key
- *
- * @example
- * // Build slug -> display text lookup
- * const lookup = buildFirstOccurrenceLookup(items, (item) =>
- *   item.attrs.flatMap(a => [[slugify(a.name), a.name], [slugify(a.value), a.value]])
- * );
- */
-const buildFirstOccurrenceLookup = (items, getPairs) =>
-  fromPairs(items.flatMap(getPairs).reverse());
-
-/**
- * Group items by a single key (one-to-many relationship)
- *
- * Each item maps to exactly one key. Simpler version of buildReverseIndex
- * for when items don't have multiple keys.
- *
- * @template T
- * @template K
- * @param {T[]} items - Array of items to group
- * @param {(item: T) => K | null | undefined} getKey - Function that extracts a single key from each item
- * @returns {Map<K, T[]>} Map from key to array of items
- *
- * @example
- * // Group events by date
- * const byDate = groupBy(events, (e) => e.data.event_date);
- */
-const groupBy = (items, getKey) =>
-  pipe(
-    filter((item) => getKey(item) != null),
-    flatMap((item) => [[getKey(item), item]]),
-    collectToMap,
-  )(items);
-
-export {
-  buildFirstOccurrenceLookup,
-  buildReverseIndex,
-  groupBy,
-  groupValuesBy,
-};
+export { buildReverseIndex };

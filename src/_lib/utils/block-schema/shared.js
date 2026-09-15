@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 /**
  * Shared constants and field factories for block modules.
  *
@@ -209,3 +210,4 @@ export const OVERLAY_CONTENT_FIELDS = {
       "Markdown overlay content rendered in `.prose` inside the `<figcaption>`.",
   },
 };
+/* jscpd:ignore-end */

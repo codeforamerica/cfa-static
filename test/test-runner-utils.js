@@ -188,12 +188,6 @@ export const COMMON_STEPS = {
     cmd: "npm",
     args: ["run", "typecheck:strict"],
   },
-  cpdFp: { name: "cpd:fp", cmd: "npm", args: ["run", "cpd:fp"] },
-  cpdDesignSystem: {
-    name: "cpd:design-system",
-    cmd: "npm",
-    args: ["run", "cpd:design-system"],
-  },
   cpd: { name: "cpd", cmd: "npm", args: ["run", "cpd"] },
   cpdRatchet: { name: "cpd:ratchet", cmd: "npm", args: ["run", "cpd:ratchet"] },
   knip: { name: "knip", cmd: "npm", args: ["run", "knip"] },

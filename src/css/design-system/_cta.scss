@@ -1,5 +1,7 @@
+// jscpd:ignore-start -- shared @use import block
 @use "../variables" as *;
 @use "../mixins" as *;
+// jscpd:ignore-end
 
 // =============================================================================
 // CTA
@@ -7,7 +9,7 @@
 
 .design-system {
   .cta {
-    @include flex-col($space-lg, center, center);
+    @include centered-col;
 
     border: none;
     text-align: center;
@@ -17,9 +19,8 @@
     @include contrast-text-vars;
 
     p {
-      @include body-lg;
+      @include lead-paragraph;
 
-      max-width: $width-narrow;
       margin-right: auto;
       margin-left: auto;
       opacity: 0.9;
@@ -34,10 +35,7 @@
       border-color: var(--color-contrast-text);
       color: var(--color-contrast-text);
 
-      &:hover {
-        color: var(--color-link);
-        background: var(--color-contrast-text);
-      }
+      @include contrast-button-hover;
     }
   }
 }

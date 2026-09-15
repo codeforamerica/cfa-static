@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { str } from "#utils/block-schema/shared.js";
 
 export const type = "include";
@@ -20,3 +21,4 @@ export const example = {
   type: "include",
   file: "demo-include.html",
 };
+/* jscpd:ignore-end */

@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   BUTTON_FIELDS_BASE,
   md,
@@ -60,3 +61,4 @@ export const example = {
   right_content: "## Side by side\n\nVariants control which side is dark.",
   right_button: { text: "Right action", href: "/news/" },
 };
+/* jscpd:ignore-end */

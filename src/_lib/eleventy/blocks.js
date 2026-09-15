@@ -1,3 +1,4 @@
+import { registerFilters } from "#eleventy/register.js";
 import {
   getLayoutForTags,
   splitBlocksForColumns,
@@ -28,20 +29,22 @@ const validatePageBodyContent = (content, layout, inputPath) => {
   );
 };
 
+/**
+ * Wrap splitBlocksForColumns so the columns-per-layout lookup resolves from
+ * the page's tags and layouts, as the filter registration requires.
+ * @param {Array<{ type: string } & Record<string, unknown>> | undefined} blocks
+ * @param {string[] | undefined} tags
+ * @param {Record<string, unknown> | undefined} layouts
+ */
+export const splitBlocksForLayout = (blocks, tags, layouts) =>
+  splitBlocksForColumns(blocks, getLayoutForTags(tags, layouts));
+
 /** @param {{ addFilter: Function }} eleventyConfig */
-export const configureBlocks = (eleventyConfig) => {
-  eleventyConfig.addFilter("blockContainerWidth", getBlockContainerWidth);
-  eleventyConfig.addFilter("blockTemplate", getBlockTemplate);
-  eleventyConfig.addFilter(
-    "splitBlocksForColumns",
-    /**
-     * @param {Array<{ type: string } & Record<string, unknown>> | undefined} blocks
-     * @param {string[] | undefined} tags
-     * @param {Record<string, unknown> | undefined} layouts
-     */
-    (blocks, tags, layouts) =>
-      splitBlocksForColumns(blocks, getLayoutForTags(tags, layouts)),
-  );
-  eleventyConfig.addFilter("validatePageBodyContent", validatePageBodyContent);
-  eleventyConfig.addFilter("splitHoistedBanner", splitHoistedBanner);
-};
+export const configureBlocks = (eleventyConfig) =>
+  registerFilters(eleventyConfig)({
+    blockContainerWidth: getBlockContainerWidth,
+    blockTemplate: getBlockTemplate,
+    splitBlocksForColumns: splitBlocksForLayout,
+    validatePageBodyContent,
+    splitHoistedBanner: splitHoistedBanner,
+  });

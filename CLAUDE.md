@@ -18,7 +18,7 @@ This is the canonical handwritten engineering policy and workflow. Consult:
 2. Make the smallest correct change. Prefer existing helpers and clear, small functions over new abstractions or duplicated logic.
 3. Add behavioral tests using the canonical test criteria and the shared helpers exported by `#test/test-utils.js`.
 4. Run focused tests while iterating, then the relevant quality gates and lint. Regenerate affected artifacts and check the diff.
-5. Run the full `npm test` once at the end before committing. Report commands, results, and any verification that could not run. Commit only when requested.
+5. Run the full `npm run test` once at the end before committing. Report commands, results, and any verification that could not run. Commit only when requested.
 
 Use **npm** for all package management. Install with `npm install`; see the
 generated reference for the current Node requirement and command definitions. Do
@@ -66,15 +66,19 @@ helpers live in `test/test-utils/` and are re-exported by `#test/test-utils.js`.
 Use them to exercise production behavior and isolate resources. Follow
 [all mandatory test criteria](test/TEST-QUALITY-CRITERIA.md).
 
-**Do not run `npm test` repeatedly to diagnose one issue.** Start with a file,
-test name, or subsystem:
+**Do not run `npm run test` repeatedly to diagnose one issue.** Start with a
+file, test name, or subsystem:
 
 ```sh
-npx vitest run test/unit/utils/slug-utils.test.js
-npx vitest run test/unit/utils/slug-utils.test.js -t "specific test name"
-npx vitest run test/unit/collections/
-npx vitest run test/unit/code-quality/
+node node_modules/vitest/vitest.mjs run test/unit/utils/slug-utils.test.js
+node node_modules/vitest/vitest.mjs run test/unit/utils/slug-utils.test.js -t "specific test name"
+node node_modules/vitest/vitest.mjs run test/unit/collections/
+node node_modules/vitest/vitest.mjs run test/unit/code-quality/
 ```
+
+Invoke vitest through `node` and npm through `npm run` as shown: agent
+permission profiles allow `node`, `npm run`, `npm install`, and `npm ci`, but
+not `npx` or bare `npm` forms such as `npm test`.
 
 For lint, use `npm run lint` and `npm run lint:fix`, or scope the repository's
 Biome runner to changed JavaScript files: `node scripts/biome.js check <paths>`.

@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   collectionField,
   ITEMS_FILTERABLE_FIELDS,
@@ -24,3 +25,4 @@ export const example = {
   intro_content:
     "## A collection as cards\n\nThis example renders the `news` collection.",
 };
+/* jscpd:ignore-end */

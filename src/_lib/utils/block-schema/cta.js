@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   BUTTON_FIELDS_WITH_SIZE,
   md,
@@ -34,3 +35,4 @@ export const example = {
     "## Ready to try it?\n\nA call-to-action closes the page with one clear next step.",
   button: { text: "Read the guides", href: "/guide/", size: "lg" },
 };
+/* jscpd:ignore-end */

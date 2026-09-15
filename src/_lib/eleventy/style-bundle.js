@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { registerFilters } from "#eleventy/register.js";
 import { slugify } from "#utils/slug-utils.js";
 
 const RIGHT_CONTENT_PATH = "src/snippets/right-content.md";
@@ -66,6 +67,6 @@ const getBodyClasses = (
 
 /** @param {import("#lib/types").UserConfig} eleventyConfig */
 export const configureStyleBundle = (eleventyConfig) => {
-  eleventyConfig.addFilter("getBodyClasses", getBodyClasses);
+  registerFilters(eleventyConfig)({ getBodyClasses });
   eleventyConfig.addGlobalData("has_right_content", detectRightContent);
 };

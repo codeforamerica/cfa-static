@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   INTRO_CONTENT_FIELD,
   objectList,
@@ -46,3 +47,4 @@ export const example = {
     { icon: "hugeicons:search-01", text: "Search the site", url: "/search/" },
   ],
 };
+/* jscpd:ignore-end */

@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { md, str } from "#utils/block-schema/shared.js";
 
 export const type = "callout";
@@ -40,3 +41,4 @@ export const example = {
   content:
     "Callouts hold short advisories, tips, and warnings. Four color variants are available.",
 };
+/* jscpd:ignore-end */

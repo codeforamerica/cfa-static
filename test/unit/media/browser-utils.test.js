@@ -9,7 +9,6 @@ import {
   getChromePath,
   getDefaultOutputDir,
   prepareOutputDir,
-  waitForServer,
 } from "#media/browser-utils.js";
 import { withTempDir } from "#test/test-utils.js";
 
@@ -143,31 +142,33 @@ describe("batch operations", () => {
   });
 });
 
-describe("waitForServer", () => {
-  test("throws after exhausting attempts against a dead port", async () => {
-    await expect(waitForServer("http://localhost:8477", 2, 10)).rejects.toThrow(
-      "did not respond after 2 attempts",
-    );
-  });
-});
-
 describe("startServer", () => {
   // The real Eleventy Dev Server keeps handles open that stall vitest's
   // worker teardown, so the module is mocked here; serving real files is
   // exercised by the lighthouse/screenshot CLI paths.
-  test("boots the dev server, waits for it, and exposes stop", async () => {
+  const mockDevServer = async (fetchImpl) => {
     const serve = vi.fn();
     const close = vi.fn(() => Promise.resolve());
     const getServer = vi.fn(() => ({ serve, close }));
     vi.doMock("@11ty/eleventy-dev-server", () => ({
       default: { getServer },
     }));
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.resolve({ ok: true, status: 200 })),
-    );
+    vi.stubGlobal("fetch", vi.fn(fetchImpl));
     vi.resetModules();
     const utils = await import("#media/browser-utils.js");
+    return { close, getServer, serve, utils };
+  };
+
+  const unmockDevServer = () => {
+    vi.unstubAllGlobals();
+    vi.doUnmock("@11ty/eleventy-dev-server");
+    vi.resetModules();
+  };
+
+  test("boots the dev server, waits for it, and exposes stop", async () => {
+    const { close, getServer, serve, utils } = await mockDevServer(() =>
+      Promise.resolve({ ok: true, status: 200 }),
+    );
 
     try {
       const server = await utils.startServer("/tmp/site-dir", 8471);
@@ -183,9 +184,29 @@ describe("startServer", () => {
       await server.stop();
       expect(close).toHaveBeenCalled();
     } finally {
-      vi.unstubAllGlobals();
-      vi.doUnmock("@11ty/eleventy-dev-server");
-      vi.resetModules();
+      unmockDevServer();
+    }
+  });
+
+  test("fails cleanly when the server never comes up", async () => {
+    const { utils } = await mockDevServer(() =>
+      Promise.reject(new Error("connection refused")),
+    );
+    vi.useFakeTimers();
+
+    try {
+      const promise = utils.startServer("/tmp/site-dir", 8472);
+      const expectation = expect(promise).rejects.toThrow(
+        "did not respond after 30 attempts",
+      );
+      for (let i = 0; i < 30; i++) {
+        await vi.advanceTimersByTimeAsync(250);
+      }
+
+      await expectation;
+    } finally {
+      vi.useRealTimers();
+      unmockDevServer();
     }
   });
 });

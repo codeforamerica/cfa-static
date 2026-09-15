@@ -3,14 +3,16 @@
  * Uses one-pass scans with bounded local state.
  */
 import { expect } from "vitest";
-import { fs, omit, path, rootDir } from "#test/test-utils.js";
+import { fs, path, rootDir } from "#test/test-utils.js";
 import { notMemberOf, pluralize } from "#utils/fp/array.js";
-import { frozenObject } from "#utils/fp/object.js";
+import { filterObject, frozenObject } from "#utils/fp/object.js";
 import { frozenSet } from "#utils/fp/set.js";
 
 // Standard fields returned by find functions (everything else is extra data)
 const STANDARD_HIT_FIELDS = ["lineNumber", "line"];
-const omitStandardFields = omit(STANDARD_HIT_FIELDS);
+const omitStandardFields = filterObject(
+  (key) => !STANDARD_HIT_FIELDS.includes(key),
+);
 
 // ============================================
 // Common patterns for skipping non-code lines

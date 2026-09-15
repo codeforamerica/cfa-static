@@ -148,25 +148,6 @@ const frozenSetFrom = (iterable) => createFrozenSetProxy(new Set(iterable));
 const frozenSet = (values) => frozenSetFrom(values);
 
 /**
- * Create a membership predicate using a Set for O(1) lookups
- *
- * More efficient than memberOf() when checking membership repeatedly,
- * as it uses Set.has() instead of Array.includes().
- *
- * @template T
- * @param {Set<T> | ReadonlySet<T>} set - Set to check membership against
- * @returns {(value: T) => boolean} Membership predicate function
- *
- * @example
- * const ALLOWED = frozenSet(['read', 'write', 'delete']);
- * const isAllowed = setHas(ALLOWED);
- *
- * permissions.filter(isAllowed)
- * userAction.every(isAllowed)
- */
-const setHas = (set) => (value) => set.has(value);
-
-/**
  * Create a negated membership predicate using a Set for O(1) lookups
  *
  * @template T
@@ -181,4 +162,4 @@ const setHas = (set) => (value) => set.has(value);
  */
 const setLacks = (set) => (value) => !set.has(value);
 
-export { frozenSet, frozenSetFrom, setHas, setLacks };
+export { frozenSet, frozenSetFrom, setLacks };

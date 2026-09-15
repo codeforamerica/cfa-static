@@ -10,7 +10,6 @@ import path from "node:path";
 import matter from "gray-matter";
 import { expect, vi } from "vitest";
 import { ROOT_DIR, SRC_DIR } from "#lib/paths.js";
-import { omit } from "#utils/fp/object.js";
 
 // Test fixture helpers for creating Eleventy-style collection items
 // (These are test-only utilities, not general FP functions)
@@ -372,7 +371,6 @@ export {
   mockExitThrow,
   mockFetch,
   noop,
-  omit,
   path,
   popupSlideAlts,
   rootDir,

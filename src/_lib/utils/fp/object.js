@@ -60,27 +60,6 @@ const filterEntries = (predicate) =>
  */
 const filterObject = (predicate) => filterEntries(([k, v]) => predicate(k, v));
 
-// Common pre-built utilities
-
-/**
- * Transform both key and value with the same function
- * @param {(s: string) => string} fn - Transform function
- * @returns {(obj: Record<string, string>) => Record<string, string>} Function that transforms both keys and values
- * @example
- * mapBoth(s => s.toLowerCase())({ FOO: 'BAR' }) // { foo: 'bar' }
- */
-const mapBoth = (fn) => mapObject((k, v) => [fn(k), fn(v)]);
-
-/**
- * Keep only entries with truthy values
- * @template V
- * @param {Record<string, V>} obj - Object with potentially falsy values
- * @returns {Record<string, V>} Object with only truthy values
- * @example
- * pickTruthy({ a: 1, b: null, c: '' }) // { a: 1 }
- */
-const pickTruthy = filterObject((_k, v) => v);
-
 /**
  * Keep only entries with non-null values (keeps false, 0, '', etc.)
  * Useful for config merging where null means "use default"
@@ -139,13 +118,6 @@ const toObject = (items, toEntry) => Object.fromEntries(items.map(toEntry));
 const fromPairs = (pairs) => Object.fromEntries(pairs);
 
 /**
- * Create a curried function that omits specified keys from an object.
- * @param {string[]} keys - Keys to omit
- * @returns {(obj: Record<string, any>) => Record<string, any>} Function that omits specified keys
- */
-const omit = (keys) => filterEntries(([k]) => !keys.includes(k));
-
-/**
  * Create a proxy handler that throws a TypeError for mutation attempts
  * @param {string} action - The action being attempted (set, delete, define)
  * @param {string} prep - Preposition for error message (on, from)
@@ -194,11 +166,8 @@ export {
   filterObject,
   fromPairs,
   frozenObject,
-  mapBoth,
   mapEntries,
   mapObject,
-  omit,
   pickNonNull,
-  pickTruthy,
   toObject,
 };

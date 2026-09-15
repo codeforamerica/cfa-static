@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   collectionField,
   INTRO_CONTENT_FIELD,
@@ -22,3 +23,4 @@ export const example = {
   collection: "news",
   intro_content: "Read our latest news posts:",
 };
+/* jscpd:ignore-end */

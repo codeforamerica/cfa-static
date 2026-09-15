@@ -141,25 +141,6 @@ export const createBatchRunner =
     );
 
 /**
- * @param {string} baseUrl
- * @param {number} [maxAttempts]
- * @param {number} [delay]
- */
-export const waitForServer = async (baseUrl, maxAttempts = 30, delay = 250) => {
-  for (let i = 0; i < maxAttempts; i++) {
-    const [result] = await Promise.allSettled([fetch(baseUrl)]);
-    const isReady =
-      result.status === "fulfilled" &&
-      (result.value.ok || result.value.status === 404);
-    if (isReady) return true;
-    await new Promise((r) => setTimeout(r, delay));
-  }
-  throw new Error(
-    `Server at ${baseUrl} did not respond after ${maxAttempts} attempts`,
-  );
-};
-
-/**
  * @typedef {{ port: number, baseUrl: string, stop: () => Promise<void> }} DevServerHandle
  */
 
@@ -184,7 +165,21 @@ export const startServer = async (siteDir, port = 8080) => {
   server.serve(port);
 
   const baseUrl = `http://localhost:${port}`;
-  await waitForServer(baseUrl, 30, 250);
+  const maxAttempts = 30;
+  const delay = 250;
+  for (let i = 0; i < maxAttempts; i++) {
+    const [result] = await Promise.allSettled([fetch(baseUrl)]);
+    const isReady =
+      result.status === "fulfilled" &&
+      (result.value.ok || result.value.status === 404);
+    if (isReady) break;
+    await new Promise((r) => setTimeout(r, delay));
+    if (i === maxAttempts - 1) {
+      throw new Error(
+        `Server at ${baseUrl} did not respond after ${maxAttempts} attempts`,
+      );
+    }
+  }
 
   return { port, baseUrl, stop: () => server.close() };
 };

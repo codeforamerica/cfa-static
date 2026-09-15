@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { str } from "#utils/block-schema/shared.js";
 
 export const type = "html";
@@ -21,3 +22,4 @@ export const example = {
   content:
     "<p><strong>Raw HTML</strong> passes straight through - the escape hatch for one-off markup.</p>",
 };
+/* jscpd:ignore-end */

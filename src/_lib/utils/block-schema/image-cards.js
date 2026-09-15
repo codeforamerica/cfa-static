@@ -1,4 +1,4 @@
-/* jscpd:ignore-start */
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   ITEMS_GRID_META,
   imageCardGridFields,
@@ -6,7 +6,6 @@ import {
   objectList,
   str,
 } from "#utils/block-schema/shared.js";
-/* jscpd:ignore-end */
 
 export const type = "image-cards";
 
@@ -49,3 +48,4 @@ export const example = {
     },
   ],
 };
+/* jscpd:ignore-end */

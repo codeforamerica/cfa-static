@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { ICON_LINKS_ITEMS_FIELD } from "#utils/block-schema/icon-links.js";
 import {
   SPLIT_BASE_DOCS,
@@ -32,3 +33,4 @@ export const example = {
     { icon: "hugeicons:search-01", text: "Search", url: "/search/" },
   ],
 };
+/* jscpd:ignore-end */

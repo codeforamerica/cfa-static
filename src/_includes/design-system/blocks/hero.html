@@ -1,14 +1,8 @@
 {%- comment -%}
 Hero section with optional badge, markdown content, and action buttons.
+Renders via the shared hero-content partial; see hero-content.html for the
+badge/content/buttons parameters. Hero-specific:
 
-Parameters (via block object):
-  - block.badge: Optional badge text above the content
-  - block.content: Markdown content rendered in .prose (required)
-  - block.buttons: Array of button objects with:
-    - text: Button label
-    - href: Link URL
-    - variant: "primary", "secondary", or "ghost" (default: "primary")
-    - size: "sm", "lg", or omit for default
   - block.class: Additional CSS classes (e.g., "gradient")
   - block.reveal: If set, adds data-reveal animation
 
