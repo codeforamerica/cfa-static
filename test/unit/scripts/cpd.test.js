@@ -292,14 +292,15 @@ describe("cpd-ratchet invocation parsing", () => {
 
   test("throws when no strict segment carries --min-tokens", () => {
     expect(() => parseCpdArgs("node scripts/cpd.js")).toThrow(
-      "Expected exactly one strict (non-near) --min-tokens segment",
+      "Expected exactly one strict (--ignore-pattern, non-near) --min-tokens segment",
     );
   });
 
   test("throws when the strict segment is not a cpd.js invocation", () => {
-    expect(() => parseCpdArgs("jscpd src --min-tokens 18")).toThrow(
-      "no longer starts with",
-    );
+    // No --ignore-pattern, so this min-tokens segment is not the strict one.
+    expect(() =>
+      parseCpdArgs("jscpd src --min-tokens 18 --ignore-pattern 'import.*from'"),
+    ).toThrow("no longer starts with");
   });
 
   test("lowers only the min-tokens value", () => {
