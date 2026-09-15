@@ -21,8 +21,7 @@
 
       p {
         @include lead-paragraph;
-
-        color: var(--color-text-muted);
+        @include muted-text;
       }
     }
   }

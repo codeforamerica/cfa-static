@@ -27,11 +27,7 @@
   }
 
   .icon-links__icon {
-    @include flex-center;
-
-    flex-shrink: 0;
-    width: 1.5em;
-    height: 1.5em;
+    @include icon-box(1.5em);
 
     svg {
       width: 100%;

@@ -43,7 +43,7 @@
       @include body-base;
 
       &::placeholder {
-        color: var(--color-text-muted);
+        @include muted-text;
       }
     }
 
@@ -82,14 +82,14 @@
     @include body-base;
 
     margin: 0;
-    color: var(--color-text-muted);
+
+    @include muted-text;
   }
 
   .search-results-list {
     @include flex-col($space-md);
+    @include reset-spacing;
 
-    margin: 0;
-    padding: 0;
     list-style: none;
   }
 

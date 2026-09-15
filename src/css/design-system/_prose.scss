@@ -25,7 +25,8 @@
       font-size: $font-size-md;
       font-style: italic;
       line-height: $line-height-relaxed;
-      color: var(--color-text-muted);
+
+      @include muted-text;
     }
 
     // Tables — Markdown tables with alternating rows and themed header
@@ -62,8 +63,8 @@
       border-top: $border-light;
     }
 
-    tbody tr:nth-child(even) {
-      @include alt-bg;
+    tbody tr {
+      @include zebra-stripe;
     }
   }
 }

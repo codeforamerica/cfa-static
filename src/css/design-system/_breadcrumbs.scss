@@ -35,7 +35,7 @@
     }
 
     .separator {
-      color: var(--color-text-muted);
+      @include muted-text;
     }
 
     span[aria-current] {

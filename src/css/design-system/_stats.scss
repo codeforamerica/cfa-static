@@ -29,7 +29,8 @@
       @include body-base;
 
       order: 1;
-      color: var(--color-text-muted);
+
+      @include muted-text;
     }
 
     dd {

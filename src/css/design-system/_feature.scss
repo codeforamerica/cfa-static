@@ -83,7 +83,8 @@
 
       grid-column: 1 / -1;
       grid-row: 2;
-      color: var(--color-text-muted);
+
+      @include muted-text;
     }
 
     // Code blocks in features should span full width below heading

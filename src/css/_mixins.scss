@@ -177,6 +177,13 @@
   }
 }
 
+// A section under a full-bleed child (banner, split-full) carries no
+// vertical padding of its own.
+@mixin section-flush {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 // Alternating-row background for zebra striping (alternate sections,
 // striped tables).
 @mixin alt-bg {
@@ -204,6 +211,23 @@
 // Card surface background, shared by every element that sits on a card.
 @mixin card-bg {
   background: var(--color-card-bg);
+}
+
+// Fixed-size icon box: centered, non-shrinking square. Shared by the icon
+// badge and inline icon wrappers.
+@mixin icon-box($size) {
+  @include flex-center;
+
+  flex-shrink: 0;
+  width: $size;
+  height: $size;
+}
+
+// Zebra stripe: an element's even rows use the alternate background.
+@mixin zebra-stripe {
+  &:nth-child(even) {
+    @include alt-bg;
+  }
 }
 
 // Interactive row link: optional light border, always plain and
@@ -306,6 +330,11 @@
 @mixin body-sm {
   font-size: $font-size-sm;
   line-height: $line-height-normal;
+}
+
+// Muted secondary text color.
+@mixin muted-text {
+  color: var(--color-text-muted);
 }
 
 // Small muted text (secondary descriptions, card metadata).

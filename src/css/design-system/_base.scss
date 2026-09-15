@@ -288,14 +288,12 @@
 
     // Sections containing split-full have no padding; panels provide their own
     &:has(.split-full) {
-      padding-top: 0;
-      padding-bottom: 0;
+      @include section-flush;
     }
 
     // Sections containing a hero have no padding; the hero fills the section
     &:has(> .hero) {
-      padding-top: 0;
-      padding-bottom: 0;
+      @include section-flush;
     }
   }
 
@@ -341,7 +339,7 @@
     }
 
     time {
-      color: var(--color-text-muted);
+      @include muted-text;
     }
 
     figure {
@@ -377,9 +375,9 @@
   // ===========================================================================
   // Even sections get alternate background; odd sections inherit from body
 
-  > section:nth-child(even),
-  main > section:nth-child(even) {
-    @include alt-bg;
+  > section,
+  main > section {
+    @include zebra-stripe;
   }
 
   // Even dark sections get alternate dark background
