@@ -39,9 +39,8 @@
   }
 
   .block-column {
-    display: flex;
-    flex-direction: column;
-    gap: $space-lg;
+    @include flex-col($space-lg);
+
     min-width: 0;
   }
 }

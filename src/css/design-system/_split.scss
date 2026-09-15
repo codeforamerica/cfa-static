@@ -64,12 +64,18 @@
   // ===========================================================================
 
   .split-full {
+
+    // Side-anchored inner padding for a split-full panel at md+.
+    @mixin split-panel-inset($side) {
+      > * {
+        @include breakpoint.up("md") {
+          padding-#{$side}: $space-2xl;
+        }
+      }
+    }
+
     display: flex;
     flex-direction: column;
-
-    @include breakpoint.up("md") {
-      flex-direction: row;
-    }
 
     // Child panels
     .left,
@@ -90,22 +96,14 @@
       justify-content: flex-end;
       background: var(--body-background-alt);
 
-      > * {
-        @include breakpoint.up("md") {
-          padding-right: $space-2xl;
-        }
-      }
+      @include split-panel-inset(right);
     }
 
     .right {
       justify-content: flex-start;
       background: var(--color-card-bg);
 
-      > * {
-        @include breakpoint.up("md") {
-          padding-left: $space-2xl;
-        }
-      }
+      @include split-panel-inset(left);
     }
 
     // Color variants — opposite panel transparent to show section background
@@ -145,6 +143,10 @@
           background: var(--split-btn-hover-bg);
         }
       }
+    }
+
+    @include breakpoint.up("md") {
+      flex-direction: row;
     }
   }
 }
