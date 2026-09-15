@@ -114,10 +114,13 @@
     el.removeAttribute(temp);
   };
 
-  function storeAndRemoveAttributes(img) {
-    for (const attr of attributes) storeAttr(img, attr);
-    for (const source of getSibblingSources(img)) storeAttr(source, "srcset");
-  }
+  /** Apply one attribute op to an image and its sibling sources. */
+  const applyToImageAttributes = (apply) => (img) => {
+    for (const attr of attributes) apply(img, attr);
+    for (const source of getSibblingSources(img)) apply(source, "srcset");
+  };
+
+  const storeAndRemoveAttributes = applyToImageAttributes(storeAttr);
 
   const processImageForDefer = (img) => {
     if (!shouldProcessImage(img)) return;
@@ -134,10 +137,7 @@
     }
   };
 
-  const restoreStoredAttributes = (img) => {
-    for (const attr of attributes) restoreAttr(img, attr);
-    for (const source of getSibblingSources(img)) restoreAttr(source, "srcset");
-  };
+  const restoreStoredAttributes = applyToImageAttributes(restoreAttr);
 
   const restoreImageAttributes = () => {
     const images = document.querySelectorAll(

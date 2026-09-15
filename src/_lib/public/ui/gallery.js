@@ -24,28 +24,33 @@ const HERO_LINK = ".current-image-link";
 const NEIGHBOR_REVEAL_RATIO = 0.5;
 const HERO_SCROLL_THRESHOLD = 50;
 
+/**
+ * How much of a neighbour to reveal around a slider edge, or 0 when it is
+ * already visible enough. measure() maps the sibling's rect to the visible
+ * width on its side of the slider.
+ * @param {Element | null} sibling
+ * @param {(rect: DOMRect) => number} measure
+ * @returns {number}
+ */
+const revealGap = (sibling, measure) => {
+  if (!sibling) return 0;
+  const siblingRect = sibling.getBoundingClientRect();
+  const visibleWidth = Math.max(0, measure(siblingRect));
+  const targetWidth = sibling.offsetWidth * NEIGHBOR_REVEAL_RATIO;
+  return visibleWidth < targetWidth ? targetWidth - visibleWidth : 0;
+};
+
 const getNeighborOffset = (li, sliderRect) => {
-  if (li.nextElementSibling) {
-    const nextRect = li.nextElementSibling.getBoundingClientRect();
-    const visibleWidth = Math.max(0, sliderRect.right - nextRect.left);
-    const targetWidth =
-      li.nextElementSibling.offsetWidth * NEIGHBOR_REVEAL_RATIO;
-    if (visibleWidth < targetWidth) {
-      return targetWidth - visibleWidth;
-    }
-  }
-
-  if (li.previousElementSibling) {
-    const prevRect = li.previousElementSibling.getBoundingClientRect();
-    const visibleWidth = Math.max(0, prevRect.right - sliderRect.left);
-    const targetWidth =
-      li.previousElementSibling.offsetWidth * NEIGHBOR_REVEAL_RATIO;
-    if (visibleWidth < targetWidth) {
-      return -(targetWidth - visibleWidth);
-    }
-  }
-
-  return 0;
+  const rightGap = li.nextElementSibling
+    ? revealGap(li.nextElementSibling, (rect) => sliderRect.right - rect.left)
+    : 0;
+  const leftGap = li.previousElementSibling
+    ? revealGap(
+        li.previousElementSibling,
+        (rect) => rect.right - sliderRect.left,
+      )
+    : 0;
+  return rightGap - leftGap;
 };
 
 const getScrollOffset = (li, slider) => {

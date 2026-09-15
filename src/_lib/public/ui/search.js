@@ -1,28 +1,25 @@
+import { createElement } from "#public/utils/dom.js";
 import { onReady } from "#public/utils/on-ready.js";
 
 const PAGE_SIZE = 10;
 
 const renderResult = (result) => {
-  const card = document.createElement("li");
-  card.className = "search-result";
+  const card = createElement("li", "search-result");
 
-  const link = document.createElement("a");
+  const link = createElement("a", "search-result__link");
   link.href = result.url;
-  link.className = "search-result__link";
 
   if (result.meta?.image) {
-    const img = document.createElement("img");
+    const img = createElement("img", "search-result__image");
     img.src = result.meta.image;
     img.alt = "";
     img.loading = "lazy";
-    img.className = "search-result__image";
     link.appendChild(img);
   }
 
-  const body = document.createElement("div");
-  body.className = "search-result__body";
+  const body = createElement("div", "search-result__body");
 
-  const title = document.createElement("h3");
+  const title = createElement("h3", "");
   title.textContent = result.meta.title;
   body.appendChild(title);
 

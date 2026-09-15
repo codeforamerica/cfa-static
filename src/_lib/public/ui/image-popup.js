@@ -8,6 +8,7 @@
 // the quarter-width hover buttons, and thumbnail clicks all drive the same
 // scroll position; a scroll listener keeps the index in sync. State lives in
 // the dialog's dataset (data-index).
+import { createElement } from "#public/utils/dom.js";
 import { onReady } from "#public/utils/on-ready.js";
 
 const TRACK = "[data-popup-track]";
@@ -49,8 +50,7 @@ const clearLqipOnLoad = (clone) => {
 };
 
 const buildSlide = (wrapper) => {
-  const slide = document.createElement("div");
-  slide.className = "popup-slide";
+  const slide = createElement("div", "popup-slide");
   const clone = wrapper.cloneNode(true);
   setImageSizes(clone, SLIDE_SIZES);
   clearLqipOnLoad(clone);
@@ -59,10 +59,9 @@ const buildSlide = (wrapper) => {
 };
 
 const buildThumb = (wrapper, index, total) => {
-  const li = document.createElement("li");
-  const button = document.createElement("button");
+  const li = createElement("li", "");
+  const button = createElement("button", "popup-thumb");
   button.type = "button";
-  button.className = "popup-thumb";
   button.dataset.popupThumb = "";
   button.dataset.index = String(index);
   const alt = wrapper.querySelector("img")?.alt;
@@ -210,20 +209,23 @@ const syncFromScroll = (dialog) => {
 const handleTrackScroll = (event) =>
   syncFromScroll(event.currentTarget.closest("dialog"));
 
+/** Re-bind one event so repeated initialisation never stacks handlers. */
+const rebind = (target) => (eventName, handler, options) => {
+  target.removeEventListener(eventName, handler);
+  target.addEventListener(eventName, handler, options);
+};
+
 export const initImagePopup = () => {
   const dialog = getDialog();
   if (!dialog) return;
 
-  dialog.removeEventListener("click", handleDialogClick);
-  dialog.addEventListener("click", handleDialogClick);
-  dialog.removeEventListener("keydown", handleDialogKeydown);
-  dialog.addEventListener("keydown", handleDialogKeydown);
-  dialog.removeEventListener("close", handleDialogClose);
-  dialog.addEventListener("close", handleDialogClose);
+  const onDialog = rebind(dialog);
+  onDialog("click", handleDialogClick);
+  onDialog("keydown", handleDialogKeydown);
+  onDialog("close", handleDialogClose);
 
   const track = getTrack(dialog);
-  track.removeEventListener("scroll", handleTrackScroll);
-  track.addEventListener("scroll", handleTrackScroll, { passive: true });
+  rebind(track)("scroll", handleTrackScroll, { passive: true });
 };
 
 onReady(initImagePopup);

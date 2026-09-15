@@ -1,4 +1,5 @@
 import { writeFileSync } from "node:fs";
+/* jscpd:ignore-start -- shared browser automation import block */
 import {
   buildUrl,
   createBatchRunner,
@@ -14,6 +15,8 @@ import {
   sanitizePagePath,
   startServer,
 } from "#media/browser-utils.js";
+
+/* jscpd:ignore-end */
 
 const CATEGORIES = frozenObject({
   performance: "performance",

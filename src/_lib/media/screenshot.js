@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- shared browser automation import block */
 import {
   BROWSER_ARGS,
   createBatchRunner,
@@ -11,6 +12,8 @@ import {
   prepareOutputDir,
   runBatchOperations,
 } from "#media/browser-utils.js";
+
+/* jscpd:ignore-end */
 
 const VIEWPORTS = frozenObject({
   mobile: { width: 375, height: 667, name: "mobile" },
