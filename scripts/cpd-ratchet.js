@@ -35,15 +35,22 @@ const CONFIG_RATCHET_REPORT = join(
 
 /**
  * Extract the strict jscpd invocation's CLI args from the cpd npm script.
+ * The cpd script runs the exact-with-gap scan and the near-miss scan on the
+ * same production paths; the strict one is the min-tokens segment that does
+ * not carry the near-miss flags.
  * @param {string} cpdScript
  * @returns {string[]}
  */
 export const parseCpdArgs = (cpdScript) => {
   const segments = cpdScript.split("&&").map((segment) => segment.trim());
-  const strict = segments.filter((segment) => segment.includes("--min-tokens"));
+  const strict = segments.filter(
+    (segment) =>
+      segment.includes("--min-tokens") &&
+      !segment.includes("--ignore-identifiers"),
+  );
   if (strict.length !== 1) {
     throw new Error(
-      `Expected exactly one --min-tokens segment in the cpd script, found ${strict.length}: ${cpdScript}`,
+      `Expected exactly one strict (non-near) --min-tokens segment in the cpd script, found ${strict.length}: ${cpdScript}`,
     );
   }
 

@@ -292,7 +292,7 @@ describe("cpd-ratchet invocation parsing", () => {
 
   test("throws when no strict segment carries --min-tokens", () => {
     expect(() => parseCpdArgs("node scripts/cpd.js")).toThrow(
-      "Expected exactly one --min-tokens segment",
+      "Expected exactly one strict (non-near) --min-tokens segment",
     );
   });
 
