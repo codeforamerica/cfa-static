@@ -7,6 +7,12 @@ import { ROOT_DIR } from "#lib/paths.js";
 import { findFiles } from "#test/test-utils/code-analysis.js";
 
 const markdown = new MarkdownIt({ html: true });
+
+export const getTableRows = (root) =>
+  [...root.querySelectorAll("tbody tr")].map((row) =>
+    [...row.cells].map((cell) => cell.textContent),
+  );
+
 const canonicalReference =
   "skills/cfa-static-site-builder/references/blocks.md";
 const publishedDocument = (file) =>
