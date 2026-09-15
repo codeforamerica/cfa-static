@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 
 /**
  * validated-config runs its checks at module load, so each test mocks
@@ -17,6 +17,17 @@ afterEach(() => {
 });
 
 describe("validated-config", () => {
+  beforeAll(async () => {
+    // Every test re-imports the module graph fresh. Pay the graph's cold
+    // transform cost once here, inside the hook budget, so no individual
+    // test's 1500ms limit has to carry it under parallel lane load.
+    await importWithSite({
+      name: "Configured Site",
+      url: "https://configured.test",
+      description: "A configured site",
+    });
+  });
+
   test("throws with a singular heading for one config error", async () => {
     await expect(
       importWithSite({

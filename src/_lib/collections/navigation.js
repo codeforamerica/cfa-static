@@ -6,15 +6,27 @@ import { getIcon } from "#media/iconify.js";
 import { imageShortcode } from "#media/image.js";
 import { createHtml } from "#utils/dom-builder.js";
 import { filter, mapAsync, pipe, sort } from "#utils/fp/array.js";
-import { sortNavigationItems } from "#utils/sorting.js";
+import { orderThenString } from "#utils/fp/sorting.js";
 
 /** @typedef {import("../types/navigation.d.ts").NavigationEntry} NavigationEntry */
 /** @typedef {(children: NavigationEntry[]) => Promise<string>} RenderChildren */
+/** @typedef {{ data: { eleventyNavigation: { order?: number, key?: string }, name: string } }} NavigationItem */
 
 const NAV_THUMBNAIL_WIDTHS = ["64", "128", "480", "600"];
 const NAV_THUMBNAIL_ASPECT = "1/1";
 const SEARCH_PAGE_PATH = join(PAGES_DIR, "search.md");
 const SEARCH_ICON_ID = "hugeicons:search-02";
+
+/**
+ * Collection comparator for navigation pages: by eleventyNavigation order
+ * (defaulting to 999), then by key with page name as the fallback for a falsy key.
+ * The default order lives with the collection, where content defaults belong.
+ * @type {(a: NavigationItem, b: NavigationItem) => number}
+ */
+const sortNavigationItems = orderThenString(
+  (item) => item.data.eleventyNavigation.order ?? 999,
+  (item) => item.data.eleventyNavigation.key || item.data.name,
+);
 
 /**
  * @param {NavigationEntry} entry

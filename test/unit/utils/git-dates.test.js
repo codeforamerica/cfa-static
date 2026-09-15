@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test, vi } from "vitest";
-import { withTempDirAsync } from "#test/test-utils.js";
+import { withChdirAsync, withTempDirAsync } from "#test/test-utils.js";
 import { datesFor, formatIso } from "#utils/git-dates.js";
 
 // These tests run real git subprocesses, which can far exceed the global
@@ -36,13 +36,7 @@ const withGitRepo =
       fs.writeFileSync(filePath, content);
       gitCommit(tempDir, "add page");
 
-      const originalCwd = process.cwd();
-      try {
-        process.chdir(tempDir);
-        await testFn({ tempDir, filePath });
-      } finally {
-        process.chdir(originalCwd);
-      }
+      await withChdirAsync(tempDir, () => testFn({ tempDir, filePath }));
     });
 
 describe("git-dates", () => {
@@ -70,13 +64,9 @@ describe("git-dates", () => {
         gitCommit(tempDir, "initial");
         fs.writeFileSync(path.join(tempDir, "untracked.md"), "content");
 
-        const originalCwd = process.cwd();
-        try {
-          process.chdir(tempDir);
+        await withChdirAsync(tempDir, () => {
           expect(datesFor("untracked.md")).toBe(null);
-        } finally {
-          process.chdir(originalCwd);
-        }
+        });
       });
     });
 

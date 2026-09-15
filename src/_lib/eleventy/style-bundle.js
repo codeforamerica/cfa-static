@@ -14,26 +14,6 @@ const detectRightContent = () =>
   fs.existsSync(path.join(process.cwd(), RIGHT_CONTENT_PATH));
 
 /**
- * Build a page-path CSS class from a URL.
- *
- * "/"                          -> "page--home"
- * "/about-us/"                 -> "page--about-us"
- * "/products/example-product/" -> "page--products--example-product"
- *
- * @param {string | undefined} pageUrl
- * @returns {string|null}
- */
-const getPagePathClass = (pageUrl) => {
-  if (typeof pageUrl !== "string") return null;
-  const segments = pageUrl
-    .split("/")
-    .filter(Boolean)
-    .map((segment) => slugify(segment));
-  const suffix = segments.length === 0 ? "home" : segments.join("--");
-  return `page--${suffix}`;
-};
-
-/**
  * Generates body CSS classes based on layout and site config.
  *
  * Called from Liquid templates as:
@@ -41,6 +21,11 @@ const getPagePathClass = (pageUrl) => {
  *
  * hasRightContent is auto-detected from the filesystem.
  * design-system class is handled directly in the template.
+ *
+ * The page-path class is derived from pageUrl:
+ * "/"                          -> "page--home"
+ * "/about-us/"                 -> "page--about-us"
+ * "/products/example-product/" -> "page--products--example-product"
  *
  * @param {string} layout
  * @param {{ sticky_mobile_nav?: boolean, horizontal_nav?: boolean }} siteConfig - The site config object (snake_case keys)
@@ -56,13 +41,23 @@ const getBodyClasses = (
   featured,
   pageUrl,
 ) => {
+  const pagePathClass =
+    typeof pageUrl === "string"
+      ? `page--${
+          pageUrl
+            .split("/")
+            .filter(Boolean)
+            .map((segment) => slugify(segment))
+            .join("--") || "home"
+        }`
+      : null;
   const classes = [
     layout.replace(".html", ""),
     siteConfig.sticky_mobile_nav ? "sticky-mobile-nav" : null,
     siteConfig.horizontal_nav !== false ? "horizontal-nav" : "left-nav",
     detectRightContent() ? "two-columns" : "one-column",
     featured ? "featured" : null,
-    getPagePathClass(pageUrl),
+    pagePathClass,
     ...(Array.isArray(extraClasses) ? extraClasses : []),
   ];
 

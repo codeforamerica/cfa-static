@@ -39,15 +39,6 @@ export const buildUrl = (pagePath, baseUrl) =>
     : `${baseUrl}${pagePath.startsWith("/") ? "" : "/"}${pagePath}`;
 
 /**
- * @param {string} pagePath
- * @param {{ outputDir: string, suffix?: string, extension: string }} options
- */
-export const buildOutputPath = (
-  pagePath,
-  { outputDir, suffix = "", extension },
-) => join(outputDir, `${sanitizePagePath(pagePath)}${suffix}.${extension}`);
-
-/**
  * @typedef {{ outputDir: string, baseUrl: string, outputPath: string | null }} BaseOperationOptions
  */
 
@@ -59,11 +50,6 @@ export const buildOutputPath = (
 /**
  * @template {object} Options
  * @typedef {OperationOptions<Options>} OutputPathOpts
- */
-
-/**
- * @template {object} Options
- * @typedef {(opts: OutputPathOpts<Options>, path: string) => string} OutputPathBuilder
  */
 
 /**
@@ -86,44 +72,6 @@ const resolveOutputPathValue = (value, opts) =>
   typeof value === "function" ? value(opts) : value;
 
 /**
- * Create a buildOutputPath wrapper with configurable suffix/extension.
- * @template {object} Options
- * @param {{ suffix?: OutputPathValue<Options>, extension: OutputPathValue<Options> }} options
- * @returns {OutputPathBuilder<Options>}
- */
-export const createOutputPathBuilder =
-  ({ suffix = "", extension }) =>
-  (opts, path) => {
-    return buildOutputPath(path, {
-      outputDir: opts.outputDir,
-      suffix: resolveOutputPathValue(suffix, opts),
-      extension: resolveOutputPathValue(extension, opts),
-    });
-  };
-
-/**
- * @template {object} Options
- * @param {string} pagePath
- * @param {OperationOptions<Options>} defaultOpts
- * @param {Partial<OperationOptions<Options>>} userOptions
- * @param {(opts: OperationOptions<Options>, path: string) => string} buildPath
- * @returns {OperationContext<Options>}
- */
-export const createOperationContext = (
-  pagePath,
-  defaultOpts,
-  userOptions,
-  buildPath,
-) => {
-  const mergedOptions = { ...defaultOpts, ...userOptions };
-  return {
-    opts: mergedOptions,
-    url: buildUrl(pagePath, mergedOptions.baseUrl),
-    outputPath: mergedOptions.outputPath || buildPath(mergedOptions, pagePath),
-  };
-};
-
-/**
  * Create operation context using a path-builder config.
  * @template {object} O
  * @param {string} pagePath
@@ -138,20 +86,23 @@ export const createPathContext = (
   userOptions,
   pathConfig,
 ) => {
-  const buildPath = createOutputPathBuilder(pathConfig);
-  return createOperationContext(pagePath, defaultOpts, userOptions, buildPath);
+  const mergedOptions = { ...defaultOpts, ...userOptions };
+  const suffix = resolveOutputPathValue(
+    pathConfig.suffix === undefined ? "" : pathConfig.suffix,
+    mergedOptions,
+  );
+  const extension = resolveOutputPathValue(pathConfig.extension, mergedOptions);
+  return {
+    opts: mergedOptions,
+    url: buildUrl(pagePath, mergedOptions.baseUrl),
+    outputPath:
+      mergedOptions.outputPath ||
+      join(
+        mergedOptions.outputDir,
+        `${sanitizePagePath(pagePath)}${suffix}.${extension}`,
+      ),
+  };
 };
-
-/**
- * Creates an error info factory for page path batch operations
- * @template {string} P
- * @param {P[]} pagePaths
- * @returns {(i: number, reason: Error) => { pagePath: P, error: string }}
- */
-export const pathErrorInfo = (pagePaths) => (i, reason) => ({
-  pagePath: pagePaths[i],
-  error: reason.message,
-});
 
 /**
  * @template T
@@ -186,7 +137,7 @@ export const createBatchRunner =
     runBatchOperations(
       pagePaths,
       (pagePath) => operationFn(pagePath, options),
-      pathErrorInfo(pagePaths),
+      (i, reason) => ({ pagePath: pagePaths[i], error: reason.message }),
     );
 
 /**

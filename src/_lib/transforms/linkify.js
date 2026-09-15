@@ -45,11 +45,6 @@ const BLOCK_TAGS = frozenSet([
 
 /** @type {(value: string) => TextPart} */
 const textPart = (value) => ({ type: "text", value });
-/** @type {(value: string) => TextPart} */
-const phonePart = (value) => ({ type: "phone", value });
-
-/** @returns {TextPartsAccumulator} */
-const createTextPartsAccumulator = () => ({ parts: [], lastIndex: 0 });
 
 /**
  * Parse text into parts based on a pattern
@@ -64,6 +59,7 @@ const parseTextByPattern = (text, pattern, partFactory) => {
   if (matches.length === 0) return [textPart(text)];
 
   const { parts, lastIndex } = matches.reduce(
+    /** @param {TextPartsAccumulator} acc */
     (acc, match) => ({
       parts: [
         ...acc.parts,
@@ -74,7 +70,7 @@ const parseTextByPattern = (text, pattern, partFactory) => {
       ],
       lastIndex: match.index + match[0].length,
     }),
-    createTextPartsAccumulator(),
+    { parts: [], lastIndex: 0 },
   );
 
   return lastIndex < text.length
@@ -96,57 +92,31 @@ const hasSkipAncestor = (element) => {
 };
 
 /**
- * Check if a text node should be processed
- * @param {Text} node
- * @param {RegExp} pattern
- * @returns {boolean}
- */
-const shouldProcessNode = (node, pattern) => {
-  if (!node.parentElement || hasSkipAncestor(node.parentElement)) {
-    return false;
-  }
-  pattern.lastIndex = 0;
-  return pattern.test(node.textContent);
-};
-
-/**
- * Check if a node should be accepted by the tree walker.
- * @param {RegExp} pattern
- * @returns {(node: Text) => number}
- */
-const createNodeFilter = (pattern) => (node) =>
-  shouldProcessNode(node, pattern) ? 1 : 2;
-
-/**
- * Get current node from walker as Text.
- * TreeWalker with SHOW_TEXT filter only visits Text nodes.
- * @param {TreeWalker} walker
- * @returns {Text}
- */
-// @ts-expect-error - walker.currentNode is Text when using SHOW_TEXT filter
-const getCurrentTextNode = (walker) => walker.currentNode;
-
-/**
  * Recursively collect all text nodes from a tree walker
- * @param {TreeWalker} walker
+ * @param {TreeWalker & { currentNode: Text }} walker - SHOW_TEXT walker
  * @param {Text[]} acc
  * @returns {Text[]}
  */
 const walkTextNodes = (walker, acc = []) =>
-  walker.nextNode()
-    ? walkTextNodes(walker, [...acc, getCurrentTextNode(walker)])
-    : acc;
+  walker.nextNode() ? walkTextNodes(walker, [...acc, walker.currentNode]) : acc;
 
 /**
  * Collect text nodes matching a pattern using recursive walker
  * @param {*} document
+ * @param {Element} root
  * @param {RegExp} pattern
  * @returns {Text[]}
  */
-const collectTextNodes = (document, pattern) =>
+const collectTextNodes = (document, root, pattern) =>
   walkTextNodes(
-    document.createTreeWalker(document.body, 4, {
-      acceptNode: createNodeFilter(pattern),
+    document.createTreeWalker(root, 4, {
+      /** @param {Text} node */
+      acceptNode: (node) => {
+        if (!node.parentElement || hasSkipAncestor(node.parentElement))
+          return 2;
+        pattern.lastIndex = 0;
+        return pattern.test(node.textContent) ? 1 : 2;
+      },
     }),
   );
 
@@ -175,36 +145,6 @@ const createSimpleLink = (document, href, text) => {
   return link;
 };
 
-/** @type {(document: *, phone: string) => HTMLAnchorElement} */
-const createPhoneLink = (document, phone) =>
-  createSimpleLink(document, `tel:${phone.replace(/\s/g, "")}`, phone);
-
-/**
- * Create DOM node for a text part
- * @param {*} document
- * @param {TextPart} part
- * @returns {Node}
- */
-const createNodeForPart = (document, part) =>
-  part.type === "phone"
-    ? createPhoneLink(document, part.value)
-    : document.createTextNode(part.value);
-
-/**
- * Build a document fragment by mapping parts through a node-creation function
- * @param {*} document
- * @param {TextPart[]} parts
- * @param {(part: TextPart) => Node} createNode
- * @returns {DocumentFragment}
- */
-const buildFragment = (document, parts, createNode) => {
-  const fragment = document.createDocumentFragment();
-  for (const part of parts) {
-    fragment.appendChild(createNode(part));
-  }
-  return fragment;
-};
-
 /**
  * Replace each text node whose parsed parts contain the link type with a
  * fragment built by the given node factory. The shared core of every
@@ -224,12 +164,11 @@ const replaceMatchedTextNodes = (
 ) => {
   for (const textNode of textNodes) {
     const parts = parser(textNode.textContent);
-    if (parts.some((p) => p.type === linkType)) {
-      textNode.parentNode?.replaceChild(
-        buildFragment(document, parts, createNode),
-        textNode,
-      );
-    }
+    if (!parts.some((p) => p.type === linkType) || !textNode.parentNode)
+      continue;
+    const fragment = document.createDocumentFragment();
+    for (const part of parts) fragment.appendChild(createNode(part));
+    textNode.parentNode.replaceChild(fragment, textNode);
   }
 };
 
@@ -260,19 +199,20 @@ const linkifyPhones = (document, config) => {
   );
   replaceMatchedTextNodes(
     document,
-    collectTextNodes(document, phonePat),
-    (text) => parseTextByPattern(text, phonePat, phonePart),
+    collectTextNodes(document, document.body, phonePat),
+    (text) =>
+      parseTextByPattern(text, phonePat, (value) => ({ type: "phone", value })),
     "phone",
-    (part) => createNodeForPart(document, part),
+    (part) =>
+      part.type === "phone"
+        ? createSimpleLink(
+            document,
+            `tel:${part.value.replace(/\s/g, "")}`,
+            part.value,
+          )
+        : document.createTextNode(part.value),
   );
 };
-
-/**
- * Escape special regex characters in a string
- * @param {string} str
- * @returns {string}
- */
-const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Build a regex that matches any of the link texts (longest first, word-bounded)
@@ -281,39 +221,11 @@ const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  */
 const buildConfigLinksPattern = (texts) => {
   const sorted = [...texts].sort((a, b) => b.length - a.length);
-  const alternation = sorted.map(escapeRegExp).join("|");
+  const alternation = sorted
+    .map((text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
   return new RegExp(`\\b(${alternation})\\b`, "g");
 };
-
-/** @type {(value: string) => TextPart} */
-const configLinkPart = (value) => ({ type: "configLink", value });
-
-/**
- * Collect text nodes matching a pattern within .prose elements
- * @param {*} document
- * @param {RegExp} pattern
- * @returns {Text[]}
- */
-const collectProseTextNodes = (document, pattern) =>
-  flatMap((prose) =>
-    walkTextNodes(
-      document.createTreeWalker(prose, 4, {
-        acceptNode: createNodeFilter(pattern),
-      }),
-    ),
-  )([...document.querySelectorAll(".prose")]);
-
-/**
- * Create DOM node for a config link part
- * @param {*} document
- * @param {TextPart} part
- * @param {Record<string, string>} linksMap
- * @returns {Node}
- */
-const createConfigLinkNode = (document, part, linksMap) =>
-  part.type === "configLink"
-    ? createSimpleLink(document, linksMap[part.value], part.value)
-    : document.createTextNode(part.value);
 
 /**
  * Linkify text based on configured links map, only within .prose elements.
@@ -329,10 +241,19 @@ const linkifyConfigLinks = (document, linksMap) => {
 
   replaceMatchedTextNodes(
     document,
-    collectProseTextNodes(document, pattern),
-    (text) => parseTextByPattern(text, pattern, configLinkPart),
+    flatMap((prose) => collectTextNodes(document, prose, pattern))([
+      ...document.querySelectorAll(".prose"),
+    ]),
+    (text) =>
+      parseTextByPattern(text, pattern, (value) => ({
+        type: "configLink",
+        value,
+      })),
     "configLink",
-    (part) => createConfigLinkNode(document, part, linksMap),
+    (part) =>
+      part.type === "configLink"
+        ? createSimpleLink(document, linksMap[part.value], part.value)
+        : document.createTextNode(part.value),
   );
 };
 

@@ -18,6 +18,7 @@ import {
   unitTestsStep,
 } from "#test/test-runner-utils.js";
 import {
+  bracketAsync,
   captureConsole,
   captureConsoleLogAsync,
   withMockedProcessExit,
@@ -90,6 +91,34 @@ describe("test-runner-utils", () => {
   // extractErrorsFromOutput Tests
   // ============================================
   describe("extractErrorsFromOutput", () => {
+    test.each([
+      "   ",
+      "  jscpd found duplicated code.  ",
+      "  Do not use duplicated code  ",
+    ])("ends clone blocks before %j", (terminator) => {
+      const output = [
+        "normal output",
+        "  ❌ Clone found  ",
+        "    src/first.js: 1-5  ",
+        "    src/second.js: 2-6  ",
+        terminator,
+        "Error: separate failure",
+      ].join("\n");
+
+      expect(extractErrorsFromOutput(output)).toEqual([
+        "  ❌ Clone found\n    src/first.js: 1-5\n    src/second.js: 2-6",
+        "Error: separate failure",
+      ]);
+    });
+
+    test("keeps an unterminated clone block through the end of output", () => {
+      expect(
+        extractErrorsFromOutput(
+          "❌ Clone found\n  src/first.js: 1-5\n  src/second.js: 2-6",
+        ),
+      ).toEqual(["❌ Clone found\n  src/first.js: 1-5\n  src/second.js: 2-6"]);
+    });
+
     test("Extracts lines starting with error indicators", () => {
       const output = `
 Some normal output
@@ -414,9 +443,8 @@ Failed to compile
 
     test("Handles empty results gracefully", () => {
       const emptyRunSteps = createBasicSteps();
-      const results = {};
 
-      const output = captureConsole(() => printSummary(emptyRunSteps, results));
+      const output = captureConsole(() => printSummary(emptyRunSteps, {}));
 
       expect(output).toContain("SUMMARY");
       expect(output).not.toContain("Passed");
@@ -588,7 +616,7 @@ Failed to compile
     });
 
     describe("checkRecord", () => {
-      test("pushes line and branch failures for partially covered record", () => {
+      test("collects line and branch failures for partially covered record", () => {
         const record = [
           "SF:src/foo.js",
           "DA:3,0",
@@ -600,10 +628,11 @@ Failed to compile
           "BRH:1",
           "BRF:2",
         ].join("\n");
-        const lineFailures = [];
-        const branchFailures = [];
 
-        checkRecord(record, "src/foo.js", lineFailures, branchFailures);
+        const { lineFailures, branchFailures } = checkRecord(
+          record,
+          "src/foo.js",
+        );
 
         expect(lineFailures).toEqual([
           "src/foo.js: 1/2 lines covered\n      uncovered lines: 3",
@@ -613,7 +642,7 @@ Failed to compile
         ]);
       });
 
-      test("pushes nothing when record is fully covered", () => {
+      test("collects nothing when record is fully covered", () => {
         const record = [
           "SF:src/bar.js",
           "DA:1,3",
@@ -623,10 +652,11 @@ Failed to compile
           "BRH:2",
           "BRF:2",
         ].join("\n");
-        const lineFailures = [];
-        const branchFailures = [];
 
-        checkRecord(record, "src/bar.js", lineFailures, branchFailures);
+        const { lineFailures, branchFailures } = checkRecord(
+          record,
+          "src/bar.js",
+        );
 
         expect(lineFailures).toEqual([]);
         expect(branchFailures).toEqual([]);
@@ -743,6 +773,40 @@ describe("step definitions", () => {
 });
 
 describe("runStepAsync", () => {
+  // Real child processes can take longer than the default test timeout.
+  test.each([
+    [false, "process.exit(0)", "", ""],
+    [true, "process.exit(0)", "", ""],
+    [
+      false,
+      "process.stdout.write('out'); process.stderr.write('err')",
+      "out",
+      "err",
+    ],
+  ])(
+    "does not forward output with verbose=%s for %s",
+    async (verbose, script, stdout, stderr) => {
+      await bracketAsync(
+        () => [
+          vi.spyOn(process.stdout, "write").mockImplementation(() => true),
+          vi.spyOn(process.stderr, "write").mockImplementation(() => true),
+        ],
+        (spies) => {
+          for (const spy of spies) spy.mockRestore();
+        },
+      )(null, async ([stdoutSpy, stderrSpy]) => {
+        const result = await runStepAsync(
+          createNodeScriptStep("silent-step", script),
+          verbose,
+        );
+        expect(result).toEqual({ status: 0, stdout, stderr });
+        expect(stdoutSpy).not.toHaveBeenCalled();
+        expect(stderrSpy).not.toHaveBeenCalled();
+      });
+    },
+    30_000,
+  );
+
   test("captures output and exit status", async () => {
     const step = createNodeScriptStep(
       "async-step",

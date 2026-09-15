@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createHtmlTransform } from "#eleventy/html-transform.js";
+import { configureHtmlTransform } from "#eleventy/html-transform.js";
 import {
   configureImages,
   imageShortcode,
@@ -31,27 +31,38 @@ const imageFiles = map((dest) => ({ src: "src/images/party.jpg", dest }));
 
 describe("image", () => {
   // ============================================
-  // createHtmlTransform tests
+  // Registered html transform tests
   // ============================================
-  describe("createHtmlTransform", () => {
-    test("createHtmlTransform returns a transform function", () => {
-      const transform = createHtmlTransform(processAndWrapImage);
+  describe("registered html transform", () => {
+    /**
+     * Configure the transform plugin and return its PostHTML tree runner.
+     */
+    const createTransformRunner = (outputPath = "/test/page.html") => {
+      const mockConfig = createMockEleventyConfig();
+      configureHtmlTransform(mockConfig, processAndWrapImage);
+      return mockConfig.htmlTransformer.plugins.html.plugin({ outputPath });
+    };
 
-      expect(typeof transform).toBe("function");
+    test("returns a transform function from the plugin factory", () => {
+      const runTree = createTransformRunner();
+      expect(typeof runTree).toBe("function");
     });
 
     test("Transform passes through non-HTML files unchanged", async () => {
-      const transform = createHtmlTransform(processAndWrapImage);
-      const result = await transform("body { margin: 0; }", "/test/style.css");
+      const runTree = createTransformRunner("/test/style.css");
+      const result = await runTree({
+        render: () => "body { margin: 0; }",
+        parser: (html) => html,
+      });
       expect(result).toBe("body { margin: 0; }");
     });
 
     test("Transform preserves HTML content without local images", async () => {
-      const transform = createHtmlTransform(processAndWrapImage);
-      const result = await transform(
-        "<html><body><p>Hello world</p></body></html>",
-        "/test/page.html",
-      );
+      const runTree = createTransformRunner();
+      const result = await runTree({
+        render: () => "<html><body><p>Hello world</p></body></html>",
+        parser: (html) => html,
+      });
       expect(result.includes("<p>Hello world</p>")).toBe(true);
       expect(result.includes("<picture")).toBe(false);
     });
@@ -280,15 +291,19 @@ describe("image", () => {
   });
 
   // ============================================
-  // createHtmlTransform tests - actual transformation
+  // Registered transform tests - actual transformation
   // ============================================
-  describe("createHtmlTransform - transformations", () => {
+  describe("registered transform - transformations", () => {
     /**
      * Run transform on HTML content and return result
      */
     const runTransform = async (html) => {
-      const transform = createHtmlTransform(processAndWrapImage);
-      return transform(html, "/test/page.html");
+      const mockConfig = createMockEleventyConfig();
+      configureHtmlTransform(mockConfig, processAndWrapImage);
+      const runTree = mockConfig.htmlTransformer.plugins.html.plugin({
+        outputPath: "/test/page.html",
+      });
+      return runTree({ render: () => html, parser: (html) => html });
     };
 
     /**

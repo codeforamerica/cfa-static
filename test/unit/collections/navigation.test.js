@@ -32,10 +32,9 @@ const pageItem = (slug, url, tags = []) => ({
   url,
 });
 
-const navItem = ([title, navOptions]) =>
-  item(title, { eleventyNavigation: navOptions });
-
-const navItems = map(navItem);
+const navItems = map(([title, navOptions]) =>
+  item(title, { eleventyNavigation: navOptions }),
+);
 
 const configureWithMock = async () => {
   const mockConfig = createMockEleventyConfig();
@@ -95,6 +94,14 @@ describe("navigationLinks collection", () => {
       ["No Order A", { key: "a-no" }],
     ]);
     expectResultTitles(result, ["First", "No Order A", "No Order Z"]);
+  });
+
+  test("breaks ties on order using the page name when keyless", async () => {
+    const result = await getNavLinks([
+      ["Zebra", { order: 1 }],
+      ["Apple", { order: 1 }],
+    ]);
+    expectResultTitles(result, ["Apple", "Zebra"]);
   });
 });
 

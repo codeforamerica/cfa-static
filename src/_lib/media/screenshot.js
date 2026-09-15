@@ -45,7 +45,7 @@ export const buildViewportSuffix = (viewport) =>
  * @param {string} viewport
  * @param {{ timeout?: number }} options
  */
-export const takeScreenshotWithPlaywright = async (
+const takeScreenshotWithPlaywright = async (
   url,
   outputPath,
   viewport,
@@ -87,6 +87,8 @@ export const takeScreenshotWithPlaywright = async (
 };
 
 /**
+ * Capture a page screenshot by running the Playwright pipeline in
+ * takeScreenshotWithPlaywright against the page's capture context.
  * @param {string} pagePath
  * @param {object} [options]
  */

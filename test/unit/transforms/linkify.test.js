@@ -86,6 +86,17 @@ describe("linkify transforms", () => {
   });
 
   describe("linkifyPhones", () => {
+    test("links every matching text node without losing inline structure", async () => {
+      const result = await transformHtml(
+        wrapHtml("<p>01234 567 890<span>01234567890</span>01234 567 890</p>"),
+        linkifyPhones,
+        { phoneNumberLength: 11 },
+      );
+      expect(result).toContain(
+        '<p><a href="tel:01234567890">01234 567 890</a><span><a href="tel:01234567890">01234567890</a></span><a href="tel:01234567890">01234 567 890</a></p>',
+      );
+    });
+
     test("converts phone numbers to tel links with length 11", async () => {
       const html = wrapHtml("<p>Call 01234 567 890</p>");
       const result = await transformHtml(html, linkifyPhones, {
@@ -304,7 +315,22 @@ describe("linkify transforms", () => {
       );
       const result = await transformConfigLinks(html, linksMap);
 
-      expect(result).toContain('href="https://acme.example.com"');
+      expect(result).toContain(
+        '<p>Visit <a href="https://acme.example.com">Acme Corp</a></p>',
+      );
+      expectSingleAnchor(result);
+    });
+
+    test("links matching text across separate prose roots", async () => {
+      const result = await transformConfigLinks(
+        wrapHtml(
+          '<div class="prose">Acme Corp</div><p>Acme Corp</p><section class="prose">Acme Corp</section>',
+        ),
+        linksMap,
+      );
+      expect(result).toContain(
+        '<div class="prose"><a href="https://acme.example.com">Acme Corp</a></div><p>Acme Corp</p><section class="prose"><a href="https://acme.example.com">Acme Corp</a></section>',
+      );
     });
   });
 

@@ -33,8 +33,11 @@ export const buildCollectionHandler = (pageUrlsRef) => (collectionApi) => {
   return [];
 };
 
-/** @param {Array<{ pagePath: string, error: unknown }>} errors */
-export const logScreenshotErrors = (errors) => {
+/**
+ * Report per-page capture failures to the console.
+ * @param {Array<{ pagePath: string, error: unknown }>} errors
+ */
+const logScreenshotErrors = (errors) => {
   if (errors.length === 0) return;
   logError(`Screenshot errors: ${errors.length}`);
   for (const err of errors) {
@@ -43,15 +46,13 @@ export const logScreenshotErrors = (errors) => {
 };
 
 /**
+ * Start the preview server, capture the given pages, and stop the server.
+ * Per-page failures are reported via logScreenshotErrors.
  * @param {string[]} pageUrls
  * @param {import("#lib/types").ScreenshotConfig} screenshotConfig
  * @param {string} outputDir
  */
-export const captureScreenshots = async (
-  pageUrls,
-  screenshotConfig,
-  outputDir,
-) => {
+const captureScreenshots = async (pageUrls, screenshotConfig, outputDir) => {
   const server = await startServer(outputDir, screenshotConfig.port || 8080);
   const configOutputDir = screenshotConfig.outputDir || "screenshots";
 
@@ -77,7 +78,8 @@ export const captureScreenshots = async (
 
 /**
  * Eleventy wrapper for screenshot utilities.
- * Wraps #media/screenshot.js for Eleventy integration.
+ * Wraps #media/screenshot.js for Eleventy integration. Captures the
+ * collected page URLs via captureScreenshots after the build.
  * @param {import("@11ty/eleventy").UserConfig} eleventyConfig
  */
 export const configureScreenshots = (eleventyConfig) => {

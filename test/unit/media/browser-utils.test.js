@@ -3,17 +3,12 @@ import { join } from "node:path";
 import { describe, expect, test, vi } from "vitest";
 import { ROOT_DIR } from "#lib/paths.js";
 import {
-  buildOutputPath,
   buildUrl,
   createBatchRunner,
-  createOperationContext,
-  createOutputPathBuilder,
   createPathContext,
   getChromePath,
   getDefaultOutputDir,
-  pathErrorInfo,
   prepareOutputDir,
-  runBatchOperations,
   waitForServer,
 } from "#media/browser-utils.js";
 import { withTempDir } from "#test/test-utils.js";
@@ -41,25 +36,29 @@ describe("browser-utils path helpers", () => {
     );
   });
 
-  test("buildOutputPath sanitizes the page path into a filename", () => {
-    expect(
-      buildOutputPath("/news/first/", {
-        outputDir: "/out",
-        suffix: "-mobile",
-        extension: "png",
-      }),
-    ).toBe("/out/news-first-mobile.png");
+  test("sanitizes the page path into a hyphenated filename", () => {
+    const { outputPath } = createPathContext(
+      "/news/first/",
+      { outputDir: "/out", baseUrl: "http://localhost:9", outputPath: null },
+      {},
+      { suffix: "-mobile", extension: "png" },
+    );
+
+    expect(outputPath).toBe("/out/news-first-mobile.png");
   });
 
-  test("createOutputPathBuilder resolves static and computed parts", () => {
-    const buildPath = createOutputPathBuilder({
-      suffix: (opts) => `-${opts.viewport}`,
-      extension: "png",
-    });
+  test("path config resolves static and computed suffix parts", () => {
+    const { outputPath } = createPathContext(
+      "/a/",
+      { outputDir: "/out", baseUrl: "http://localhost:9", outputPath: null },
+      { viewport: "tablet" },
+      {
+        suffix: (opts) => `-${opts.viewport}`,
+        extension: "png",
+      },
+    );
 
-    const path = buildPath({ outputDir: "/out", viewport: "tablet" }, "/a/");
-
-    expect(path).toBe("/out/a-tablet.png");
+    expect(outputPath).toBe("/out/a-tablet.png");
   });
 
   test("getDefaultOutputDir resolves under the repo root", () => {
@@ -69,7 +68,7 @@ describe("browser-utils path helpers", () => {
   });
 });
 
-describe("createOperationContext", () => {
+describe("createPathContext", () => {
   const defaults = {
     outputDir: "/out",
     baseUrl: "http://localhost:9",
@@ -77,16 +76,16 @@ describe("createOperationContext", () => {
   };
 
   test("merges options and builds url and output path", () => {
-    const context = createOperationContext(
+    const context = createPathContext(
       "/contact/",
       defaults,
       { outputDir: "/custom" },
-      (opts, path) => `${opts.outputDir}${path}file.png`,
+      { suffix: "", extension: "png" },
     );
 
     expect(context.opts.outputDir).toBe("/custom");
     expect(context.url).toBe("http://localhost:9/contact/");
-    expect(context.outputPath).toBe("/custom/contact/file.png");
+    expect(context.outputPath).toBe("/custom/contact.png");
   });
 
   test("an explicit outputPath wins over the builder", () => {
@@ -100,7 +99,7 @@ describe("createOperationContext", () => {
     expect(context.outputPath).toBe("/exact/here.png");
   });
 
-  test("createPathContext builds paths from a path config", () => {
+  test("builds paths from a path config", () => {
     const context = createPathContext(
       "/a/b/",
       defaults,
@@ -117,14 +116,13 @@ describe("createOperationContext", () => {
 
 describe("batch operations", () => {
   test("collects results and maps rejections to error info", async () => {
-    const { results, errors } = await runBatchOperations(
-      ["/ok/", "/bad/"],
-      (path) =>
-        path === "/ok/"
-          ? Promise.resolve({ path })
-          : Promise.reject(new Error("boom")),
-      pathErrorInfo(["/ok/", "/bad/"]),
+    const runBatch = createBatchRunner((path) =>
+      path === "/ok/"
+        ? Promise.resolve({ path })
+        : Promise.reject(new Error("boom")),
     );
+
+    const { results, errors } = await runBatch(["/ok/", "/bad/"]);
 
     expect(results).toEqual([{ path: "/ok/" }]);
     expect(errors).toEqual([{ pagePath: "/bad/", error: "boom" }]);

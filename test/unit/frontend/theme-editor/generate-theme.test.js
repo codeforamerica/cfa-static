@@ -65,6 +65,32 @@ describe("shouldIncludeScopedVar", () => {
 });
 
 describe("generateThemeCss", () => {
+  test("normalizes only global variable prefixes, leaving scoped names unchanged", () => {
+    expect(
+      generateThemeCss(
+        { "color-bg": "red", "--color-text": "black" },
+        { header: { "color-bg": "blue", "--color-text": "white" } },
+        [],
+      ),
+    ).toBe(
+      ":root {\n  --color-bg: red;\n  --color-text: black;\n}\n\nheader {\n  color-bg: blue;\n  --color-text: white;\n}\n",
+    );
+  });
+
+  test.each([
+    undefined,
+    null,
+    [],
+  ])("preserves empty root whitespace without body classes (%j)", (bodyClasses) => {
+    expect(generateThemeCss({}, {}, bodyClasses)).toBe(":root {\n\n}\n");
+  });
+
+  test("separates the body classes comment with a blank line and no trailing newline", () => {
+    expect(generateThemeCss({}, {}, ["header-dark", "main-boxed"])).toBe(
+      ":root {\n\n}\n\n/* body_classes: header-dark, main-boxed */",
+    );
+  });
+
   test("emits :root block with only global values", () => {
     const css = generateThemeCss(
       { "--color-bg": "#ffffff", "--color-text": "#000000" },

@@ -21,6 +21,16 @@ describe("eleventyComputed.blocks", () => {
     });
   });
 
+  test("applies defaults without mutating source blocks", async () => {
+    const block = Object.freeze({ type: "stats", items: [] });
+    const blocks = Object.freeze([block]);
+    const result = await eleventyComputed.blocks({ blocks, page, name });
+    expect(result).toEqual([
+      { type: "stats", items: [], reveal: true, dark: false },
+    ]);
+    expect(result[0]).not.toBe(block);
+  });
+
   test("throws on unknown block types", async () => {
     await expect(
       runSingle({ type: "unknown-type", content: "test" }),
@@ -177,5 +187,71 @@ describe("eleventyComputed.blocks block gallery", () => {
     expect(blocks[0].type).toBe("hero");
     // Defaults are applied to the generated blocks like any others
     expect(blocks.every((block) => "dark" in block)).toBe(true);
+  });
+});
+
+describe("eleventyComputed.blocks item and block validation", () => {
+  test("passes when a tagged item has a name and valid blocks", async () => {
+    await expect(
+      eleventyComputed.blocks({
+        blocks: [{ type: "markdown", content: "Hello" }],
+        name,
+        tags: ["pages"],
+        page,
+      }),
+    ).resolves.toBeDefined();
+  });
+
+  test("does not throw for untagged utility templates without name", async () => {
+    await expect(
+      eleventyComputed.blocks({ subtitle: "utility page", page }),
+    ).resolves.toBeUndefined();
+  });
+
+  test("throws with the page path in the message when a tagged item is missing its name", async () => {
+    await expect(
+      eleventyComputed.blocks({
+        tags: ["pages"],
+        subtitle: "No name",
+        page: { inputPath: "src/pages/test.md" },
+      }),
+    ).rejects.toThrow(/missing required "name" field[\s\S]*test\.md/);
+  });
+
+  test("throws when a nested block item is missing a required field", async () => {
+    await expect(
+      eleventyComputed.blocks({
+        blocks: [{ type: "features", items: [{ icon: "star" }] }],
+        name,
+        tags: ["pages"],
+        page,
+      }),
+    ).rejects.toThrow('"features"');
+  });
+
+  test("throws every missing nested field from the shared schema", async () => {
+    await expect(
+      eleventyComputed.blocks({
+        blocks: [{ type: "downloads", items: [{}] }],
+        name,
+        tags: ["pages"],
+        page,
+      }),
+    ).rejects.toThrow(/required "file"[\s\S]*required "label"/);
+  });
+
+  test("throws item and block errors together when several names are missing", async () => {
+    await expect(
+      eleventyComputed.blocks({
+        tags: ["pages"],
+        blocks: [
+          { type: "features", items: [{ description: "no name" }] },
+          { type: "image-cards", items: [{ image: "/a.jpg" }] },
+        ],
+        page,
+      }),
+    ).rejects.toThrow(
+      /Item is missing required[\s\S]*"features"[\s\S]*"image-cards"/,
+    );
   });
 });

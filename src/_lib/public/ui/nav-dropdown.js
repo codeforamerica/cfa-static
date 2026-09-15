@@ -8,44 +8,28 @@ import { onReady } from "#public/utils/on-ready.js";
  *   that toggles the submenu. The <a> stays a normal navigable link.
  */
 
-const createCaretButton = (item) => {
-  const button = document.createElement("button");
-  button.className = "nav-caret";
-  button.setAttribute("aria-expanded", "false");
-  button.setAttribute("aria-label", "Toggle submenu");
-  button.addEventListener("click", () => {
-    const isExpanded = item.classList.toggle("expanded");
-    button.setAttribute("aria-expanded", String(isExpanded));
-  });
-  return button;
-};
-
-const setupClickToggle = (item) => {
-  if (item.querySelector(":scope > .nav-caret")) return;
-  const submenu = item.querySelector(":scope > ul");
-  if (!submenu) return;
-
-  const button = createCaretButton(item);
-  item.insertBefore(button, submenu);
-};
-
-const teardownClickToggle = (item) => {
-  const button = item.querySelector(":scope > .nav-caret");
-  if (button) button.remove();
-  item.classList.remove("expanded");
-};
-
-const applyClickMode = (navItems) => {
-  document.body.classList.remove("nav-can-hover");
+const updateNavMode = (navItems, canHover) => {
+  document.body.classList.toggle("nav-can-hover", canHover);
   for (const item of navItems) {
-    setupClickToggle(item);
-  }
-};
+    const existingButton = item.querySelector(":scope > .nav-caret");
+    if (canHover) {
+      existingButton?.remove();
+      item.classList.remove("expanded");
+      continue;
+    }
+    if (existingButton) continue;
+    const submenu = item.querySelector(":scope > ul");
+    if (!submenu) continue;
 
-const applyHoverMode = (navItems) => {
-  document.body.classList.add("nav-can-hover");
-  for (const item of navItems) {
-    teardownClickToggle(item);
+    const button = document.createElement("button");
+    button.className = "nav-caret";
+    button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-label", "Toggle submenu");
+    button.addEventListener("click", () => {
+      const isExpanded = item.classList.toggle("expanded");
+      button.setAttribute("aria-expanded", String(isExpanded));
+    });
+    item.insertBefore(button, submenu);
   }
 };
 
@@ -57,11 +41,10 @@ export const initNavDropdown = () => {
   if (navItems.length === 0) return;
 
   const hoverQuery = window.matchMedia("(hover: hover)");
-  const update = () =>
-    hoverQuery.matches ? applyHoverMode(navItems) : applyClickMode(navItems);
-
-  hoverQuery.addEventListener("change", update);
-  update();
+  hoverQuery.addEventListener("change", () =>
+    updateNavMode(navItems, hoverQuery.matches),
+  );
+  updateNavMode(navItems, hoverQuery.matches);
 };
 
 onReady(initNavDropdown);

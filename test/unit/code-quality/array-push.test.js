@@ -20,7 +20,6 @@ const { find: findArrayPush } = createCodeChecker({
 describe("array-push", () => {
   test("Detects .push() calls in source code", () => {
     const source = `
-const arr = [];
 arr.push(1);
 items.push(newItem);
 result.push(...more);

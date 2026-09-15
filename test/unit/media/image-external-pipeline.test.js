@@ -1,6 +1,7 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { computeExternalImageHtml } from "#media/image-external.js";
 import { LQIP_WIDTH } from "#media/image-lqip.js";
+import { expectAsyncThrows } from "#test/test-utils.js";
 
 const imageFn = vi.fn();
 const processFormats = vi.fn(() => Promise.resolve({ raw: true }));
@@ -23,6 +24,8 @@ vi.mock("#media/image-pipeline.js", () => ({
 }));
 
 describe("computeExternalImageHtml", () => {
+  beforeEach(() => vi.clearAllMocks());
+
   test("processes the url through the pipeline into wrapped html", async () => {
     const result = await computeExternalImageHtml({
       imageName: "https://example.com/pic.jpg",
@@ -45,7 +48,7 @@ describe("computeExternalImageHtml", () => {
 
     // The filename format eleventy-img will call: slugified alt + a
     // short url hash, then per-width naming.
-    expect(imageOptions.slug).toMatch(/^sample-picture-[0-9a-f]{8}$/);
+    expect(imageOptions.slug).toBe("sample-picture-58e7ee87");
     expect(
       imageOptions.filenameFormat("id", src, 320, "webp", imageOptions),
     ).toBe(`${imageOptions.slug}-320.webp`);
@@ -74,5 +77,44 @@ describe("computeExternalImageHtml", () => {
 
     const options = processFormats.mock.calls.at(-1)[2];
     expect(options.slug).toMatch(/^external-image-[0-9a-f]{8}$/);
+  });
+
+  test("deduplicates concurrent work despite different local-only noLqip flags", async () => {
+    const props = {
+      imageName: "https://example.com/shared.jpg",
+      alt: "Shared",
+    };
+    const results = await Promise.all([
+      computeExternalImageHtml({ ...props, noLqip: true }),
+      computeExternalImageHtml({ ...props, noLqip: false }),
+    ]);
+
+    expect(results).toEqual(["<div>wrapped</div>", "<div>wrapped</div>"]);
+    expect(processFormats).toHaveBeenCalledTimes(1);
+  });
+
+  test("does not retain settled processing results", async () => {
+    const props = {
+      imageName: "https://example.com/repeated.jpg",
+      alt: "Repeated",
+    };
+    await computeExternalImageHtml(props);
+    await computeExternalImageHtml(props);
+
+    expect(processFormats).toHaveBeenCalledTimes(2);
+  });
+
+  test("propagates processing failures without preventing a retry", async () => {
+    const error = new Error("External image download failed");
+    processFormats.mockRejectedValueOnce(error);
+    const props = { imageName: "https://example.com/retry.jpg", alt: "Retry" };
+
+    expect(await expectAsyncThrows(() => computeExternalImageHtml(props))).toBe(
+      error,
+    );
+    await expect(computeExternalImageHtml(props)).resolves.toBe(
+      "<div>wrapped</div>",
+    );
+    expect(processFormats).toHaveBeenCalledTimes(2);
   });
 });

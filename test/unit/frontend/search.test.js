@@ -1,16 +1,13 @@
 // Search UI tests
-// Tests renderResult, createSearchController, and initSearch behavior
+// Tests createSearchController, initSearch, and loadPagefind behavior
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   createSearchController,
-  handleSubmit,
   initSearch,
   loadPagefind,
-  readQueryParam,
-  renderResult,
 } from "#public/ui/search.js";
 import { withTempDirAsync } from "#test/test-utils.js";
 
@@ -87,19 +84,30 @@ afterEach(() => {
 });
 
 // ============================================
-// renderResult
+// renderResult (exercised via createSearchController)
 // ============================================
 
 describe("renderResult", () => {
-  test("creates list item with link to result URL", () => {
-    const el = renderResult(createMockResult());
+  /** Render a result through the public controller path and return its card. */
+  const renderWith = async (makeResult) => {
+    document.body.innerHTML = SEARCH_HTML;
+    const result = makeResult();
+    const handle = { data: vi.fn(() => Promise.resolve(result)) };
+    window.pagefind = createMockPagefind([handle]);
+    const controller = createSearchController(getElements());
+    await controller.runSearch("test");
+    return document.querySelector(".search-result");
+  };
+
+  test("creates list item with link to result URL", async () => {
+    const el = await renderWith(() => createMockResult());
     expect(el.tagName).toBe("LI");
     expect(el.className).toBe("search-result");
     expect(el.querySelector("a").href).toContain("/products/test-product/");
   });
 
-  test("includes image when meta.image is present", () => {
-    const el = renderResult(createMockResult());
+  test("includes image when meta.image is present", async () => {
+    const el = await renderWith(() => createMockResult());
     const img = el.querySelector("img");
     expect(img).not.toBeNull();
     expect(img.src).toContain("/img/test.jpg");
@@ -107,26 +115,28 @@ describe("renderResult", () => {
     expect(img.className).toBe("search-result__image");
   });
 
-  test("omits image when meta.image is absent", () => {
-    const result = createMockResult();
-    delete result.meta.image;
-    const el = renderResult(result);
+  test("omits image when meta.image is absent", async () => {
+    const el = await renderWith(() => {
+      const result = createMockResult();
+      delete result.meta.image;
+      return result;
+    });
     expect(el.querySelector("img")).toBeNull();
   });
 
-  test("displays title from meta", () => {
-    const el = renderResult(createMockResult());
+  test("displays title from meta", async () => {
+    const el = await renderWith(() => createMockResult());
     expect(el.querySelector("h3").textContent).toBe("Test Product");
   });
 
-  test("renders excerpt HTML with highlight marks", () => {
-    const el = renderResult(createMockResult());
+  test("renders excerpt HTML with highlight marks", async () => {
+    const el = await renderWith(() => createMockResult());
     const excerpt = el.querySelector(".search-result__body p");
     expect(excerpt.innerHTML).toContain("<mark>");
   });
 
-  test("omits excerpt paragraph when not provided", () => {
-    const el = renderResult(createMockResult({ excerpt: "" }));
+  test("omits excerpt paragraph when not provided", async () => {
+    const el = await renderWith(() => createMockResult({ excerpt: "" }));
     expect(el.querySelector(".search-result__body p")).toBeNull();
   });
 });
@@ -182,59 +192,70 @@ describe("loadPagefind", () => {
 });
 
 // ============================================
-// readQueryParam
+// readQueryParam (exercised via initSearch)
 // ============================================
 
 describe("readQueryParam", () => {
-  test("returns q param from URL", () => {
-    setSearchParam("hello");
+  test("reads the q param from the URL into the search input", async () => {
+    document.body.innerHTML = SEARCH_HTML;
+    window.pagefind = createMockPagefind();
 
-    expect(readQueryParam()).toBe("hello");
+    setSearchParam("hello");
+    initSearch();
+
+    expect(document.querySelector("input[type='search']").value).toBe("hello");
+    await vi.waitFor(() =>
+      expect(window.pagefind.search).toHaveBeenCalledWith("hello"),
+    );
   });
 
-  test("returns null when no q param", () => {
-    expect(readQueryParam()).toBeNull();
+  test("does not search when no q param is present", () => {
+    document.body.innerHTML = SEARCH_HTML;
+    window.pagefind = createMockPagefind();
+
+    initSearch();
+
+    expect(document.querySelector("input[type='search']").value).toBe("");
+    expect(window.pagefind.search).not.toHaveBeenCalled();
   });
 });
 
 // ============================================
-// handleSubmit
+// handleSubmit (exercised via a real cancelable form submit event)
 // ============================================
 
 describe("handleSubmit", () => {
-  test("calls runSearch with trimmed input value", () => {
-    const controller = {
-      input: { value: "  widgets  " },
-      runSearch: vi.fn(),
-    };
-    const event = { preventDefault: vi.fn() };
+  /** Set up the page, init, set the input value, and submit the form. */
+  const submitWith = (value) => {
+    document.body.innerHTML = SEARCH_HTML;
+    window.pagefind = createMockPagefind();
+    initSearch();
+    document.querySelector("input[type='search']").value = value;
+    const event = new Event("submit", { cancelable: true });
+    document.querySelector(".search-box").dispatchEvent(event);
+    return event;
+  };
 
-    handleSubmit(controller)(event);
+  test("prevents default and searches with the trimmed input", async () => {
+    const event = submitWith("  widgets  ");
 
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(controller.runSearch).toHaveBeenCalledWith("widgets");
+    expect(event.defaultPrevented).toBe(true);
+    await vi.waitFor(() =>
+      expect(window.pagefind.search).toHaveBeenCalledWith("widgets"),
+    );
   });
 
   test("updates URL with query parameter", () => {
-    const controller = {
-      input: { value: "gadgets" },
-      runSearch: vi.fn(),
-    };
-
-    handleSubmit(controller)({ preventDefault: vi.fn() });
+    submitWith("gadgets");
 
     expect(window.location.search).toContain("q=gadgets");
   });
 
   test("does not search when input is empty", () => {
-    const controller = {
-      input: { value: "   " },
-      runSearch: vi.fn(),
-    };
+    const event = submitWith("   ");
 
-    handleSubmit(controller)({ preventDefault: vi.fn() });
-
-    expect(controller.runSearch).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(true);
+    expect(window.pagefind.search).not.toHaveBeenCalled();
   });
 });
 
@@ -341,17 +362,6 @@ describe("initSearch", () => {
     expect(() => initSearch()).not.toThrow();
   });
 
-  test("populates input from URL query param", () => {
-    document.body.innerHTML = SEARCH_HTML;
-    window.pagefind = createMockPagefind();
-
-    setSearchParam("hello");
-
-    initSearch();
-
-    expect(document.querySelector("input[type='search']").value).toBe("hello");
-  });
-
   test("populates page input, not unrelated navigation search box", () => {
     document.body.innerHTML = `
       <body class="design-system">
@@ -384,18 +394,5 @@ describe("initSearch", () => {
 
     expect(document.querySelector("#page-input").value).toBe("hello");
     expect(document.querySelector("#nav-input").value).toBe("");
-  });
-
-  test("form submit with empty input does not search", () => {
-    document.body.innerHTML = SEARCH_HTML;
-    window.pagefind = createMockPagefind();
-
-    initSearch();
-    document.querySelector("input[type='search']").value = "   ";
-    document
-      .querySelector(".search-box")
-      .dispatchEvent(new Event("submit", { cancelable: true }));
-
-    expect(window.pagefind.search).not.toHaveBeenCalled();
   });
 });
