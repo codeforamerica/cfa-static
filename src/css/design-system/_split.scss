@@ -1,4 +1,6 @@
 // jscpd:ignore-start -- shared @use import block
+@use "sass:list";
+@use "sass:map";
 @use "../variables" as *;
 @use "../mixins" as *;
 @use "../breakpoints" as breakpoint;
@@ -50,9 +52,12 @@
 
       figcaption {
         padding: $space-xs $space-sm;
-        font-size: $font-size-sm;
+
+        @include body-sm;
+
         font-style: italic;
-        background: var(--color-card-bg);
+
+        @include card-bg;
       }
 
       @include video-media;
@@ -71,6 +76,20 @@
         @include breakpoint.up("md") {
           padding-#{$side}: $space-2xl;
         }
+      }
+    }
+
+    // The two panels of a colored split-full variant, built here once so the
+    // dark and primary selectors share this one source. Pass $cross: true
+    // for the transparent opposite panels.
+    @mixin split-variant-panels($variant, $cross: false) {
+      $pair: map.get((false: (left, right), true: (right, left)), $cross);
+      $left-panel: list.nth($pair, 1);
+      $right-panel: list.nth($pair, 2);
+
+      &.#{$variant}-left .#{$left-panel},
+      &.#{$variant}-right .#{$right-panel} {
+        @content;
       }
     }
 
@@ -101,27 +120,24 @@
 
     .right {
       justify-content: flex-start;
-      background: var(--color-card-bg);
 
+      @include card-bg;
       @include split-panel-inset(left);
     }
 
     // Color variants — opposite panel transparent to show section background
-    &.dark-left .right,
-    &.dark-right .left {
+    @include split-variant-panels(dark, true) {
       background: transparent;
     }
 
     // Dark colored panels
-    &.dark-left .left,
-    &.dark-right .right {
+    @include split-variant-panels(dark) {
       @include dark-section-vars;
       @include split-btn-colors($color-dark-text, $color-dark-bg);
     }
 
     // Primary colored panels
-    &.primary-left .left,
-    &.primary-right .right {
+    @include split-variant-panels(primary) {
       @include split-btn-colors(var(--color-contrast-text), $color-text);
 
       background: var(--color-link);

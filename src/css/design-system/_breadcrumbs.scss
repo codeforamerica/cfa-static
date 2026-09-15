@@ -19,7 +19,8 @@
 
     padding-block: $space-sm;
 
-    font-size: $font-size-sm;
+    @include body-sm;
+
     list-style: none;
 
     li {

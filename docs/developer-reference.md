@@ -21,7 +21,7 @@ Every declared npm script is listed below in package order. Values are the exact
 | `npm run test:integration` | `vitest run test/integration` |
 | `npm run typecheck` | `tsc --noEmit --incremental --tsBuildInfoFile tsconfig.tsbuildinfo` |
 | `npm run typecheck:strict` | `node scripts/strict-typecheck-ratchet.js` |
-| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 17 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from' --max-gap-lines 3 --ignore-case && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 32 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from' --max-gap-lines 3 --ignore-identifiers --ignore-literals --similarity 0.85 && node scripts/cpd.js src/_lib/utils/fp --min-tokens 12 --max-gap-lines 3 && node scripts/cpd.js src/css/design-system --min-tokens 17 --max-gap-lines 3` |
+| `npm run cpd` | `node scripts/cpd.js && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 17 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from' --max-gap-lines 3 --ignore-case && node scripts/cpd.js src/_lib src/_data scripts --min-tokens 32 --ignore '**/index.js,**/customise-cms/**,**/mutation/**' --ignore-pattern 'import.*from' --max-gap-lines 3 --ignore-identifiers --ignore-literals --similarity 0.85 && node scripts/cpd.js src/_lib/utils/fp --min-tokens 12 --max-gap-lines 3 && node scripts/cpd.js src/css/design-system --min-tokens 16 --max-gap-lines 3` |
 | `npm run cpd:ratchet` | `node scripts/cpd-ratchet.js` |
 | `npm run knip` | `knip` |
 | `npm run knip:fix` | `knip --fix` |

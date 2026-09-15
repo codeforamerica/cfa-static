@@ -76,11 +76,8 @@
       flex-direction: column;
       gap: var(--item-gap);
 
-      border: $border-light;
-      border-radius: $radius-lg;
-
-      background: var(--color-card-bg);
-
+      @include box-border($radius-lg);
+      @include card-bg;
       @include card-hover;
 
       &.featured {

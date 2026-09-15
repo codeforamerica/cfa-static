@@ -201,6 +201,21 @@
   border-radius: $radius;
 }
 
+// Card surface background, shared by every element that sits on a card.
+@mixin card-bg {
+  background: var(--color-card-bg);
+}
+
+// Interactive row link: optional light border, always plain and
+// color-inheriting. Shared by the downloads and icon-links blocks.
+@mixin row-link($border: true) {
+  @if $border {
+    @include box-border;
+  }
+
+  @include plain-row-link;
+}
+
 @mixin card-hover {
   transition:
     transform $transition-normal,
