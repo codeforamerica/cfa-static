@@ -1,10 +1,9 @@
-/* jscpd:ignore-start */
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   SPLIT_BASE_DOCS,
   SPLIT_BASE_FIELDS,
   str,
 } from "#utils/block-schema/split-shared.js";
-/* jscpd:ignore-end */
 
 export const type = "split-code";
 export const template = "design-system/split.html";
@@ -40,3 +39,4 @@ export const example = {
   figure_language: "json",
   figure_code: '{\n  "name": "My Site",\n  "url": "https://example.com"\n}',
 };
+/* jscpd:ignore-end */

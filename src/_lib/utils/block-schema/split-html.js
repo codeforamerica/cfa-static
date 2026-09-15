@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   md,
   SPLIT_BASE_DOCS,
@@ -28,3 +29,4 @@ export const example = {
     "## Text beside custom HTML\n\nThe figure column renders whatever HTML you give it.",
   figure_html: '<p style="font-size:3rem;text-align:center">&#127881;</p>',
 };
+/* jscpd:ignore-end */

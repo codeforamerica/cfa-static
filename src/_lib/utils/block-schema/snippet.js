@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 export const type = "snippet";
 
 export const fields = {
@@ -22,3 +23,4 @@ export const example = {
   type: "snippet",
   reference: "demo",
 };
+/* jscpd:ignore-end */

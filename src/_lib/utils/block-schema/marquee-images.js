@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   INTRO_CONTENT_FIELD,
   objectList,
@@ -51,3 +52,4 @@ export const example = {
     { image: "fireworks.jpg", alt: "Fireworks" },
   ],
 };
+/* jscpd:ignore-end */

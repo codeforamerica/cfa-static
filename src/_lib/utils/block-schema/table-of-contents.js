@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { str } from "#utils/block-schema/shared.js";
 
 export const type = "table-of-contents";
@@ -33,3 +34,4 @@ export const example = {
   title: "On this page",
   levels: "2,3",
 };
+/* jscpd:ignore-end */

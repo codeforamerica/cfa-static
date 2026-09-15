@@ -11,12 +11,14 @@
 import { createElement } from "#public/utils/dom.js";
 import { onReady } from "#public/utils/on-ready.js";
 
+/* jscpd:ignore-start -- declaration data: popup selector constants */
 const TRACK = "[data-popup-track]";
 const THUMBS = "[data-popup-thumbs]";
 const STATUS = "[data-popup-status]";
 const NAV = "[data-nav]";
 const CLOSE = "[data-popup-close]";
 const THUMB = "[data-popup-thumb]";
+/* jscpd:ignore-end */
 
 const SLIDE_SIZES = "100vw";
 const THUMB_SIZES = "96px";
@@ -39,8 +41,7 @@ const setImageSizes = (root, sizes) => {
   }
 };
 
-// The contain-fitted LQIP background peeks out around the loaded image's
-// edges as a blurred halo, so drop it as soon as the real pixels arrive.
+// The contain-fitted LQIP background peeks out past the loaded image as a halo.
 const clearLqipOnLoad = (clone) => {
   const img = clone.querySelector("img");
   if (!img) return;
@@ -170,7 +171,6 @@ const handleDialogClick = (event) => {
   }
   if (event.target.closest(CLOSE)) return event.currentTarget.close();
   if (event.target.closest(THUMBS)) return;
-  // Anything else - the image, empty stage space, or the backdrop - closes.
   event.currentTarget.close();
 };
 

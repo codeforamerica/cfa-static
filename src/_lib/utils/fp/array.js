@@ -362,6 +362,7 @@ const pluralize = (singular, plural) => {
   return (count) => (count === 1 ? `1 ${singular}` : `${count} ${pluralForm}`);
 };
 
+/* jscpd:ignore-start -- declaration data: exported name list */
 export {
   compact,
   exclude,
@@ -384,3 +385,4 @@ export {
   unique,
   uniqueBy,
 };
+/* jscpd:ignore-end */

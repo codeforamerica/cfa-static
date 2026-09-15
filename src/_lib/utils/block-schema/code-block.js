@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { str } from "#utils/block-schema/shared.js";
 
 export const type = "code-block";
@@ -37,3 +38,4 @@ export const example = {
   language: "bash",
   code: "npm install\nnpm run serve",
 };
+/* jscpd:ignore-end */

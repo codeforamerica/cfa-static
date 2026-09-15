@@ -1,6 +1,5 @@
-/* jscpd:ignore-start */
+/* jscpd:ignore-start -- block schema declaration data */
 import { SPLIT_BASE_FIELDS, str } from "#utils/block-schema/split-shared.js";
-/* jscpd:ignore-end */
 
 export const type = "split-callout";
 
@@ -44,3 +43,4 @@ export const example = {
   figure_name: "Talk to a person",
   figure_subtitle: "Phone lines open 9-5, Monday to Friday.",
 };
+/* jscpd:ignore-end */

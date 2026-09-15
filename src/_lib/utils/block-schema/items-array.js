@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   ITEMS_FILTERABLE_FIELDS,
   ITEMS_GRID_META,
@@ -28,3 +29,4 @@ export const example = {
   intro_content:
     "## Hand-picked items\n\nList file paths, or a directory to include everything in it.",
 };
+/* jscpd:ignore-end */

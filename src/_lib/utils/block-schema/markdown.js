@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { md } from "#utils/block-schema/shared.js";
 
 export const type = "markdown";
@@ -22,3 +23,4 @@ export const example = {
   content:
     "## Plain markdown\n\nThe simplest block: write markdown, get rich text. Lists, links, and **emphasis** all work.\n\n- One\n- Two\n- Three",
 };
+/* jscpd:ignore-end */

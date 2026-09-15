@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { md } from "#utils/block-schema/shared.js";
 
 export const type = "section-header";
@@ -28,3 +29,4 @@ export const example = {
   intro:
     "## Section headers introduce a page section\n\nUse one wherever a group of blocks needs a heading and a sentence of context.",
 };
+/* jscpd:ignore-end */

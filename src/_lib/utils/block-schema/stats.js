@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   INTRO_CONTENT_FIELD,
   objectList,
@@ -6,7 +7,6 @@ import {
 
 export const type = "stats";
 
-/* jscpd:ignore-start */
 export const fields = {
   items: {
     ...objectList("Statistics", {
@@ -18,7 +18,6 @@ export const fields = {
     description:
       'Stat objects: `{value, label}` or pipe-delimited strings `"value|label"`.',
   },
-  /* jscpd:ignore-end */
   intro_content: INTRO_CONTENT_FIELD,
   reveal: {
     type: "boolean",
@@ -41,3 +40,4 @@ export const example = {
     { value: "0", label: "Servers to run" },
   ],
 };
+/* jscpd:ignore-end */

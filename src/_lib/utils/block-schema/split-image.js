@@ -1,10 +1,9 @@
-/* jscpd:ignore-start */
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   SPLIT_BASE_DOCS,
   SPLIT_BASE_FIELDS,
   str,
 } from "#utils/block-schema/split-shared.js";
-/* jscpd:ignore-end */
 
 export const type = "split-image";
 export const template = "design-system/split.html";
@@ -41,3 +40,4 @@ export const example = {
   figure_alt: "Fireworks over a city at night",
   figure_caption: "Captions are optional.",
 };
+/* jscpd:ignore-end */

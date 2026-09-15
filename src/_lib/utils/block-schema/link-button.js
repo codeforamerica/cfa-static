@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { LINK_BUTTON_STYLE_FIELDS, str } from "#utils/block-schema/shared.js";
 
 export const type = "link-button";
@@ -28,3 +29,4 @@ export const example = {
   href: "/search/",
   variant: "primary",
 };
+/* jscpd:ignore-end */

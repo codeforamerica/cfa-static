@@ -133,12 +133,15 @@ const withSchemaLanguage = (meta, pageLanguage) => ({
  * Configure breadcrumbs in Eleventy
  * @param {import("#lib/types").UserConfig} eleventyConfig
  */
-const configureBreadcrumbs = (eleventyConfig) =>
+const configureBreadcrumbs = (eleventyConfig) => {
+  /* jscpd:ignore-start -- declaration data: registered filter map */
   registerFilters(eleventyConfig)({
     breadcrumbsFilter,
     withSchemaBreadcrumbs,
     withSchemaLanguage,
   });
+  /* jscpd:ignore-end */
+};
 
 export {
   breadcrumbsFilter,

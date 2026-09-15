@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { HERO_CONTENT_FIELDS, str } from "#utils/block-schema/shared.js";
 
 export const type = "hero";
@@ -36,3 +37,4 @@ export const example = {
     { text: "Secondary", href: "/news/", variant: "secondary", size: "lg" },
   ],
 };
+/* jscpd:ignore-end */

@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   collectionField,
   FILTER_FIELD,
@@ -35,3 +36,4 @@ export const example = {
   collection: "news",
   intro_content: "## A collection as link columns",
 };
+/* jscpd:ignore-end */

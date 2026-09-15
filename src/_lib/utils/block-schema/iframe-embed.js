@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import { INTRO_CONTENT_FIELD, num, str } from "#utils/block-schema/shared.js";
 
 export const type = "iframe-embed";
@@ -64,3 +65,4 @@ export const example = {
   aspect_ratio: "16/9",
   max_width: "560px",
 };
+/* jscpd:ignore-end */

@@ -18,6 +18,7 @@ const FORMAT_UNITS = ["B", "KB", "MB", "GB"];
  * per-extension map below so the grouped data lives here once.
  * @type {Array<[string, string[]]>}
  */
+/* jscpd:ignore-start -- declaration data: extension->icon groups */
 const ICON_GROUPS = [
   ["pdf-02", ["pdf"]],
   ["doc-01", ["doc", "docx", "odt", "rtf"]],
@@ -29,6 +30,7 @@ const ICON_GROUPS = [
   ["music-note-01", ["mp3", "wav", "m4a", "ogg"]],
   ["video-01", ["mp4", "mov", "webm"]],
 ];
+/* jscpd:ignore-end */
 
 /**
  * Extension → Iconify icon id (all icons use the hugeicons set already cached by the project).

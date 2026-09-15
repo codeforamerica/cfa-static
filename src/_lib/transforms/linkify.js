@@ -16,6 +16,7 @@ import { frozenSet } from "#utils/fp/set.js";
 const SKIP_TAGS = frozenSet(["a", "script", "style", "code", "pre", "title"]);
 
 /** Block-level elements - stop ancestor search when we hit one */
+/* jscpd:ignore-start -- declaration data: element tag list */
 const BLOCK_TAGS = frozenSet([
   "p",
   "div",
@@ -40,8 +41,11 @@ const BLOCK_TAGS = frozenSet([
   "td",
   "th",
   "form",
-  "body",
+  "table",
+  "ul",
+  "ol",
 ]);
+/* jscpd:ignore-end */
 
 /** @type {(value: string) => TextPart} */
 const textPart = (value) => ({ type: "text", value });

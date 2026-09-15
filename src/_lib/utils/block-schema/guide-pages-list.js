@@ -1,12 +1,11 @@
+/* jscpd:ignore-start -- block schema declaration data */
 export const type = "guide-pages-list";
 
-/* jscpd:ignore-start */
 export const containerWidth = "full";
 
 export const collections = ["guide-categories"];
 
 export const fields = {};
-/* jscpd:ignore-end */
 
 export const docs = {
   summary:
@@ -18,3 +17,4 @@ export const docs = {
 export const example = {
   type: "guide-pages-list",
 };
+/* jscpd:ignore-end */

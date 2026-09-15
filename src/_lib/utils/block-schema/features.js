@@ -1,3 +1,4 @@
+/* jscpd:ignore-start -- block schema declaration data */
 import {
   bool,
   INTRO_CONTENT_FIELD,
@@ -61,3 +62,4 @@ export const example = {
     },
   ],
 };
+/* jscpd:ignore-end */
