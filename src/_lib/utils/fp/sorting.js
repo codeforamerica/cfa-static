@@ -73,4 +73,4 @@ const orderThenString = (getNumeric, getString) => (a, b) => {
   return diff !== 0 ? diff : compareBy(getString)(a, b);
 };
 
-export { compareBy, descending, orderThenString };
+export { compareBy, compareStringKeys, descending, orderThenString };

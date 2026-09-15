@@ -1,3 +1,4 @@
+import { registerFilters } from "#eleventy/register.js";
 import { createFieldIndexer } from "#utils/collection-utils.js";
 import { normaliseSlug } from "#utils/slug-utils.js";
 
@@ -42,10 +43,11 @@ const guidesForProperty = (guides, propertySlug) => {
 };
 
 /** @param {*} eleventyConfig */
-const configureGuides = (eleventyConfig) => {
-  eleventyConfig.addFilter("guidesByCategory", guidesByCategory);
-  eleventyConfig.addFilter("generalGuides", generalGuides);
-  eleventyConfig.addFilter("guidesForProperty", guidesForProperty);
-};
+const configureGuides = (eleventyConfig) =>
+  registerFilters(eleventyConfig)({
+    guidesByCategory,
+    generalGuides,
+    guidesForProperty,
+  });
 
 export { configureGuides, generalGuides, guidesByCategory, guidesForProperty };

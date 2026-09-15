@@ -231,10 +231,10 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 
 | Export | JSDoc Summary |
 | --- | --- |
-| [`buildFirstOccurrenceLookup`](../src/_lib/utils/fp/grouping.js#L95) | Build a first-occurrence-wins lookup from items |
-| [`buildReverseIndex`](../src/_lib/utils/fp/grouping.js#L46) | Build a reverse index from items to keys (many-to-many relationship) |
-| [`groupBy`](../src/_lib/utils/fp/grouping.js#L114) | Group items by a single key (one-to-many relationship) |
-| [`groupValuesBy`](../src/_lib/utils/fp/grouping.js#L69) | Group values by key with deduplication |
+| [`buildFirstOccurrenceLookup`](../src/_lib/utils/fp/grouping.js#L107) | Build a first-occurrence-wins lookup from items |
+| [`buildReverseIndex`](../src/_lib/utils/fp/grouping.js#L61) | Build a reverse index from items to keys (many-to-many relationship) |
+| [`groupBy`](../src/_lib/utils/fp/grouping.js#L126) | Group items by a single key (one-to-many relationship) |
+| [`groupValuesBy`](../src/_lib/utils/fp/grouping.js#L81) | Group values by key with deduplication |
 
 ### `#utils/fp/memoize.js`
 
@@ -284,6 +284,7 @@ Source: every `.js` file directly under `src/_lib/utils/fp/`. Names come from pa
 | Export | JSDoc Summary |
 | --- | --- |
 | [`compareBy`](../src/_lib/utils/fp/sorting.js#L43) | Create a comparator from a key-extraction function. Auto-detects type: uses localeCompare for strings, subtraction for numbers. |
+| [`compareStringKeys`](../src/_lib/utils/fp/sorting.js#L11) | Compare two string keys using locale comparison. |
 | [`descending`](../src/_lib/utils/fp/sorting.js#L61) | Reverse a comparator (flip ascending to descending or vice versa). |
 | [`orderThenString`](../src/_lib/utils/fp/sorting.js#L71) | Factory function to create a comparator that sorts by numeric value first, then by string value as a secondary sort key. |
 

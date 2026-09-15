@@ -101,6 +101,13 @@ const ELEVENTY_REGISTRATION_PATTERN = new RegExp(
   "g",
 );
 
+// Matches the registerFilters map form used by configure* modules:
+//   registerFilters(eleventyConfig)({ shorthand, key: implementation, ... })
+// and captures the implementation references, which would otherwise be
+// invisible to the addFilter("name", fn) pattern above.
+const REGISTER_FILTERS_PATTERN =
+  /registerFilters\s*\([^)]*\)\s*\(\s*\{([\s\S]*?)\}/g;
+
 // Matches: import name from "path" (default imports)
 const DEFAULT_IMPORT_PATTERN =
   /import\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s+from\s*["']([^"']+)["']/g;
@@ -349,9 +356,26 @@ import { orig as alias } from "#utils/test.js";
       SRC_JS_FILES()
         .map((file) => [
           file,
-          [...readSource(file).matchAll(ELEVENTY_REGISTRATION_PATTERN)].map(
-            (match) => match[1],
-          ),
+          unique([
+            ...[
+              ...readSource(file).matchAll(ELEVENTY_REGISTRATION_PATTERN),
+            ].map((match) => match[1]),
+            // Map form: named entries (`key: implementation`) and shorthands
+            ...readSource(file)
+              .matchAll(REGISTER_FILTERS_PATTERN)
+              .flatMap((match) =>
+                unique([
+                  ...[...match[1].matchAll(/:\s*([A-Za-z_$][\w$]*)/g)].map(
+                    (ref) => ref[1],
+                  ),
+                  ...[
+                    ...match[1].matchAll(
+                      /(?:^|,)\s*([A-Za-z_$][\w$]*)\s*(?=,|$|\})/g,
+                    ),
+                  ].map((ref) => ref[1]),
+                ]),
+              ),
+          ]),
         ])
         .filter(([, registered]) => registered.length > 0),
     );

@@ -14,10 +14,12 @@ import {
   getNewestCollectionItemDate,
 } from "@11ty/eleventy-plugin-rss";
 import { fileInfo } from "#eleventy/file-info.js";
+import { registerFilters } from "#eleventy/register.js";
 import { canonicalUrl } from "#utils/canonical-url.js";
 import { filterItems } from "#utils/collection-filter.js";
 import { sort } from "#utils/fp/array.js";
 import { frozenObject } from "#utils/fp/object.js";
+import { compareBy } from "#utils/fp/sorting.js";
 import { datesFor, formatIso } from "#utils/git-dates.js";
 import { sortItems } from "#utils/sorting.js";
 
@@ -68,7 +70,7 @@ const splitHashtags = (str) => {
     .filter((segment) => segment.text !== "");
 };
 
-const byName = sort((a, b) => a.data.name.localeCompare(b.data.name));
+const byName = sort(compareBy((item) => item.data.name));
 
 /**
  * Alphabetise a collection, drop the current page, and attach the separator
@@ -109,8 +111,5 @@ const FILTERS = frozenObject({
 });
 
 /** @param {*} eleventyConfig */
-export const configureFilters = (eleventyConfig) => {
-  for (const [name, fn] of Object.entries(FILTERS)) {
-    eleventyConfig.addFilter(name, fn);
-  }
-};
+export const configureFilters = (eleventyConfig) =>
+  registerFilters(eleventyConfig)(FILTERS);

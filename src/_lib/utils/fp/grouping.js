@@ -27,6 +27,21 @@ const appendToMap = (map, [key, item]) =>
 const collectToMap = (pairs) => reduce(appendToMap, new Map())(pairs);
 
 /**
+ * Curried collector: turn items into [key, item] pairs, then group them
+ * into a Map. Both groupers below differ only in how a key is extracted,
+ * so the map-building shape lives here once.
+ * @template T
+ * @template K
+ * @param {(item: T) => Iterable<[K, T]>} toPairs - Pair extraction function
+ * @returns {(items: T[]) => Map<K, T[]>} Grouping function
+ */
+const collectBy = (toPairs) =>
+  pipe(
+    flatMap((item) => [...toPairs(item)]),
+    collectToMap,
+  );
+
+/**
  * Build a reverse index from items to keys (many-to-many relationship)
  *
  * Each item can map to multiple keys via the getKeys function.
@@ -44,10 +59,7 @@ const collectToMap = (pairs) => reduce(appendToMap, new Map())(pairs);
  * const widgetProducts = index.get("widgets") ?? [];
  */
 const buildReverseIndex = (items, getKeys) =>
-  pipe(
-    flatMap((item) => getKeys(item).map((key) => [key, item])),
-    collectToMap,
-  )(items);
+  collectBy((item) => getKeys(item).map((key) => [key, item]))(items);
 
 /**
  * Group values by key with deduplication
@@ -114,8 +126,7 @@ const buildFirstOccurrenceLookup = (items, getPairs) =>
 const groupBy = (items, getKey) =>
   pipe(
     filter((item) => getKey(item) != null),
-    flatMap((item) => [[getKey(item), item]]),
-    collectToMap,
+    collectBy((item) => [[getKey(item), item]]),
   )(items);
 
 export {

@@ -8,6 +8,7 @@
  */
 
 import strings from "#data/strings.js";
+import { registerFilters } from "#eleventy/register.js";
 import { canonicalUrl } from "#utils/canonical-url.js";
 import { translationForUrl } from "#utils/i18n.js";
 
@@ -132,11 +133,12 @@ const withSchemaLanguage = (meta, pageLanguage) => ({
  * Configure breadcrumbs in Eleventy
  * @param {import("#lib/types").UserConfig} eleventyConfig
  */
-const configureBreadcrumbs = (eleventyConfig) => {
-  eleventyConfig.addFilter("breadcrumbsFilter", breadcrumbsFilter);
-  eleventyConfig.addFilter("withSchemaBreadcrumbs", withSchemaBreadcrumbs);
-  eleventyConfig.addFilter("withSchemaLanguage", withSchemaLanguage);
-};
+const configureBreadcrumbs = (eleventyConfig) =>
+  registerFilters(eleventyConfig)({
+    breadcrumbsFilter,
+    withSchemaBreadcrumbs,
+    withSchemaLanguage,
+  });
 
 export {
   breadcrumbsFilter,

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import markdownIt from "markdown-it";
+import { registerFilters } from "#eleventy/register.js";
 import { memoize } from "#utils/fp/memoize.js";
 import { processLiquidStrings } from "#utils/liquid-render.js";
 import { validateSidebarBlocks } from "#utils/sidebar-blocks.js";
@@ -218,15 +219,19 @@ const renderSnippetShortcode = async (name, defaultString, mdRenderer) =>
 const configureFileUtils = (eleventyConfig) => {
   const mdRenderer = createMarkdownRenderer();
 
-  eleventyConfig.addFilter("snippet_data", snippetDataFilter);
-  eleventyConfig.addAsyncFilter("snippet_blocks", snippetBlocksFilter);
-  eleventyConfig.addAsyncFilter("sidebar_blocks", sidebarBlocksFilter);
-  eleventyConfig.addAsyncFilter("render_block_liquid", renderBlockLiquidFilter);
-  eleventyConfig.addFilter(
-    "markdown",
-    /** @param {string | null | undefined} str */
-    (str) => (str ? mdRenderer.render(str) : ""),
-  );
+  registerFilters(eleventyConfig)({
+    snippet_data: snippetDataFilter,
+    markdown: /** @param {string | null | undefined} str */ (str) =>
+      str ? mdRenderer.render(str) : "",
+  });
+  registerFilters(
+    eleventyConfig,
+    "addAsyncFilter",
+  )({
+    snippet_blocks: snippetBlocksFilter,
+    sidebar_blocks: sidebarBlocksFilter,
+    render_block_liquid: renderBlockLiquidFilter,
+  });
 
   eleventyConfig.addAsyncShortcode(
     "render_snippet",
