@@ -26,14 +26,19 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { gunzipSync } from "node:zlib";
 import { ROOT_DIR } from "#lib/paths.js";
-import { isMainModule } from "#scripts/lib/is-main-module.js";
+import { runIfMain } from "#scripts/lib/is-main-module.js";
 
 export const JSCPD_VERSION = "5.2.0";
 export const JSCPD_URL = `https://registry.npmjs.org/jscpd-linux-x64-musl/-/jscpd-linux-x64-musl-${JSCPD_VERSION}.tgz`;
 export const JSCPD_SHA256 =
   "6dc6cdd9d245b485e5382872546e406e1d608500832a63644353b97b1faedf8c";
 
-/** @type {{ binaryPath: string, binDir: string }} */
+/**
+ * Where the installer looks for and writes the jscpd binary.
+ * @typedef {{ binaryPath: string, binDir: string }} JscpdPaths
+ */
+
+/** @type {JscpdPaths} */
 export const jscpdPaths = {
   binaryPath: join(ROOT_DIR, ".bin", "jscpd"),
   binDir: join(ROOT_DIR, ".bin"),
@@ -81,17 +86,26 @@ const downloadTarball = async (url) => {
   return Buffer.from(await response.arrayBuffer());
 };
 
-/** Install the pinned binary when the cached one is missing or wrong. */
-export const installJscpd = async (paths = jscpdPaths) => {
+/**
+ * Install the pinned binary when the cached one is missing or wrong.
+ * @param {JscpdPaths} [paths] - Where to look for and write the binary
+ * @param {string} [expectedSha256] - The checksum the installed binary must
+ * match; injectable so tests can exercise the flow with fixture content
+ * @returns {Promise<string>} The verified binary path
+ */
+export const installJscpd = async (
+  paths = jscpdPaths,
+  expectedSha256 = JSCPD_SHA256,
+) => {
   const cached = existsSync(paths.binaryPath)
     ? sha256Hex(readFileSync(paths.binaryPath))
     : null;
-  if (cached === JSCPD_SHA256) return paths.binaryPath;
+  if (cached === expectedSha256) return paths.binaryPath;
 
   mkdirSync(paths.binDir, { recursive: true });
   const tar = gunzipSync(await downloadTarball(JSCPD_URL));
   const binary = jscpdEntryFromTar(tar);
-  if (sha256Hex(binary) !== JSCPD_SHA256) {
+  if (sha256Hex(binary) !== expectedSha256) {
     throw new Error("jscpd binary checksum mismatch");
   }
 
@@ -102,14 +116,31 @@ export const installJscpd = async (paths = jscpdPaths) => {
   return paths.binaryPath;
 };
 
-/** The jscpd binary path if it is already installed and verified. */
-export const installedJscpd = (paths = jscpdPaths) =>
+/** The jscpd binary path if it is already installed and verified.
+ * @param {JscpdPaths} [paths] - Where the binary lives
+ * @param {string} [expectedSha256] - The checksum to verify against
+ * @returns {string | null}
+ */
+export const installedJscpd = (
+  paths = jscpdPaths,
+  expectedSha256 = JSCPD_SHA256,
+) =>
   existsSync(paths.binaryPath) &&
-  sha256Hex(readFileSync(paths.binaryPath)) === JSCPD_SHA256
+  sha256Hex(readFileSync(paths.binaryPath)) === expectedSha256
     ? paths.binaryPath
     : null;
 
-if (isMainModule(import.meta.url)) {
-  const path = await installJscpd();
+/** CLI action: install the pinned binary and report where it landed.
+ * @param {JscpdPaths} [paths] - Where to look for and write the binary
+ * @param {string} [expectedSha256] - The checksum to verify against
+ * @returns {Promise<void>}
+ */
+export const installJscpdMain = async (
+  paths = jscpdPaths,
+  expectedSha256 = JSCPD_SHA256,
+) => {
+  const path = await installJscpd(paths, expectedSha256);
   console.log(`jscpd ${JSCPD_VERSION} ready at ${resolve(path)}`);
-}
+};
+
+await runIfMain(import.meta.url, installJscpdMain);

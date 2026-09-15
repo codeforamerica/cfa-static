@@ -177,11 +177,13 @@ export const buildCpdFailureLines = (duplicates) => {
  * shell and pre-commit hook install (scripts/jscpd/install.js), then a
  * binary dropped at bin/jscpd. GitHub Actions and ordinary npm installs
  * have none of these and keep using the npm-shipped binary via npx.
+ * @param {boolean} [includeInstalled] - Check the devenv-staged deployment
+ * when true; pass false to isolate the repo-local fallback in tests.
  * @returns {string | null}
  */
-export const jscpdBinaryPath = () => {
+export const jscpdBinaryPath = (includeInstalled = true) => {
   if (process.env.JSCPD_BIN) return process.env.JSCPD_BIN;
-  if (installedJscpd()) return jscpdPaths.binaryPath;
+  if (includeInstalled && installedJscpd()) return jscpdPaths.binaryPath;
   const local = join(ROOT_DIR, "bin", "jscpd");
   return existsSync(local) ? local : null;
 };

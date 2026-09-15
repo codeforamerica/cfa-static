@@ -204,6 +204,26 @@ describe("jscpdBinaryPath", () => {
       else process.env.JSCPD_BIN = previous;
     }
   });
+
+  test("falls back to the repo-local bin/jscpd when no installed binary applies", () => {
+    const binDir = join(ROOT_DIR, "bin");
+    const local = join(binDir, "jscpd");
+    const previous = process.env.JSCPD_BIN;
+    delete process.env.JSCPD_BIN;
+    try {
+      mkdirSync(binDir, { recursive: true });
+      writeFileSync(local, "");
+
+      expect(jscpdBinaryPath(false)).toBe(local);
+
+      rmSync(local, { force: true });
+      expect(jscpdBinaryPath(false)).toBeNull();
+    } finally {
+      rmSync(local, { force: true });
+      if (previous === undefined) delete process.env.JSCPD_BIN;
+      else process.env.JSCPD_BIN = previous;
+    }
+  });
 });
 
 describe("runCpd", () => {
